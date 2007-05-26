@@ -8,4 +8,4 @@ INCLUDES = $(all_includes)
 cgiscaler_LDFLAGS = $(all_libraries)
 cgiscalerdir = /var/www/localhost/cgi-bin/scaler
 cgiscaler_PROGRAMS = cgiscaler
-noinst_HEADERS = debug.h query_string.h
+noinst_HEADERS = config.h debug.h query_string.h

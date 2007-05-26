@@ -18,14 +18,10 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-struct point {
-  int w;
-  int h;
-};
 
-struct query_params {
-	struct point size;
-	char *file_name;
-	int strict;
-	int lowq;
-};
+#define WIDTH_PARAM "w"
+#define HEIGHT_PARAM "h"
+#define STRICT_PARAM "s"
+#define LOWQ_PARAM "wap"
+
+#define TRUE_PARAM_VAL 't'

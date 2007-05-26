@@ -37,7 +37,8 @@ int main(int argc, char *argv[])
 	
 	printf("Hello, world!\n");
 	
-	debug(DEB, "Query String: %s", getenv("QUERY_STRING"));
+	get_query_params();
+
 	debug_stop();
 	
 	return EXIT_SUCCESS;
