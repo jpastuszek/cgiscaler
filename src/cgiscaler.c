@@ -27,19 +27,35 @@
 #include <stdlib.h>
 
 #include "debug.h"
+#include "query_string.h"
+
+void do_on_exit(void);
+void serve_error_image_and_exit();
 
 int main(int argc, char *argv[])
 {
+	struct query_params *params;
+
 	debug_start("/tmp/cgiscaler.deb");
-
-	printf("Content-type: text/html\n");
-	printf("\n");
+	atexit(do_on_exit);
 	
-	printf("Hello, world!\n");
 	
-	get_query_params();
-
-	debug_stop();
+	params = get_query_params();
+	if (!params)
+		serve_error_image_and_exit();
 	
 	return EXIT_SUCCESS;
+}
+
+/* we will stop debug when normal exit */
+void do_on_exit(void) {
+	debug_stop();
+}
+
+void serve_error_image_and_exit() {
+	printf("Content-type: text/html\n");
+	printf("\n");
+
+	printf("Error: Error image not implemented\n");
+	exit(7);
 }

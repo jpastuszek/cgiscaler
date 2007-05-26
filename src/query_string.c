@@ -53,11 +53,11 @@ struct query_params *get_query_params() {
 	if (!query_string || !file_name)
 		return 0;
 
-	params = malloc(sizeof(struct query_params));
-	if (!params)
-		exit(66);
-	params->file_name = process_file_name(file_name);
-
+	file_name = process_file_name(file_name);
+	/* empty file_name... failing */
+	if (file_name[0] == 0)
+		return 0;
+	
 	debug(DEB, "Processing query string: '%s' target name: '%s'", query_string, file_name);
 
 	w = get_query_string_param(query_string, WIDTH_PARAM);
@@ -65,8 +65,23 @@ struct query_params *get_query_params() {
 	s = get_query_string_param(query_string, STRICT_PARAM);
 	lowq = get_query_string_param(query_string, LOWQ_PARAM);
 
-	params->size.w = atoi(w);
-	params->size.h = atoi(h);
+	/* now we set all qurey_param fields */
+	params = malloc(sizeof(struct query_params));
+	if (!params)
+		exit(66);
+
+	params->file_name = file_name;
+
+	if (w[0] == 0)
+		params->size.w = 0;
+	else
+		params->size.w = atoi(w);
+
+	if (h[0] == 0)
+		params->size.h = 0;
+	else
+		params->size.h = atoi(h);
+
 	if (s[0] == TRUE_PARAM_VAL)
 		params->strict = 1;
 	else
@@ -80,6 +95,7 @@ struct query_params *get_query_params() {
 
 	debug(DEB, "Params: file: '%s', size w: %d h: %d, strict: %d lowq: %d", params->file_name, params->size.w, params->size.h, params->strict, params->lowq);
 
+	/* we don't free file_name as it is used in param structure and will be freed on free_query_params */
 	free(w);
 	free(h);
 	free(s);

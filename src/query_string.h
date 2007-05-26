@@ -29,3 +29,5 @@ struct query_params {
 	int strict;
 	int lowq;
 };
+
+struct query_params *get_query_params();
