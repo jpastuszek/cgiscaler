@@ -18,6 +18,7 @@
     <general>
       <activetarget>src/cgiscaler</activetarget>
       <useconfiguration>debug</useconfiguration>
+      <useactivetarget>true</useactivetarget>
     </general>
     <run>
       <mainprogram>src/cgiscaler</mainprogram>

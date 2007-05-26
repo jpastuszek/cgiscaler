@@ -5,7 +5,8 @@ cgiscaler_SOURCES = cgiscaler.c debug.c query_string.c
 INCLUDES = $(all_includes)
 
 # the library search path.
-cgiscaler_LDFLAGS = $(all_libraries)
 cgiscalerdir = /var/www/localhost/cgi-bin/scaler
 cgiscaler_PROGRAMS = cgiscaler
 noinst_HEADERS = config.h debug.h query_string.h
+cgiscaler_LDFLAGS = -lMagick -llcms -ltiff -lfreetype -ljpeg -lfontconfig \
+	-lXext -lSM -lICE -lX11 -lXt -lbz2 -lz -lpthread -lm -lpthread -lWand -lMagick

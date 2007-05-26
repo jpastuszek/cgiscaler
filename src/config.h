@@ -25,3 +25,6 @@
 #define LOWQ_PARAM "wap"
 
 #define TRUE_PARAM_VAL 't'
+
+#define MEDIA_PATH "/home/kazuya/Photos/"
+#define WORK_DIR "/tmp/"

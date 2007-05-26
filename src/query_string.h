@@ -31,3 +31,4 @@ struct query_params {
 };
 
 struct query_params *get_query_params();
+void free_query_params(struct query_params *query_params);
