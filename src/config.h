@@ -28,3 +28,9 @@
 
 #define MEDIA_PATH "/home/kazuya/Photos/"
 #define WORK_DIR "/tmp/"
+
+#define OUT_FORMAT "JPEG"
+#define OUT_FORMAT_MIME_TYPE "image/jpeg"
+
+#define LOWQ_QUALITY 30
+#define NORMAL_QUALITY 70
