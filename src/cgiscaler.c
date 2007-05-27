@@ -103,11 +103,6 @@ void serve_error_image_and_exit() {
 void serve_image(MagickWand *magick_wand, struct query_params *params) {
 	unsigned char *blob;
 	size_t blob_len;
-//	char *content_type;
-//	int content_type_len;
-//	char *content_length;
-//	char content_length_val[10];
-//	int content_len;
 	size_t bytes_written;
 	size_t total_blob_written;
 
@@ -125,35 +120,17 @@ void serve_image(MagickWand *magick_wand, struct query_params *params) {
 		MagickSetCompressionQuality(magick_wand, NORMAL_QUALITY);
 
 
-	/* + 2 stands for \n + \0 */
-//	content_type_len = strlen("Content-type: ") + strlen(OUT_FORMAT_MIME_TYPE) + 2;
-//	content_type = malloc(content_type_len);
-//	strcpy(content_type, "Content-type: ");
-//	strcat(content_type, OUT_FORMAT_MIME_TYPE);
-//	strcat(content_type, "\n");
-//	fwrite(content_type, content_type_len, 1, stdout);
-//	free(content_type);
-	printf("Content-type: %s\n", OUT_FORMAT_MIME_TYPE);
-
-//	snprintf(content_length_val, 10, "%d", blob_len);
-//	content_len = strlen("Content-Length: ") + strlen(content_length_val) + 2;
-//	content_length = malloc(content_len);
-//	strcpy(content_length, "Content-Length: ");
-//	strcat(content_length, content_length_val);
-//	strcat(content_length, "\n");
-	//printf(content_length);
-//	fwrite(content_length, content_len, 1, stdout);
-//	free(content_length);	
-//	printf("Content-Length: : %d\n\r", blob_len);
+	printf("Content-Type: %s\n", OUT_FORMAT_MIME_TYPE);
+	printf("Content-Length: %u\n", blob_len);
 
 	printf("\n");
-	fsync(stdout);
+	/* flushing buffers befor we do direct fd write */
+	fflush(stdout);
 
-	/* I don't beleve that this is optimal... but it works */
-	fwrite(blob, blob_len, 1, stdout);
+	/* using stdout (FILE *) write instead of fd 1 is safer as printf also is using stdout */
+//	fwrite(blob, blob_len, 1, stdout);
 
-/* freeking mystery why write makes headers fucked... heh */
-/*
+/* using write is risky as we are writing to fd directly... where using printf we are writting to stdout (FILE *) buffers */
 	total_blob_written = 0;
 	while(1) {
 		debug(DEB, "Writing %d bytes to stdout", blob_len - total_blob_written);
@@ -170,7 +147,7 @@ void serve_image(MagickWand *magick_wand, struct query_params *params) {
 			break;
 		fsync(1);
 	}
-*/
+
 	MagickRelinquishMemory(blob);
 }
 

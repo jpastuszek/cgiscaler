@@ -23,6 +23,15 @@
     <run>
       <mainprogram>src/cgiscaler</mainprogram>
       <terminal>true</terminal>
+      <runarguments>
+        <cgiscaler></cgiscaler>
+      </runarguments>
+      <debugarguments>
+        <cgiscaler></cgiscaler>
+      </debugarguments>
+      <cwd>
+        <cgiscaler>/home/kazuya/Projects/CGIScaler/debug/./src</cgiscaler>
+      </cwd>
     </run>
     <configurations>
       <optimized>
@@ -112,6 +121,7 @@
     <tree>
       <hidepatterns>*.o,*.lo,CVS</hidepatterns>
       <hidenonprojectfiles>false</hidenonprojectfiles>
+      <showvcsfields>false</showvcsfields>
     </tree>
   </kdevfileview>
   <kdevdocumentation>

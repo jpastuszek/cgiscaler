@@ -138,6 +138,7 @@ char *process_file_name(char *file_param) {
 	return return_name;
 }
 
+/* it could be probably implemented with scanf sort of functions */
 char *get_query_string_param(char *query_string, char *param_name) {
 	int i, qurey_string_len;
 	char *start_query_string;
@@ -200,21 +201,5 @@ char *get_query_string_param(char *query_string, char *param_name) {
 		}
 	}
 }
-
-/*
-int find_first(char *str, int start, char c) {
-	int i, str_len;
-
-	str_len = strlen(str);
-	if (str_len >= start)
-		return -1;
-
-	for (i = start; i < str_len; i++)
-		if (str[i] == c)
-			retrun i;
-
-	return -1;
-}
-*/
 
 
