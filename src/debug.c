@@ -56,7 +56,7 @@ void debug_stop() {
 }
 
 void debug(const char *level, const char *fmt, ...) {
-	int size = 10, msg_len;
+	int size = 40, msg_len;
 	char *msg, *new_msg;
 	va_list ap;
 

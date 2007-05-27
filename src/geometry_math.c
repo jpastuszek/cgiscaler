@@ -18,7 +18,10 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include <math.h>
+
 #include "geometry_math.h"
+#include "debug.h"
 
 struct dimmensions resize_to_fit_in(struct dimmensions a, struct dimmensions b) {
 	double wf, hf, f;
@@ -36,4 +39,24 @@ struct dimmensions resize_to_fit_in(struct dimmensions a, struct dimmensions b) 
 	out.h = a.h * f;
 	
 	return out;
+}
+
+struct dimmensions reduce_filed(struct dimmensions a, int field) {
+	int in_field;
+	struct dimmensions ret;
+	double f;
+
+	debug(DEB,"Reducing image field %d x %d to %d pixels", a.w, a.h, field);
+
+	in_field = a.w * a.h;
+	if (in_field <= field)
+		return a;
+
+	f = sqrt((double) field / in_field);
+
+	ret.w = a.w * f;
+	ret.h = a.h * f;
+
+	debug(DEB,"After reduction %d x %d", ret.w, ret.h);
+	return ret;
 }

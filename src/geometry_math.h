@@ -38,5 +38,6 @@ struct box {
 
 
 struct dimmensions resize_to_fit_in(struct dimmensions a, struct dimmensions b);
+struct dimmensions reduce_filed(struct dimmensions a, int field);
 
 #endif

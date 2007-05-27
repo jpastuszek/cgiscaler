@@ -31,16 +31,13 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
-
-
-
-
 #include <wand/MagickWand.h>
 
 #include "debug.h"
 #include "query_string.h"
 #include "config.h"
 #include "geometry_math.h"
+#include "cache.h"
 
 #define ThrowWandException(wand) \
 { \
@@ -84,7 +81,12 @@ int main(int argc, char *argv[])
 	params = get_query_params();
 	if (!params)
 		serve_error_image_and_exit();
+
+	/* we are reducing requested thumbnail resolution to MAX_PIXEL_NO */
+	params->size = reduce_filed(params->size, MAX_PIXEL_NO);
 	
+	prepare_cache_file_name(params);
+
 	/* loading image... if it fails wand will be 0 */
 	magick_wand = load_image(params->file_name);
 	if (!magick_wand) {

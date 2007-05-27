@@ -27,12 +27,15 @@
 #define TRUE_PARAM_VAL 't'
 
 #define MEDIA_PATH "/home/kazuya/Photos/"
+#define CACHE_PATH "/home/kazuya/Temp/cache/"
 
 #define OUT_FORMAT "JPEG"
 #define OUT_FORMAT_MIME_TYPE "image/jpeg"
 
 #define LOWQ_QUALITY 20
 #define NORMAL_QUALITY 80
+
+#define MAX_PIXEL_NO 200000
 
 #define ERROR_FILE_PATH "error.jpg"
 #define ERROR_FILE_MIME_TYPE "image/jpeg"

@@ -18,6 +18,9 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#ifndef QUERY_STRING_H
+#define QUERY_STRING_H
+
 #include "geometry_math.h"
 
 struct query_params {
@@ -29,3 +32,5 @@ struct query_params {
 
 struct query_params *get_query_params();
 void free_query_params(struct query_params *query_params);
+
+#endif
