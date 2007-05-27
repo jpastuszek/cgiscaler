@@ -51,8 +51,13 @@ exit(-1); \
 
 void do_on_exit(void);
 void serve_error_image_and_exit();
-void serve_image(MagickWand *magick_wand, struct query_params *params);
+
 MagickWand *load_image(char *file_name);
+
+unsigned char *prepare_blob(MagickWand *magick_wand, struct query_params *params, size_t *blob_len);
+void free_blob(unsigned char *blob);
+void serve_blob(unsigned char *blob, size_t blob_len);
+
 MagickWand *resize(MagickWand *magick_wand, struct dimmensions to_size);
 MagickWand *crop_and_resize(MagickWand *magick_wand, struct dimmensions size);
 
@@ -60,6 +65,8 @@ int main(int argc, char *argv[])
 {
 	struct query_params *params;
 	MagickWand *magick_wand;
+	unsigned char *blob;
+	size_t blob_len;
 
 	debug_start("/tmp/cgiscaler.deb");
 	atexit(do_on_exit);
@@ -80,14 +87,19 @@ int main(int argc, char *argv[])
 		magick_wand = crop_and_resize(magick_wand, params->size);
 	else
 		magick_wand = resize(magick_wand, params->size);
-
 	if (!magick_wand)
 		serve_error_image_and_exit();
 
-	serve_image(magick_wand, params);
-	DestroyMagickWand(magick_wand);
+	blob = prepare_blob(magick_wand, params, &blob_len);
+	if (!blob)
+		serve_error_image_and_exit();
 
+	serve_blob(blob, blob_len);
+
+	free_blob(blob);
+	DestroyMagickWand(magick_wand);
 	free_query_params(params);
+
 	return EXIT_SUCCESS;
 }
 
@@ -104,75 +116,6 @@ void serve_error_image_and_exit() {
 	printf("Error: Error image not implemented\n");
 	exit(7);
 }
-
-void serve_image(MagickWand *magick_wand, struct query_params *params) {
-	unsigned char *blob;
-	size_t blob_len;
-	size_t bytes_written;
-	size_t total_blob_written;
-	MagickBooleanType status;
-
-	debug(DEB,"Serving Image");
-
-	/* this will remove meta data - this is very important as photos have loads of it */
-	status = MagickStripImage(magick_wand);
-	if (status == MagickFalse) {
-		DestroyMagickWand(magick_wand);
-		exit(1);
-	}
-
-	status = MagickSetFormat(magick_wand, OUT_FORMAT);
-	if (status == MagickFalse) {
-		DestroyMagickWand(magick_wand);
-		exit(1);
-	}
-
-	if (params->lowq)
-		status = MagickSetCompressionQuality(magick_wand, LOWQ_QUALITY);
-	else
-		status = MagickSetCompressionQuality(magick_wand, NORMAL_QUALITY);
-	if (status == MagickFalse) {
-		DestroyMagickWand(magick_wand);
-		exit(1);
-	}
-
-	blob = MagickGetImageBlob(magick_wand, &blob_len);
-	if (!blob) {
-		DestroyMagickWand(magick_wand);
-		exit(1);
-	}
-
-	printf("Content-Type: %s\n", OUT_FORMAT_MIME_TYPE);
-	printf("Content-Length: %u\n", blob_len);
-
-	printf("\n");
-	/* flushing buffers befor we do direct fd write */
-	fflush(stdout);
-
-	/* using stdout (FILE *) write instead of fd 1 is safer as printf also is using stdout */
-//	fwrite(blob, blob_len, 1, stdout);
-
-/* using write is risky as we are writing to fd directly... where using printf we are writting to stdout (FILE *) buffers */
-	total_blob_written = 0;
-	while(1) {
-		debug(DEB, "Writing %d bytes to stdout", blob_len - total_blob_written);
-		bytes_written = write(1, blob + total_blob_written, blob_len - total_blob_written);
-		debug(DEB, "%d bytes written", bytes_written);
-		if (bytes_written == -1) {
-			debug(ERR, "Error writting to stdout %s", strerror(errno));
-			exit(1);
-		}
-		
-		total_blob_written += bytes_written;
-
-		if (total_blob_written >= blob_len)
-			break;
-		fsync(1);
-	}
-
-	MagickRelinquishMemory(blob);
-}
-
 
 MagickWand *load_image(char *file_name) {
 	char *path;
@@ -192,12 +135,96 @@ MagickWand *load_image(char *file_name) {
 
 	status = MagickReadImage(magick_wand, path);
 	if (status == MagickFalse) {
+		debug(WARN,"Loading image '%s' failed", path);
 		DestroyMagickWand(magick_wand);
 		return 0;
 	}
 
 	return magick_wand;
 }
+
+/* creates blob from wand according to quality param in params and returns it's size */
+unsigned char *prepare_blob(MagickWand *magick_wand, struct query_params *params, size_t *blob_len) {
+	unsigned char *blob;
+	MagickBooleanType status;
+
+	debug(DEB,"Preparing BLOB");
+
+	/* this will remove meta data - this is very important as photos have loads of it */
+	status = MagickStripImage(magick_wand);
+	if (status == MagickFalse) {
+		debug(ERR,"Failed to Strip Image");
+		DestroyMagickWand(magick_wand);
+		return 0;
+	}
+
+	status = MagickSetFormat(magick_wand, OUT_FORMAT);
+	if (status == MagickFalse) {
+		debug(ERR,"Failed to set output Format");
+		DestroyMagickWand(magick_wand);
+		return 0;
+	}
+
+	if (params->lowq)
+		status = MagickSetCompressionQuality(magick_wand, LOWQ_QUALITY);
+	else
+		status = MagickSetCompressionQuality(magick_wand, NORMAL_QUALITY);
+	if (status == MagickFalse) {
+		debug(ERR,"Failed to set Compression Quality");
+		DestroyMagickWand(magick_wand);
+		return 0;
+	}
+
+	blob = MagickGetImageBlob(magick_wand, blob_len);
+	if (!blob || !(*blob_len)) {
+		debug(ERR,"Failed to Get Image Blob");
+		DestroyMagickWand(magick_wand);
+		return 0;
+	}
+
+	debug(DEB,"Prepared BLOB szie: %u", *blob_len);
+	return blob;
+}
+
+void free_blob(unsigned char *blob) {
+	MagickRelinquishMemory(blob);
+}
+
+void serve_blob(unsigned char *blob, size_t blob_len) {
+	size_t bytes_written;
+	size_t total_blob_written;
+
+	debug(DEB,"Serving BLOB: size: %d", blob_len);
+
+	printf("Content-Type: %s\n", OUT_FORMAT_MIME_TYPE);
+	printf("Content-Length: %u\n", blob_len);
+
+	printf("\n");
+	/* flushing buffers befor we do direct fd write */
+	fflush(stdout);
+
+	/* using stdout (FILE *) write instead of fd 1 is safer as printf also is using stdout */
+/*	fwrite(blob, blob_len, 1, stdout); */
+
+/* using write is risky as we are writing to fd directly... where using printf we are writting to stdout (FILE *) buffers */
+	total_blob_written = 0;
+	while(1) {
+		debug(DEB, "Writing %d bytes to stdout", blob_len - total_blob_written);
+		bytes_written = write(1, blob + total_blob_written, blob_len - total_blob_written);
+		debug(DEB, "%d bytes written", bytes_written);
+		if (bytes_written == -1) {
+			debug(ERR, "Error writting to stdout %s", strerror(errno));
+			exit(1);
+		}
+		
+		total_blob_written += bytes_written;
+
+		if (total_blob_written >= blob_len)
+			break;
+		fsync(1);
+	}
+}
+
 
 MagickWand *resize(MagickWand *magick_wand, struct dimmensions to_size) {
 	struct dimmensions image_size;
@@ -214,7 +241,7 @@ MagickWand *resize(MagickWand *magick_wand, struct dimmensions to_size) {
 		return 0;
 	}
 
-	return magick_wand;	
+	return magick_wand;
 }
 
 MagickWand *crop_and_resize(MagickWand *magick_wand, struct dimmensions to_size) {
