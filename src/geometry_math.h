@@ -18,14 +18,25 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include "geometry_math.h"
+#ifndef GEOMETRY_MATH_H
+#define GEOMETRY_MATH_H
 
-struct query_params {
-	struct dimmensions size;
-	char *file_name;
-	int strict;
-	int lowq;
+struct dimmensions {
+	int w;
+	int h;
 };
 
-struct query_params *get_query_params();
-void free_query_params(struct query_params *query_params);
+struct point {
+	int x;
+	int y;
+};
+
+struct box {
+	struct point position;
+	struct dimmensions size;
+};
+
+
+struct dimmensions resize_to_fit_in(struct dimmensions a, struct dimmensions b);
+
+#endif

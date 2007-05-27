@@ -20,12 +20,20 @@
 
 #include "geometry_math.h"
 
-struct query_params {
-	struct dimmensions size;
-	char *file_name;
-	int strict;
-	int lowq;
-};
+struct dimmensions resize_to_fit_in(struct dimmensions a, struct dimmensions b) {
+	double wf, hf, f;
+	struct dimmensions out;
 
-struct query_params *get_query_params();
-void free_query_params(struct query_params *query_params);
+	wf = (double) b.w / a.w;
+	hf = (double) b.h / a.h;
+
+	if (wf > hf)
+		f = hf;
+	else 
+		f = wf;
+
+	out.w = a.w * f;
+	out.h = a.h * f;
+	
+	return out;
+}

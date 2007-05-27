@@ -32,5 +32,5 @@
 #define OUT_FORMAT "JPEG"
 #define OUT_FORMAT_MIME_TYPE "image/jpeg"
 
-#define LOWQ_QUALITY 30
-#define NORMAL_QUALITY 70
+#define LOWQ_QUALITY 20
+#define NORMAL_QUALITY 80

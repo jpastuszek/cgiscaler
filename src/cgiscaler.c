@@ -33,7 +33,7 @@
 #include "debug.h"
 #include "query_string.h"
 #include "config.h"
-
+#include "geometry_math.h"
 
 #define ThrowWandException(wand) \
 { \
@@ -44,7 +44,7 @@ ExceptionType \
 severity; \
 \
 description=MagickGetException(wand,&severity); \
-(void) fprintf(stderr,"%s %s %ld %s\n",GetMagickModule(),description); \
+(void) debug(ERR,"%s %s %ld %s\n",GetMagickModule(),description); \
 description=(char *) MagickRelinquishMemory(description); \
 exit(-1); \
 }
@@ -53,7 +53,7 @@ void do_on_exit(void);
 void serve_error_image_and_exit();
 void serve_image(MagickWand *magick_wand, struct query_params *params);
 MagickWand *load_image(char *file_name);
-
+MagickWand *crop_and_resize(MagickWand *magick_wand, struct dimmensions size);
 
 int main(int argc, char *argv[])
 {
@@ -69,17 +69,20 @@ int main(int argc, char *argv[])
 	if (!params)
 		serve_error_image_and_exit();
 	
+	/* loading image... if it fails wand will be 0 */
 	magick_wand = load_image(params->file_name);
 	if (!magick_wand)
 		serve_error_image_and_exit();
 
+	/* according to strict value we are resizing or cropresizing... if failes wand == 0 */
+	if (params->strict)
+		magick_wand = crop_and_resize(magick_wand, params->size);
 
-//	if (params->strict)
-//		image = crop_and_resize(image, params->size);
 
+	if (!magick_wand)
+		serve_error_image_and_exit();
 
 	serve_image(magick_wand, params);
-
 	DestroyMagickWand(magick_wand);
 
 	free_query_params(params);
@@ -105,20 +108,37 @@ void serve_image(MagickWand *magick_wand, struct query_params *params) {
 	size_t blob_len;
 	size_t bytes_written;
 	size_t total_blob_written;
-
+	MagickBooleanType status;
 
 	debug(DEB,"Serving Image");
 
-	blob = MagickGetImageBlob(magick_wand, &blob_len);
-	if (!blob)
+	/* this will remove meta data - this is very important as photos have loads of it */
+	status = MagickStripImage(magick_wand);
+	if (status == MagickFalse) {
+		DestroyMagickWand(magick_wand);
 		exit(1);
+	}
 
-	MagickSetFormat(magick_wand, OUT_FORMAT);
+	status = MagickSetFormat(magick_wand, OUT_FORMAT);
+	if (status == MagickFalse) {
+		DestroyMagickWand(magick_wand);
+		exit(1);
+	}
+
 	if (params->lowq)
-		MagickSetCompressionQuality(magick_wand, LOWQ_QUALITY);
+		status = MagickSetCompressionQuality(magick_wand, LOWQ_QUALITY);
 	else
-		MagickSetCompressionQuality(magick_wand, NORMAL_QUALITY);
+		status = MagickSetCompressionQuality(magick_wand, NORMAL_QUALITY);
+	if (status == MagickFalse) {
+		DestroyMagickWand(magick_wand);
+		exit(1);
+	}
 
+	blob = MagickGetImageBlob(magick_wand, &blob_len);
+	if (!blob) {
+		DestroyMagickWand(magick_wand);
+		exit(1);
+	}
 
 	printf("Content-Type: %s\n", OUT_FORMAT_MIME_TYPE);
 	printf("Content-Length: %u\n", blob_len);
@@ -177,3 +197,38 @@ MagickWand *load_image(char *file_name) {
 	return magick_wand;
 }
 
+
+MagickWand *crop_and_resize(MagickWand *magick_wand, struct dimmensions to_size) {
+	struct dimmensions image_size, crop_size;
+	int x, y;
+	MagickBooleanType status;
+
+	image_size.w = MagickGetImageWidth(magick_wand);
+	image_size.h = MagickGetImageHeight(magick_wand);	
+
+	debug(DEB, "Doing CropResize: orginal: %d x %d to: %d x %d", image_size.w, image_size.h, to_size.w, to_size.h);
+
+	/* fit to_szie into image_size */
+	crop_size = resize_to_fit_in(to_size, image_size);
+	debug(DEB, "Crop size: %d x %d", crop_size.w, crop_size.h);
+
+	/* calculate to center crop */
+	x = (image_size.w - crop_size.w) / 2;
+	y = (image_size.h - crop_size.h) / 2;
+	debug(DEB, "Crop center: %d x %d", x, y);
+
+	status = MagickCropImage(magick_wand, crop_size.w, crop_size.h, x, y);
+	if (status == MagickFalse) {
+		DestroyMagickWand(magick_wand);
+		return 0;
+	}
+
+	/* now it is time to resize to to_szie */
+	status = MagickResizeImage(magick_wand, to_size.w, to_size.h, LanczosFilter, 0);
+	if (status == MagickFalse) {
+		DestroyMagickWand(magick_wand);
+		return 0;
+	}
+
+	return magick_wand;
+}
