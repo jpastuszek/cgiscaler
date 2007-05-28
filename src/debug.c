@@ -32,6 +32,7 @@ int debug_file_fd;
 int debug_on;
 
 void debug_start(char *file) {
+#ifndef DEBUG
 	if (debug_on)
 		return;
 
@@ -43,9 +44,11 @@ void debug_start(char *file) {
 	debug_on = 1;
 
 	debug(">>>>", "Starting debug");
+#endif
 }
 
 void debug_stop() {
+#ifndef DEBUG
 	if (!debug_on)
 		return;
 
@@ -53,9 +56,11 @@ void debug_stop() {
 
 	close(debug_file_fd);
 	debug_on = 0;
+#endif
 }
 
 void debug(const char *level, const char *fmt, ...) {
+#ifndef DEBUG
 	int size = 40, msg_len;
 	char *msg, *new_msg;
 	va_list ap;
@@ -93,7 +98,9 @@ void debug(const char *level, const char *fmt, ...) {
 	write(debug_file_fd, ": ", 2);
 	write(debug_file_fd, msg, msg_len);
 	write(debug_file_fd, "\n", 1);
+#ifdef DEBUG_SYNC
 	fsync(debug_file_fd);
-
+#endif
 	free(msg);
+#endif
 }
