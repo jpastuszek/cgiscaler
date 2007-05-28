@@ -26,18 +26,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <errno.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <unistd.h>
 #include <wand/MagickWand.h>
 
-#include "debug.h"
 #include "query_string.h"
 #include "config.h"
 #include "geometry_math.h"
 #include "cache.h"
+#include "serve.h"
+#include "debug.h"
+
 
 #define ThrowWandException(wand) \
 { \
@@ -82,7 +79,13 @@ int main(int argc, char *argv[])
 	if (!params)
 		serve_error_image_and_exit();
 	
-	debug(DEB,"Cached: %d", check_if_cached(params));
+	/* if we have served from cache ok... clenup and exit success */
+	if (serve_from_cache(params)) {
+		free_query_params(params);
+		exit(0);
+	}
+
+	//debug(DEB,"Cached: %d", check_if_cached(params));
 
 	/* loading image... if it fails wand will be 0 */
 	magick_wand = load_image(params->file_name);
@@ -107,7 +110,9 @@ int main(int argc, char *argv[])
 		serve_error_image_and_exit();
 	}
 
-	serve_blob(blob, blob_len);
+	serve_from_blob(blob, blob_len, OUT_FORMAT_MIME_TYPE);
+
+	write_blob_to_cache(blob, blob_len, params);
 
 	free_blob(blob);
 	DestroyMagickWand(magick_wand);
@@ -120,100 +125,6 @@ int main(int argc, char *argv[])
 void do_on_exit(void) {
 	MagickWandTerminus();
 	debug_stop();
-}
-
-void serve_error_image_and_exit() {
-	char *file_path;
-	unsigned char *buffer;
-	int error_file;
-	size_t bytes_read, bytes_written, total_bytes_read, total_bytes_written;
-	off_t file_size;
-
-	file_path = malloc(strlen(MEDIA_PATH) + strlen(ERROR_FILE_PATH) + 1);
-	strcpy(file_path, MEDIA_PATH);
-	strcat(file_path, ERROR_FILE_PATH);
-
-	debug(DEB,"Serving error image: '%s'", file_path);
-
-	error_file = open(file_path, O_RDONLY);
-	if (error_file == -1) {
-		debug(WARN,"Failed to open error file '%s': %s", file_path, strerror(errno));
-		free(file_path);
-		serve_error_message_end_exit();
-	}
-
-	free(file_path);
-
-	/* Getting image size */
-	file_size = lseek(error_file, 0, SEEK_END);
-	if (file_size == -1) {
-		close(error_file);
-		debug(WARN,"Failed to get file size: %s", strerror(errno));
-		serve_error_message_end_exit();
-	}
-
-	if (lseek(error_file, 0, SEEK_SET) == -1) {
-		close(error_file);
-		debug(WARN,"Failed to reposition file offset: %s", strerror(errno));
-		serve_error_message_end_exit();
-	}
-
-	/* Sending headers */
-	printf("Content-Type: %s\n", ERROR_FILE_MIME_TYPE);
-	printf("Content-Length: %u\n", file_size);
-	printf("\n");
-
-	/* Fflush is neccessary to avoid overwriting buffered headers by direct fd writes */
-	fflush(stdout);
-
-	/* Allocating buffer */
-	buffer = malloc(WRITE_BUFFER_LEN);
-	if (!buffer)
-		exit(66);
-
-	/* Lets pipe data throut the buffer to stdout */
-	bytes_read = total_bytes_read = 0;
-	while(1) {
-		/* reading buffer size or less amount of data */
-		bytes_read = read(error_file, buffer, WRITE_BUFFER_LEN);
-		if (bytes_read == -1) {
-			debug(ERR,"Failed reading error file: %s", strerror(errno));
-			exit(10);
-		}
-		/* all done */
-		if (!bytes_read)
-			break;
-
-		total_bytes_read += bytes_read;
-		
-		/* loop until all read data was sent out */
-		bytes_written = total_bytes_written = 0;
-		do {
-			debug(DEB, "Writing %d bytes to stdout", bytes_read);
-			bytes_written = write(1, buffer + total_bytes_written, bytes_read);
-			debug(DEB, "%d bytes written", bytes_written);
-			if (bytes_written == -1) {
-				debug(ERR,"Failed writting to stdout: %s", strerror(errno));
-				exit(10);
-			}
-			bytes_read -= bytes_written;
-			total_bytes_written += bytes_written;
-			fsync(1);
-		} while(bytes_read);
-		
-	}
-
-	free(buffer);
-	exit(6);
-}
-
-void serve_error_message_end_exit() {
-	printf("Content-Type: text/plain\n");
-	printf("\n");
-
-	printf("Something went wrong...\n");
-	fflush(stdout);
-	exit(7);
 }
 
 MagickWand *load_image(char *file_name) {
@@ -287,41 +198,6 @@ unsigned char *prepare_blob(MagickWand *magick_wand, struct query_params *params
 
 void free_blob(unsigned char *blob) {
 	MagickRelinquishMemory(blob);
-}
-
-void serve_blob(unsigned char *blob, size_t blob_len) {
-	size_t bytes_written;
-	size_t total_blob_written;
-
-	debug(DEB,"Serving BLOB: size: %d", blob_len);
-
-	printf("Content-Type: %s\n", OUT_FORMAT_MIME_TYPE);
-	printf("Content-Length: %u\n", blob_len);
-
-	printf("\n");
-	/* flushing buffers befor we do direct fd write */
-	fflush(stdout);
-
-	/* using stdout (FILE *) write instead of fd 1 is safer as printf also is using stdout */
-/*	fwrite(blob, blob_len, 1, stdout); */
-
-/* using write is risky as we are writing to fd directly... where using printf we are writting to stdout (FILE *) buffers */
-	total_blob_written = 0;
-	while(1) {
-		debug(DEB, "Writing %d bytes to stdout", blob_len - total_blob_written);
-		bytes_written = write(1, blob + total_blob_written, blob_len - total_blob_written);
-		debug(DEB, "%d bytes written", bytes_written);
-		if (bytes_written == -1) {
-			debug(ERR, "Error writting to stdout %s", strerror(errno));
-			exit(1);
-		}
-		
-		total_blob_written += bytes_written;
-
-		if (total_blob_written >= blob_len)
-			break;
-		fsync(1);
-	}
 }
 
 

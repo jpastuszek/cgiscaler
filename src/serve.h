@@ -18,13 +18,13 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include <unistd.h>
 #include "query_string.h"
 
-#define NO_ORIG 1
-#define NO_CACHE 2
-#define MTIME_DIFFER 4
-#define CACHE_OK 0
+int serve_from_file(char *file_path, char *mime_type);
+void serve_from_blob(unsigned char *blob, size_t blob_len, char *mime_type);
+int serve_from_cache(struct query_params *params);
+void serve_error_image_and_exit();
+void serve_error_message_end_exit();
 
-int check_if_cached(struct query_params *params);
-char *prepare_cache_file_path(struct query_params *params);
-int write_blob_to_cache(unsigned char *blob, int blob_len, struct query_params *params);
+int write_blob_to_file(unsigned char *blob, int blob_len, char *file_path);

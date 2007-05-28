@@ -46,7 +46,7 @@ struct query_params *get_query_params() {
 		if (!query_string)
 			query_string = "w=200&h=300&s=t";
 		if (!file_name)
-			file_name = "/test.jpg";
+			file_name = "/00/ff/test.jpg";
 	}
 
 	/* strange env... failing */
