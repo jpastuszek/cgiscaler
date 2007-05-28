@@ -24,10 +24,10 @@
       <mainprogram>src/cgiscaler</mainprogram>
       <terminal>true</terminal>
       <runarguments>
-        <cgiscaler></cgiscaler>
+        <cgiscaler/>
       </runarguments>
       <debugarguments>
-        <cgiscaler></cgiscaler>
+        <cgiscaler/>
       </debugarguments>
       <cwd>
         <cgiscaler>/home/kazuya/Projects/CGIScaler/debug/./src</cgiscaler>

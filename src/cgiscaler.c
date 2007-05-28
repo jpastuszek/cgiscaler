@@ -81,11 +81,8 @@ int main(int argc, char *argv[])
 	params = get_query_params();
 	if (!params)
 		serve_error_image_and_exit();
-
-	/* we are reducing requested thumbnail resolution to MAX_PIXEL_NO */
-	params->size = reduce_filed(params->size, MAX_PIXEL_NO);
 	
-	prepare_cache_file_name(params);
+	debug(DEB,"Cached: %d", check_if_cached(params));
 
 	/* loading image... if it fails wand will be 0 */
 	magick_wand = load_image(params->file_name);
@@ -337,6 +334,9 @@ MagickWand *resize(MagickWand *magick_wand, struct dimmensions to_size) {
 
 	to_size = resize_to_fit_in(image_size, to_size);
 
+	/* we are reducing requested thumbnail resolution to MAX_PIXEL_NO */
+	to_size = reduce_filed(to_size, MAX_PIXEL_NO);
+
 	status = MagickResizeImage(magick_wand, to_size.w, to_size.h, LanczosFilter, 0);
 	if (status == MagickFalse) {
 		DestroyMagickWand(magick_wand);
@@ -370,6 +370,9 @@ MagickWand *crop_and_resize(MagickWand *magick_wand, struct dimmensions to_size)
 		DestroyMagickWand(magick_wand);
 		return 0;
 	}
+
+	/* we are reducing requested thumbnail resolution to MAX_PIXEL_NO */
+	to_size = reduce_filed(to_size, MAX_PIXEL_NO);
 
 	/* now it is time to resize to to_szie */
 	status = MagickResizeImage(magick_wand, to_size.w, to_size.h, LanczosFilter, 0);
