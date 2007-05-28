@@ -9,5 +9,4 @@ noinst_HEADERS = cache.h config.h debug.h geometry_math.h query_string.h \
 	serve.h
 cgiscaler_SOURCES = cache.c cgiscaler.c debug.c geometry_math.c query_string.c \
 	serve.c
-AM_CFLAGS = -Wall -lMagick -lWand -lX11 -lXext -lXt -lbz2 -lfontconfig \
-	-lfreetype -ljpeg -llcms -lm -lpthread -ltiff -lz
+AM_CFLAGS = -Wall -lMagick -lWand

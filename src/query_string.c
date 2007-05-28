@@ -140,7 +140,6 @@ char *process_file_name(char *file_param) {
 
 /* it could be probably implemented with scanf sort of functions */
 char *get_query_string_param(char *query_string, char *param_name) {
-	int i, qurey_string_len;
 	char *start_query_string;
 	char *until_equal;
 	char *until_amp;
