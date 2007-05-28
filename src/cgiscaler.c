@@ -131,6 +131,7 @@ MagickWand *load_image(char *file_name) {
 	char *path;
 	MagickWand *magick_wand;
 	MagickBooleanType status;
+	PixelWand *pixel_wand;
 
 	path = malloc(strlen(MEDIA_PATH) + strlen(file_name) + 1);
 	strcpy(path, MEDIA_PATH);
@@ -148,6 +149,29 @@ MagickWand *load_image(char *file_name) {
 		DestroyMagickWand(magick_wand);
 		return 0;
 	}
+
+	debug(DEB, "Setting background color to '%s'", DEFAULT_BACKGROUND_COLOR);
+
+	/* Set background to DEFAULT_BACKGROUND_COLOR - in case of transparent gifs or png */
+	pixel_wand = NewPixelWand();
+	PixelSetColor(pixel_wand, DEFAULT_BACKGROUND_COLOR);
+	if (status == MagickFalse) {
+		debug(ERR,"Failed to set Pixel Wand Color to '%s'", DEFAULT_BACKGROUND_COLOR);
+		DestroyPixelWand(pixel_wand);
+		DestroyMagickWand(magick_wand);
+		return 0;
+	}
+	MagickSetBackgroundColor(magick_wand, pixel_wand);
+	if (status == MagickFalse) {
+		debug(ERR,"Failed to set background color to '%s'", DEFAULT_BACKGROUND_COLOR);
+		DestroyPixelWand(pixel_wand);
+		DestroyMagickWand(magick_wand);
+		return 0;
+	}
+
+	MagickSetImageMatteColor(magick_wand, pixel_wand);
+	MagickSetImageMatte(magick_wand, MagickFalse);
+	DestroyPixelWand(pixel_wand);
 
 	return magick_wand;
 }
@@ -167,6 +191,7 @@ unsigned char *prepare_blob(MagickWand *magick_wand, struct query_params *params
 		return 0;
 	}
 
+
 	status = MagickSetFormat(magick_wand, OUT_FORMAT);
 	if (status == MagickFalse) {
 		debug(ERR,"Failed to set output Format");
@@ -183,7 +208,7 @@ unsigned char *prepare_blob(MagickWand *magick_wand, struct query_params *params
 		DestroyMagickWand(magick_wand);
 		return 0;
 	}
-
+	
 	blob = MagickGetImageBlob(magick_wand, blob_len);
 	if (!blob || !(*blob_len)) {
 		debug(ERR,"Failed to Get Image Blob");

@@ -48,6 +48,9 @@
 /* "blur factor where > 1 is blurry, < 1 is sharp" */
 #define RESIZE_SMOOTH_FACTOR 1
 
+/* color to fill transparency when conferting from transparent gifs */
+#define DEFAULT_BACKGROUND_COLOR "#ffffff"
+
 #define MAX_PIXEL_NO 200000
 
 #define ERROR_FILE_PATH "error.jpg"

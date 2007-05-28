@@ -54,10 +54,13 @@ struct query_params *get_query_params() {
 		return 0;
 
 	file_name = process_file_name(file_name);
+	/* bad file name */
+	if (!file_name)
+		return 0;
 	/* empty file_name... failing */
 	if (file_name[0] == 0)
 		return 0;
-	
+
 	debug(DEB, "Processing query string: '%s' target name: '%s'", query_string, file_name);
 
 	w = get_query_string_param(query_string, WIDTH_PARAM);
@@ -122,7 +125,9 @@ char *allocate_empty_string() {
 char *process_file_name(char *file_param) {
 	char *return_name;
 	int offset = 0;
-
+	char *dot;
+	int dot_offset;
+	
 	if (!strlen(file_param))
 		return allocate_empty_string();
 
@@ -135,6 +140,16 @@ char *process_file_name(char *file_param) {
 		exit(66);
 
 	strcpy(return_name, file_param);
+
+	dot_offset = 0;
+	while ((dot = index(return_name + dot_offset,'.')) != 0) {
+		if (*(dot+1) == '.') {
+			debug(WARN, "Double dot found in file name! failing...");
+			return 0;
+		}
+		dot_offset = dot - return_name + 1;
+	}
+
 	return return_name;
 }
 
