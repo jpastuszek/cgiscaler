@@ -37,7 +37,7 @@ void debug_start(char *file) {
 	if (debug_on)
 		return;
 
-	debug_file_fd = open(file, O_WRONLY | O_CREAT | O_APPEND);
+	debug_file_fd = open(file, O_WRONLY | O_CREAT | O_APPEND, 0666);
 	if (debug_file_fd < 0) {
 		debug_on = 0;
 		return;	

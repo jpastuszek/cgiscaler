@@ -37,6 +37,17 @@
 #define LOWQ_QUALITY 20
 #define NORMAL_QUALITY 80
 
+/* Possible resize filters 
+    BesselFilter   BlackmanFilter   BoxFilter
+    CatromFilter   CubicGaussianFilter
+    HanningFilter  HermiteFilter    LanczosFilter
+    MitchellFilter PointQuandraticFilter
+    SincFilter     TriangleFilter
+*/
+#define RESIZE_FILTER LanczosFilter
+/* "blur factor where > 1 is blurry, < 1 is sharp" */
+#define RESIZE_SMOOTH_FACTOR 1
+
 #define MAX_PIXEL_NO 200000
 
 #define ERROR_FILE_PATH "error.jpg"
