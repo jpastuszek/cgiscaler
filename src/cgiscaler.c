@@ -129,7 +129,6 @@ void do_on_exit(void) {
 
 MagickWand *load_image(char *file_name) {
 	char *path;
-	Image *image;
 	MagickWand *magick_wand;
 	MagickBooleanType status;
 

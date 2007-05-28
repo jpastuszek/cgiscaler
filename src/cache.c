@@ -28,6 +28,7 @@
 #include <errno.h>
 
 #include "cache.h"
+#include "serve.h"
 #include "config.h"
 #include "debug.h"
 
@@ -77,7 +78,6 @@ int check_if_cached(struct query_params *params) {
 	char *cache_file_path;
 	char *orginal_file_path;
 	int orginal_mtime, cache_mtime;
-	int ret;
 
 	debug(DEB, "Checking cache");
 
@@ -180,7 +180,6 @@ int write_blob_to_cache(unsigned char *blob, int blob_len, struct query_params *
 	char *orginal_file_path;
 	time_t orginal_mtime;
 	struct utimbuf time_buf;
-	int ret;
 
 	debug(DEB, "Writing cache file for image  '%s'", params->file_name);
 

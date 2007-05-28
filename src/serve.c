@@ -62,7 +62,7 @@ int serve_from_file(char *file_path, char *mime_type) {
 
 	/* Sending headers */
 	printf("Content-Type: %s\n", mime_type);
-	printf("Content-Length: %u\n", file_size);
+	printf("Content-Length: %u\n", (unsigned int) file_size);
 	printf("\n");
 
 	/* Fflush is neccessary to avoid overwriting buffered headers by direct fd writes */
