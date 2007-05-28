@@ -28,12 +28,13 @@
 #include <string.h>
 
 #include "debug.h"
+#include "config.h"
 
 int debug_file_fd;
 int debug_on;
 
 void debug_start(char *file) {
-#ifndef DEBUG
+#ifdef DEBUG
 	if (debug_on)
 		return;
 
@@ -49,7 +50,7 @@ void debug_start(char *file) {
 }
 
 void debug_stop() {
-#ifndef DEBUG
+#ifdef DEBUG
 	if (!debug_on)
 		return;
 
@@ -61,7 +62,7 @@ void debug_stop() {
 }
 
 void debug(const char *level, const char *fmt, ...) {
-#ifndef DEBUG
+#ifdef DEBUG
 	int size = 40, msg_len;
 	char *msg, *new_msg;
 	va_list ap;

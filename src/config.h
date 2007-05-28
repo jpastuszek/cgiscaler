@@ -19,7 +19,7 @@
  ***************************************************************************/
 
 #define DEBUG
-#define DEBUG_SYNC
+//#define DEBUG_SYNC
 
 #define WIDTH_PARAM "w"
 #define HEIGHT_PARAM "h"
