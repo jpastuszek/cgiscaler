@@ -120,7 +120,7 @@ void serve_from_blob(unsigned char *blob, size_t blob_len, char *mime_type) {
 	debug(DEB,"Serving from BLOB: size: %d", blob_len);
 
 	printf("Content-Type: %s\n", mime_type);
-	printf("Content-Length: %u\n", blob_len);
+	printf("Content-Length: %u\n", (unsigned int) blob_len);
 
 	printf("\n");
 	/* flushing buffers befor we do direct fd write */

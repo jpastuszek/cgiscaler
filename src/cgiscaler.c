@@ -275,7 +275,7 @@ MagickWand *crop_and_resize(MagickWand *magick_wand, struct dimmensions to_size)
 	to_size = reduce_filed(to_size, MAX_PIXEL_NO);
 
 	/* now it is time to resize to to_szie */
-	status = MagickResizeImage(magick_wand, to_size.w, to_size.h, LanczosFilter, 0);
+	status = MagickResizeImage(magick_wand, to_size.w, to_size.h, RESIZE_FILTER, RESIZE_SMOOTH_FACTOR);
 	if (status == MagickFalse) {
 		DestroyMagickWand(magick_wand);
 		return 0;
