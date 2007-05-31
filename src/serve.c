@@ -180,7 +180,8 @@ int serve_from_cache(struct query_params *params) {
 	return ret;
 }
 
-void serve_error_image_and_exit() {
+/* we will try error miage but if it does not exist we will fail back to error message */
+void serve_error() {
 	char *file_path;
 
 	file_path = malloc(strlen(MEDIA_PATH) + strlen(ERROR_FILE_PATH) + 1);
@@ -189,19 +190,18 @@ void serve_error_image_and_exit() {
 
 	debug(DEB,"Serving error image: '%s'", file_path);
 	if (!serve_from_file(file_path, ERROR_FILE_MIME_TYPE))
-		serve_error_message_end_exit();
+		serve_error_message();
 
 	free(file_path);
-	exit(6);
 }
 
-void serve_error_message_end_exit() {
+/* serving plain text message as an absolute failback */
+void serve_error_message() {
 	printf("Content-Type: text/plain\n");
 	printf("\n");
 
 	printf("Something went wrong...\n");
 	fflush(stdout);
-	exit(7);
 }
 
 int write_blob_to_file(unsigned char *blob, int blob_len, char *file_path) {

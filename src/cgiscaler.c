@@ -50,7 +50,6 @@ description=(char *) MagickRelinquishMemory(description); \
 exit(-1); \
 }
 
-void do_on_exit(void);
 void serve_error_image_and_exit();
 void serve_error_message_end_exit();
 
@@ -63,6 +62,10 @@ void serve_blob(unsigned char *blob, size_t blob_len);
 MagickWand *resize(MagickWand *magick_wand, struct dimmensions to_size);
 MagickWand *crop_and_resize(MagickWand *magick_wand, struct dimmensions size);
 
+
+/* TODO: Tests!!!! I am modifing without proper tests... that leads to disastet! */
+
+/* this is main function, for simplicity we don't want exits at any other point (expect [m|rw]alloc related) */
 int main(int argc, char *argv[])
 {
 	struct query_params *params;
@@ -71,13 +74,14 @@ int main(int argc, char *argv[])
 	size_t blob_len;
 
 	debug_start("/tmp/cgiscaler.deb");
-	atexit(do_on_exit);
+	/* stopp debuging on exit */
+	atexit(debug_stop);
 	
-	MagickWandGenesis();
-
 	params = get_query_params();
-	if (!params)
-		serve_error_image_and_exit();
+	if (!params) {
+		serve_error();
+		exit(70);
+	}
 	
 	/* if we have served from cache ok... clenup and exit success */
 	if (serve_from_cache(params)) {
@@ -85,13 +89,16 @@ int main(int argc, char *argv[])
 		exit(0);
 	}
 
-	//debug(DEB,"Cached: %d", check_if_cached(params));
+	/* now we need ImageMagick after this we should terminate ImgeMagick afterwards */
+	MagickWandGenesis();
 
 	/* loading image... if it fails wand will be 0 */
 	magick_wand = load_image(params->file_name);
 	if (!magick_wand) {
 		free_query_params(params);
-		serve_error_image_and_exit();
+		serve_error();
+		MagickWandTerminus();
+		exit(71);
 	}
 
 	/* according to strict value we are resizing or cropresizing... if failes wand == 0 */
@@ -101,13 +108,17 @@ int main(int argc, char *argv[])
 		magick_wand = resize(magick_wand, params->size);
 	if (!magick_wand) {
 		free_query_params(params);
-		serve_error_image_and_exit();
+		serve_error();
+		MagickWandTerminus();
+		exit(72);
 	}
 
 	blob = prepare_blob(magick_wand, params, &blob_len);
 	if (!blob) {
 		free_query_params(params);
-		serve_error_image_and_exit();
+		serve_error();
+		MagickWandTerminus();
+		exit(73);
 	}
 
 	serve_from_blob(blob, blob_len, OUT_FORMAT_MIME_TYPE);
@@ -117,14 +128,9 @@ int main(int argc, char *argv[])
 	free_blob(blob);
 	DestroyMagickWand(magick_wand);
 	free_query_params(params);
+	MagickWandTerminus();
 
 	return EXIT_SUCCESS;
-}
-
-/* we will stop debug when normal exit */
-void do_on_exit(void) {
-	MagickWandTerminus();
-	debug_stop();
 }
 
 MagickWand *load_image(char *file_name) {
