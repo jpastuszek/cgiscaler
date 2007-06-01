@@ -41,14 +41,15 @@ struct query_params *get_query_params() {
 	query_string = getenv("QUERY_STRING");
 	file_name = getenv("PATH_INFO");
 
-	/* if we are running not from CGI than use test data */
+/* we will use proper testing env
+	if we are running not from CGI than use test data
 	if (!getenv("SERVER_NAME")) {
 		if (!query_string)
-			query_string = "w=200&h=300&s=t";
+			query_string = "w=200&h=300&s=true";
 		if (!file_name)
 			file_name = "/00/ff/test.jpg";
 	}
-
+*/
 	/* strange env... failing */
 	if (!query_string || !file_name)
 		return 0;
@@ -85,12 +86,12 @@ struct query_params *get_query_params() {
 	else
 		params->size.h = atoi(h);
 
-	if (s[0] == TRUE_PARAM_VAL)
+	if (!strcmp(s, TRUE_PARAM_VAL))
 		params->strict = 1;
 	else
 		params->strict = 0;
 
-	if (lowq[0] == TRUE_PARAM_VAL)
+	if (!strcmp(lowq, TRUE_PARAM_VAL))
 		params->lowq = 1;
 	else
 		params->lowq = 0;
@@ -128,10 +129,11 @@ char *process_file_name(char *file_param) {
 	char *dot;
 	int dot_offset;
 	
-	if (!strlen(file_param))
+	if (file_param[0] == 0)
 		return allocate_empty_string();
 
-	if (file_param[0] == '/' || file_param[0] == '\\')
+	// removing front '/'
+	while(file_param[offset] == '/')
 		offset++;
 
 	file_param += offset;

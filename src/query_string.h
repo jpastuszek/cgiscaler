@@ -33,4 +33,8 @@ struct query_params {
 struct query_params *get_query_params();
 void free_query_params(struct query_params *query_params);
 
+// private
+char *process_file_name(char *file_param);
+char *get_query_string_param(char *query_string, char *param_name);
+
 #endif

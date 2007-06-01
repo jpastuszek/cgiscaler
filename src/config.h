@@ -26,7 +26,7 @@
 #define STRICT_PARAM "s"
 #define LOWQ_PARAM "wap"
 
-#define TRUE_PARAM_VAL 't'
+#define TRUE_PARAM_VAL "t"
 
 #define MEDIA_PATH "/home/kazuya/Photos/"
 #define CACHE_PATH "/home/kazuya/Temp/cache/"
