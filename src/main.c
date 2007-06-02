@@ -63,9 +63,9 @@ int main(int argc, char *argv[])
 
 	/* according to strict value we are resizing or cropresizing... if failes wand == 0 */
 	if (params->strict)
-		magick_wand = crop_and_resize(magick_wand, params->size);
+		magick_wand = strict_resize(magick_wand, params->size);
 	else
-		magick_wand = resize(magick_wand, params->size);
+		magick_wand = fit_resize(magick_wand, params->size);
 	if (!magick_wand) {
 		free_query_params(params);
 		serve_error();

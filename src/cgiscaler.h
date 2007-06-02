@@ -28,5 +28,5 @@ void free_image(MagickWand *magick_wand);
 unsigned char *prepare_blob(MagickWand *magick_wand, struct query_params *params, size_t *blob_len);
 void free_blob(unsigned char *blob);
 
-MagickWand *resize(MagickWand *magick_wand, struct dimmensions to_size);
-MagickWand *crop_and_resize(MagickWand *magick_wand, struct dimmensions size);
+MagickWand *fit_resize(MagickWand *magick_wand, struct dimmensions to_size);
+MagickWand *strict_resize(MagickWand *magick_wand, struct dimmensions size);

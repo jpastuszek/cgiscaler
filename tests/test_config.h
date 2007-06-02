@@ -19,6 +19,10 @@
  ***************************************************************************/
 /* This is test config file */
 
+#define IMAGE_TEST_FILE "quick_gimp_pattern_test.png"
+#define IMAGE_TEST_FILE_WIDTH 450
+#define IMAGE_TEST_FILE_HEIGHT 300
+
 #define WIDTH_PARAM "w"
 #define HEIGHT_PARAM "h"
 #define STRICT_PARAM "s"
@@ -47,10 +51,10 @@
 /* "blur factor where > 1 is blurry, < 1 is sharp" */
 #define RESIZE_SMOOTH_FACTOR 1
 
-/* color to fill transparency when conferting from transparent gifs */
-#define DEFAULT_BACKGROUND_COLOR "#ffffff"
+/* color to fill transparency when conferting from transparent gifs - yellowishs*/
+#define DEFAULT_BACKGROUND_COLOR "#fcff00"
 
-#define MAX_PIXEL_NO 200000
+#define MAX_PIXEL_NO ((IMAGE_TEST_FILE_WIDTH - 10) * (IMAGE_TEST_FILE_HEIGHT - 10) - 4000)
 
 #define ERROR_FILE_PATH "error.jpg"
 #define ERROR_FILE_MIME_TYPE "image/jpeg"

@@ -152,8 +152,10 @@ void free_blob(unsigned char *blob) {
 	MagickRelinquishMemory(blob);
 }
 
+/* TODO: implement non aspect ratio keeping resize */
 
-MagickWand *resize(MagickWand *magick_wand, struct dimmensions to_size) {
+/* Resize the image to to_size dimmensons keeping aspect ration and fitting into to_size dimmensions effectivly using to_size width and height as the limits */
+MagickWand *fit_resize(MagickWand *magick_wand, struct dimmensions to_size) {
 	struct dimmensions image_size;
 	MagickBooleanType status;
 
@@ -174,7 +176,8 @@ MagickWand *resize(MagickWand *magick_wand, struct dimmensions to_size) {
 	return magick_wand;
 }
 
-MagickWand *crop_and_resize(MagickWand *magick_wand, struct dimmensions to_size) {
+/* This will do so called strict scaling. It will resize the image to to_size dimmensions cutting off image regions to keep constant aspect ratio */
+MagickWand *strict_resize(MagickWand *magick_wand, struct dimmensions to_size) {
 	struct dimmensions image_size, crop_size;
 	int x, y;
 	MagickBooleanType status;

@@ -19,6 +19,7 @@
  ***************************************************************************/
 
 #include <stdio.h>
+#include <magick/MagickCore.h>
 
 #include "../cgreen/cgreen.h"
 #include "query_string.h"
@@ -27,8 +28,6 @@
 #include "test_config.h"
 
 #include "debug.h"
-
-#define PATTERN_TEST_FILE "quick_gimp_pattern_test.png"
 
 /* my own asserts */
 
@@ -179,18 +178,109 @@ static void test_reduce_filed() {
 /* cgiscaler image tests */
 
 static void test_load_image() {
-	MagickWand *wand;
+	MagickWand *magick_wand;
 
-	wand = load_image("non_existing_file.jpg");
-	assert_equal(wand, 0);
+	magick_wand = load_image("non_existing_file.jpg");
+	assert_equal(magick_wand, 0);
 
-	wand = load_image(PATTERN_TEST_FILE);
-	assert_not_equal(wand, 0);
-	
-	if (wand)
-		free_image(wand);
+	magick_wand = load_image(IMAGE_TEST_FILE);
+	assert_not_equal(magick_wand, 0);
+		
+	assert_equal(MagickGetImageWidth(magick_wand), IMAGE_TEST_FILE_WIDTH);
+	assert_equal(MagickGetImageHeight(magick_wand), IMAGE_TEST_FILE_HEIGHT);
+	/* Checking if comment was striped off */
+	/* MagickGetImageAttribute is depricated but not yet in IM v. 6.3.0 */
+	assert_equal(MagickGetImageAttribute(magick_wand, "comment"), 0);
+/* TODO: ./configure should gatere IM version and if newer versions are used use instead:	
+	assert_equal(MagickGetImageProperty(magick_wand, "comment"), 0);
+*/
 
-	
+	free_image(magick_wand);
+}
+
+static void test_fit_resize() {
+	MagickWand *magick_wand;
+	struct dimmensions a, img, b;
+
+	a.w = 100;
+	a.h = 200;
+
+	magick_wand = load_image(IMAGE_TEST_FILE);
+	assert_not_equal(magick_wand, 0);
+
+	img.w = MagickGetImageWidth(magick_wand);
+	img.h = MagickGetImageHeight(magick_wand);
+
+	magick_wand = fit_resize(magick_wand, a);
+	assert_not_equal(magick_wand, 0);
+
+	/* as we know this works from previous tests we can calculete image size to see if it works */
+	b = resize_to_fit_in(img, a);
+
+	assert_equal(MagickGetImageWidth(magick_wand), b.w);
+	assert_equal(MagickGetImageHeight(magick_wand), b.h);
+
+	free_image(magick_wand);
+}
+
+static void test_strict_resize() {
+	MagickWand *magick_wand;
+	struct dimmensions a;
+
+	a.w = 100;
+	a.h = 200;
+
+	magick_wand = load_image(IMAGE_TEST_FILE);
+	assert_not_equal(magick_wand, 0);
+
+	magick_wand = strict_resize(magick_wand, a);
+	assert_not_equal(magick_wand, 0);
+
+	assert_equal(MagickGetImageWidth(magick_wand), 100);
+	assert_equal(MagickGetImageHeight(magick_wand), 200);
+
+	free_image(magick_wand);
+}
+
+static void test_resize_field_limiting() {
+	MagickWand *magick_wand;
+	struct dimmensions a;
+
+	/* we will resize a little bit so resizing will take effect */
+	a.w = IMAGE_TEST_FILE_WIDTH - 10;
+	a.h = IMAGE_TEST_FILE_HEIGHT - 10;
+
+	/* MAX_PIXEL_NO is set to lower then a.w * a.h */
+	if (a.w * a.h > MAX_PIXEL_NO)
+		assert_true(1);
+	else
+		assert_true(0);
+
+	/* fit_resize */
+	magick_wand = load_image(IMAGE_TEST_FILE);
+	assert_not_equal(magick_wand, 0);
+
+	magick_wand = fit_resize(magick_wand, a);
+	assert_not_equal(magick_wand, 0);
+
+	assert_not_equal(MagickGetImageWidth(magick_wand), a.w);
+	assert_not_equal(MagickGetImageHeight(magick_wand), a.h);
+	assert_equal_low_precision(MagickGetImageWidth(magick_wand) * MagickGetImageHeight(magick_wand), MAX_PIXEL_NO, 0.1);
+
+	free_image(magick_wand);
+
+	/* strict_resize */
+	magick_wand = load_image(IMAGE_TEST_FILE);
+	assert_not_equal(magick_wand, 0);
+
+	magick_wand = strict_resize(magick_wand, a);
+	assert_not_equal(magick_wand, 0);
+
+	assert_not_equal(MagickGetImageWidth(magick_wand), a.w);
+	assert_not_equal(MagickGetImageHeight(magick_wand), a.h);
+	assert_equal_low_precision(MagickGetImageWidth(magick_wand) * MagickGetImageHeight(magick_wand), MAX_PIXEL_NO, 0.1);
+
+	free_image(magick_wand);
 }
 
 int main(int argc, char **argv) {
@@ -210,6 +300,9 @@ int main(int argc, char **argv) {
 	add_suite(suite, geometry_math_suite);
 
 	add_test(cgiscaler_suite, test_load_image);
+	add_test(cgiscaler_suite, test_fit_resize);
+	add_test(cgiscaler_suite, test_strict_resize);
+	add_test(cgiscaler_suite, test_resize_field_limiting);
 	add_suite(suite, cgiscaler_suite);
 
 /* debug just in case of hmm... problems */

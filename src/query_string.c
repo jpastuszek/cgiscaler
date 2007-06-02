@@ -28,6 +28,8 @@
 char *process_file_name(char *file_param);
 char *get_query_string_param(char *qurey_string, char *param_name);
 
+/* TODO: %xx in query string decoding */
+
 struct query_params *get_query_params() {
 	char *query_string;
 	char *file_name;
