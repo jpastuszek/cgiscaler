@@ -18,47 +18,14 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include <math.h>
+#include <wand/MagickWand.h>
+#include <stdlib.h>
 
-#include "geometry_math.h"
-#include "debug.h"
+#include "query_string.h"
 
-/* This functin will return dimmensions that will be resoult of fitting rectangle of dimmensions a in to rectangle of dimmensions b without loosing it's aspect ratio */
-struct dimmensions resize_to_fit_in(struct dimmensions a, struct dimmensions b) {
-	double wf, hf, f;
-	struct dimmensions out;
+MagickWand *load_image(char *file_name);
+unsigned char *prepare_blob(MagickWand *magick_wand, struct query_params *params, size_t *blob_len);
+void free_blob(unsigned char *blob);
 
-	wf = (double) b.w / a.w;
-	hf = (double) b.h / a.h;
-
-	if (wf > hf)
-		f = hf;
-	else 
-		f = wf;
-
-	out.w = a.w * f;
-	out.h = a.h * f;
-	
-	return out;
-}
-
-/* This function will return dimmension a with reduced field to value of field parameter without loosing it's aspect ratio */
-struct dimmensions reduce_filed(struct dimmensions a, int field) {
-	int in_field;
-	struct dimmensions ret;
-	double f;
-
-	debug(DEB,"Reducing rectangle field %d x %d to %d pixels", a.w, a.h, field);
-
-	in_field = a.w * a.h;
-	if (in_field <= field)
-		return a;
-
-	f = sqrt((double) field / in_field);
-
-	ret.w = a.w * f;
-	ret.h = a.h * f;
-
-	debug(DEB,"After reduction %d x %d", ret.w, ret.h);
-	return ret;
-}
+MagickWand *resize(MagickWand *magick_wand, struct dimmensions to_size);
+MagickWand *crop_and_resize(MagickWand *magick_wand, struct dimmensions size);

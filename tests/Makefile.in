@@ -14,6 +14,7 @@
 
 @SET_MAKE@
 
+
 VPATH = @srcdir@
 pkgdatadir = $(datadir)/@PACKAGE@
 pkglibdir = $(libdir)/@PACKAGE@
@@ -34,7 +35,8 @@ build_triplet = @build@
 host_triplet = @host@
 noinst_PROGRAMS = test$(EXEEXT)
 subdir = tests
-DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
+DIST_COMMON = $(noinst_HEADERS) $(srcdir)/Makefile.am \
+	$(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.in
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
@@ -43,11 +45,11 @@ mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = $(top_builddir)/config.h
 CONFIG_CLEAN_FILES =
 PROGRAMS = $(noinst_PROGRAMS)
-am_test_OBJECTS = cache.$(OBJEXT) debug.$(OBJEXT) \
+am_test_OBJECTS = cache.$(OBJEXT) cgiscaler.$(OBJEXT) debug.$(OBJEXT) \
 	geometry_math.$(OBJEXT) query_string.$(OBJEXT) serve.$(OBJEXT) \
 	test.$(OBJEXT)
 test_OBJECTS = $(am_test_OBJECTS)
-test_LDADD = $(LDADD)
+test_DEPENDENCIES = $(top_builddir)/cgreen/libcgreen.a
 DEFAULT_INCLUDES = -I. -I$(top_builddir)@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -62,6 +64,7 @@ LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	$(LDFLAGS) -o $@
 SOURCES = $(test_SOURCES)
 DIST_SOURCES = $(test_SOURCES)
+HEADERS = $(noinst_HEADERS)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -171,10 +174,14 @@ target_alias = @target_alias@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 METASOURCES = AUTO
-test_SOURCES = cache.c cache.h config.h debug.c debug.h geometry_math.c \
-	geometry_math.h query_string.c query_string.h serve.c serve.h test.c
+test_SOURCES = cache.c cgiscaler.c debug.c geometry_math.c query_string.c \
+	serve.c test.c
 
-AM_CFLAGS = -Wall -lMagick -lWand ../../cgreen/cgreen.a
+AM_CFLAGS = -Wall -lMagick -lWand
+noinst_HEADERS = cache.h cgiscaler.h config.h debug.h geometry_math.h \
+	query_string.h serve.h
+
+test_LDADD = $(top_builddir)/cgreen/libcgreen.a
 all: all-am
 
 .SUFFIXES:
@@ -226,6 +233,7 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cache.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cgiscaler.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/debug.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/geometry_math.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/query_string.Po@am__quote@
@@ -335,7 +343,7 @@ distdir: $(DISTFILES)
 	done
 check-am: all-am
 check: check-am
-all-am: Makefile $(PROGRAMS)
+all-am: Makefile $(PROGRAMS) $(HEADERS)
 installdirs:
 install: install-am
 install-exec: install-exec-am

@@ -21,10 +21,11 @@
 #include <stdio.h>
 
 #include "../cgreen/cgreen.h"
-#include "../src/query_string.h"
-#include "../src/config.h"
+#include "query_string.h"
+#include "geometry_math.h"
+#include "config.h"
 
-
+/* query_string tests */
 static void test_query_string_param() {
 	char *prog = get_query_string_param("name=kaz&prog=cgiscaler&year=2007","prog");
 	char *name = get_query_string_param("name=kaz&prog=cgiscaler&year=2007","name");
@@ -84,13 +85,60 @@ static void test_get_query_params() {
 	assert_equal(params->strict, 0);
 	assert_equal(params->lowq, 0);
 	free_query_params(params);
+
+	snprintf(test_query_string, 256, "beer=czech_lager&%s=%s&%s=%s", STRICT_PARAM, "xbrna", LOWQ_PARAM, TRUE_PARAM_VAL);
+
+	setenv("QUERY_STRING", test_query_string, 1);
+
+	params = get_query_params();
+	assert_not_equal(params, 0);
+	assert_string_equal(params->file_name, "some/path/funny.jpeg");
+	assert_equal(params->size.w, 0);
+	assert_equal(params->size.h, 0);
+	assert_equal(params->strict, 0);
+	assert_equal(params->lowq, 1);
+	free_query_params(params);
+}
+
+/* geometry_math tests */
+static void test_resize_to_fit_in() {
+	struct dimmensions a, b, c;
+
+	a.w = 100;
+	a.h = 200;
+
+	/* down fit */
+	b.w = 200;
+	b.h = 100;
+
+	c = resize_to_fit_in(a, b);
+	assert_equal(c.w, 50);
+	assert_equal(c.h, 100);
+
+	/* up fit */
+	b.w = 1200;
+	b.h = 1200;
+
+	c = resize_to_fit_in(a, b);
+	assert_equal(c.w, 600);
+	assert_equal(c.h, 1200);
 }
 
 int main(int argc, char **argv) {
 	TestSuite *suite = create_test_suite();
-	add_test(suite, test_query_string_param);
-	add_test(suite, test_process_file_name);
-	add_test(suite, test_get_query_params);
+
+	TestSuite *query_string_suite = create_test_suite();
+	TestSuite *geometry_math_suite = create_test_suite();
+
+	add_test(query_string_suite, test_query_string_param);
+	add_test(query_string_suite, test_process_file_name);
+	add_test(query_string_suite, test_get_query_params);
+	add_suite(suite, query_string_suite);
+
+	add_test(geometry_math_suite, test_resize_to_fit_in);
+	add_suite(suite, geometry_math_suite);
+
 	return run_test_suite(suite, create_text_reporter());
+
 }
 

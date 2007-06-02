@@ -24,11 +24,9 @@
 #endif
 
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
-#include <wand/MagickWand.h>
 
-#include "query_string.h"
+#include "cgiscaler.h"
 #include "config.h"
 #include "geometry_math.h"
 #include "cache.h"
@@ -50,88 +48,8 @@ description=(char *) MagickRelinquishMemory(description); \
 exit(-1); \
 }
 
-void serve_error_image_and_exit();
-void serve_error_message_end_exit();
-
-MagickWand *load_image(char *file_name);
-
-unsigned char *prepare_blob(MagickWand *magick_wand, struct query_params *params, size_t *blob_len);
-void free_blob(unsigned char *blob);
-void serve_blob(unsigned char *blob, size_t blob_len);
-
-MagickWand *resize(MagickWand *magick_wand, struct dimmensions to_size);
-MagickWand *crop_and_resize(MagickWand *magick_wand, struct dimmensions size);
-
-
-/* TODO: Tests!!!! I am modifing without proper tests... that leads to disastet! */
-
-/* this is main function, for simplicity we don't want exits at any other point (expect [m|rw]alloc related) */
-int main(int argc, char *argv[])
-{
-	struct query_params *params;
-	MagickWand *magick_wand;
-	unsigned char *blob;
-	size_t blob_len;
-
-	debug_start("/tmp/cgiscaler.deb");
-	/* stopp debuging on exit */
-	atexit(debug_stop);
-	
-	params = get_query_params();
-	if (!params) {
-		serve_error();
-		exit(70);
-	}
-	
-	/* if we have served from cache ok... clenup and exit success */
-	if (serve_from_cache(params)) {
-		free_query_params(params);
-		exit(0);
-	}
-
-	/* now we need ImageMagick after this we should terminate ImgeMagick afterwards */
-	MagickWandGenesis();
-
-	/* loading image... if it fails wand will be 0 */
-	magick_wand = load_image(params->file_name);
-	if (!magick_wand) {
-		free_query_params(params);
-		serve_error();
-		MagickWandTerminus();
-		exit(71);
-	}
-
-	/* according to strict value we are resizing or cropresizing... if failes wand == 0 */
-	if (params->strict)
-		magick_wand = crop_and_resize(magick_wand, params->size);
-	else
-		magick_wand = resize(magick_wand, params->size);
-	if (!magick_wand) {
-		free_query_params(params);
-		serve_error();
-		MagickWandTerminus();
-		exit(72);
-	}
-
-	blob = prepare_blob(magick_wand, params, &blob_len);
-	if (!blob) {
-		free_query_params(params);
-		serve_error();
-		MagickWandTerminus();
-		exit(73);
-	}
-
-	serve_from_blob(blob, blob_len, OUT_FORMAT_MIME_TYPE);
-
-	write_blob_to_cache(blob, blob_len, params);
-
-	free_blob(blob);
-	DestroyMagickWand(magick_wand);
-	free_query_params(params);
-	MagickWandTerminus();
-
-	return EXIT_SUCCESS;
-}
+/* TODO: Zero sized image will do orginal size? may by configuralble? :D */
+/* TODO: Performace tests... profiler? :D */
 
 MagickWand *load_image(char *file_name) {
 	char *path;
