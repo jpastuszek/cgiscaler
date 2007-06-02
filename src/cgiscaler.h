@@ -25,7 +25,7 @@
 
 MagickWand *load_image(char *file_name);
 void free_image(MagickWand *magick_wand);
-unsigned char *prepare_blob(MagickWand *magick_wand, struct query_params *params, size_t *blob_len);
+unsigned char *prepare_blob(MagickWand *magick_wand, int quality, size_t *blob_len,const char *format);
 void free_blob(unsigned char *blob);
 
 MagickWand *fit_resize(MagickWand *magick_wand, struct dimmensions to_size);

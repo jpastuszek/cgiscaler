@@ -19,6 +19,7 @@
  ***************************************************************************/
 
 #include <stdio.h>
+#include <strings.h>
 #include <magick/MagickCore.h>
 
 #include "../cgreen/cgreen.h"
@@ -283,6 +284,33 @@ static void test_resize_field_limiting() {
 	free_image(magick_wand);
 }
 
+static void test_prepare_blob() {
+	MagickWand *magick_wand;
+	struct dimmensions a;
+	size_t blob_len;
+	unsigned char *blob;
+
+	a.w = 100;
+	a.h = 200;
+
+	magick_wand = load_image(IMAGE_TEST_FILE);
+	assert_not_equal(magick_wand, 0);
+
+	magick_wand = strict_resize(magick_wand, a);
+	assert_not_equal(magick_wand, 0);
+
+	/* we are preparing JPEG data */
+	blob = prepare_blob(magick_wand, 70, &blob_len, "JPG");
+	assert_not_equal(blob, 0);
+	assert_not_equal(blob_len, 0);
+
+	/* JPEG data magick number */
+	assert_equal(blob[0], 0xff);
+	assert_equal(blob[1], 0xd8);
+
+	free_blob(blob);
+}
+
 int main(int argc, char **argv) {
 	TestSuite *suite = create_test_suite();
 
@@ -303,6 +331,7 @@ int main(int argc, char **argv) {
 	add_test(cgiscaler_suite, test_fit_resize);
 	add_test(cgiscaler_suite, test_strict_resize);
 	add_test(cgiscaler_suite, test_resize_field_limiting);
+	add_test(cgiscaler_suite, test_prepare_blob);
 	add_suite(suite, cgiscaler_suite);
 
 /* debug just in case of hmm... problems */

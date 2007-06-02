@@ -32,6 +32,7 @@ int main(int argc, char *argv[])
 	MagickWand *magick_wand;
 	unsigned char *blob;
 	size_t blob_len;
+	int quality;
 
 	debug_start(DEBUG_FILE);
 	/* stopp debuging on exit */
@@ -73,7 +74,12 @@ int main(int argc, char *argv[])
 		exit(72);
 	}
 
-	blob = prepare_blob(magick_wand, params, &blob_len);
+	if (params->lowq)
+		quality = LOWQ_QUALITY;
+	else
+		quality = NORMAL_QUALITY;
+
+	blob = prepare_blob(magick_wand, quality, &blob_len, OUT_FORMAT);
 	if (!blob) {
 		free_query_params(params);
 		serve_error();

@@ -114,23 +114,20 @@ void free_image(MagickWand *magick_wand) {
 }
 
 /* creates blob from wand according to quality param in params and returns it's size */
-unsigned char *prepare_blob(MagickWand *magick_wand, struct query_params *params, size_t *blob_len) {
+unsigned char *prepare_blob(MagickWand *magick_wand, int quality, size_t *blob_len,const char *format) {
 	unsigned char *blob;
 	MagickBooleanType status;
 
 	debug(DEB,"Preparing BLOB");
 
-	status = MagickSetFormat(magick_wand, OUT_FORMAT);
+	status = MagickSetFormat(magick_wand, format);
 	if (status == MagickFalse) {
 		debug(ERR,"Failed to set output Format");
 		DestroyMagickWand(magick_wand);
 		return 0;
 	}
 
-	if (params->lowq)
-		status = MagickSetCompressionQuality(magick_wand, LOWQ_QUALITY);
-	else
-		status = MagickSetCompressionQuality(magick_wand, NORMAL_QUALITY);
+	status = MagickSetCompressionQuality(magick_wand, quality);
 	if (status == MagickFalse) {
 		debug(ERR,"Failed to set Compression Quality");
 		DestroyMagickWand(magick_wand);
