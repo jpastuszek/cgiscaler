@@ -75,14 +75,6 @@ MagickWand *load_image(char *file_name) {
 		return 0;
 	}
 
-	/* this will remove meta data - this is very important as photos have loads of it */
-	status = MagickStripImage(magick_wand);
-	if (status == MagickFalse) {
-		debug(ERR,"Failed to Strip Image");
-		DestroyMagickWand(magick_wand);
-		return 0;
-	}
-
 	debug(DEB, "Setting background color to '%s'", DEFAULT_BACKGROUND_COLOR);
 
 	/* Set background to DEFAULT_BACKGROUND_COLOR - in case of transparent gifs or png */
@@ -103,7 +95,29 @@ MagickWand *load_image(char *file_name) {
 	}
 
 	MagickSetImageMatteColor(magick_wand, pixel_wand);
+	if (status == MagickFalse) {
+		debug(ERR,"Failed to set matte color color to '%s'", DEFAULT_BACKGROUND_COLOR);
+		DestroyPixelWand(pixel_wand);
+		DestroyMagickWand(magick_wand);
+		return 0;
+	}
+
 	MagickSetImageMatte(magick_wand, MagickFalse);
+	if (status == MagickFalse) {
+		debug(ERR,"Failed to set matte off");
+		DestroyPixelWand(pixel_wand);
+		DestroyMagickWand(magick_wand);
+		return 0;
+	}
+
+	/* this will remove meta data - this is very important as photos have loads of it */
+	status = MagickStripImage(magick_wand);
+	if (status == MagickFalse) {
+		debug(ERR,"Failed to Strip Image");
+		DestroyMagickWand(magick_wand);
+		return 0;
+	}
+
 	DestroyPixelWand(pixel_wand);
 
 	return magick_wand;

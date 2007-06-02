@@ -52,7 +52,7 @@
 #define RESIZE_SMOOTH_FACTOR 1
 
 /* color to fill transparency when conferting from transparent gifs - yellowishs*/
-#define DEFAULT_BACKGROUND_COLOR "#fcff00"
+#define DEFAULT_BACKGROUND_COLOR "#112233"
 
 #define MAX_PIXEL_NO ((IMAGE_TEST_FILE_WIDTH - 10) * (IMAGE_TEST_FILE_HEIGHT - 10) - 4000)
 

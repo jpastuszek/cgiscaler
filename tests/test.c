@@ -58,6 +58,41 @@ void assert_equal_precision(double value, double expected, double precision_erro
 	assert_true_with_message(ret, "value [%f] not in precision range of [%f] and [%f] (%f)", value, expected - (range_delta / 2), expected + (range_delta / 2), precision_error);
 }
 
+void assert_image_pixel_color(MagickWand *magick_wand, int x, int y, const char *color) {
+	PixelWand *pixel_wand;
+	MagickBooleanType status;
+
+	pixel_wand = NewPixelWand();
+	status = MagickGetImagePixelColor(magick_wand, x, y, pixel_wand);
+	assert_not_equal(status, MagickFalse);
+
+	/* we assert that we no longer have transparent pixel */
+	assert_string_equal(PixelGetColorAsString(pixel_wand), color);
+	printf("%s", PixelGetColorAsString(pixel_wand));
+
+	DestroyPixelWand(pixel_wand);
+}
+
+void assert_image_pixel_alpha(MagickWand *magick_wand, int x, int y, float alpha) {
+	PixelWand *pixel_wand;
+	MagickBooleanType status;
+	int true;
+	float tested_alpha;
+
+	pixel_wand = NewPixelWand();
+	status = MagickGetImagePixelColor(magick_wand, x, y, pixel_wand);
+	assert_not_equal(status, MagickFalse);
+
+	true = 0;
+	tested_alpha = PixelGetAlpha(pixel_wand);
+	if (tested_alpha == alpha)
+		true = 1;
+
+	assert_true_with_message(true, "pixel alpha shoud be [%f] but is [%f]", alpha, tested_alpha);
+
+	DestroyPixelWand(pixel_wand);
+}
+
 /* query_string tests */
 static void test_query_string_param() {
 	char *prog = get_query_string_param("name=kaz&prog=cgiscaler&year=2007","prog");
@@ -284,6 +319,30 @@ static void test_resize_field_limiting() {
 	free_image(magick_wand);
 }
 
+static void test_transparent_resize_bg_color() {
+	MagickWand *magick_wand;
+	struct dimmensions a;
+
+	/* we resize just 1 pixel so we don't loose our transparent region at (10,10) */
+	a.w = IMAGE_TEST_FILE_WIDTH - 1;
+	a.h = IMAGE_TEST_FILE_HEIGHT - 1;
+
+	magick_wand = load_image(IMAGE_TEST_FILE);
+	assert_not_equal(magick_wand, 0);
+
+	/* assert that at point(10,10) we have transparent pixel */
+	assert_image_pixel_alpha(magick_wand, 10, 10, 0.0);
+
+	magick_wand = strict_resize(magick_wand, a);
+	assert_not_equal(magick_wand, 0);
+
+	/* we assert that we no longer have transparent pixel */
+	assert_image_pixel_alpha(magick_wand, 10, 10, 1.0);
+	assert_image_pixel_color(magick_wand, 10, 10, "rgb11,22,33");
+
+	free_image(magick_wand);
+}
+
 static void test_prepare_blob() {
 	MagickWand *magick_wand;
 	struct dimmensions a;
@@ -311,6 +370,7 @@ static void test_prepare_blob() {
 	free_blob(blob);
 }
 
+
 int main(int argc, char **argv) {
 	TestSuite *suite = create_test_suite();
 
@@ -331,6 +391,7 @@ int main(int argc, char **argv) {
 	add_test(cgiscaler_suite, test_fit_resize);
 	add_test(cgiscaler_suite, test_strict_resize);
 	add_test(cgiscaler_suite, test_resize_field_limiting);
+	add_test(cgiscaler_suite, test_transparent_resize_bg_color);
 	add_test(cgiscaler_suite, test_prepare_blob);
 	add_suite(suite, cgiscaler_suite);
 
