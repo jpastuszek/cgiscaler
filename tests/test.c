@@ -25,6 +25,34 @@
 #include "geometry_math.h"
 #include "config.h"
 
+/* my own asserts */
+
+void assert_equal_low_precision(double value, double expected, double low_precision_error) {
+	int ret, range_min;
+
+	range_min = expected - (expected * low_precision_error);
+	if (value <= expected && value >= range_min)
+		ret = 1;
+	else
+		ret = 0;
+
+
+	assert_true_with_message(ret, "value [%f] not in precision range of [%f] and [%f] (%f)", value, range_min, expected, low_precision_error);
+}
+
+void assert_equal_precision(double value, double expected, double precision_error) {
+	int ret;
+	double range_delta;
+
+	range_delta = (expected * precision_error);
+	if (value <= expected + (range_delta / 2) && value >= expected - (range_delta / 2))
+		ret = 1;
+	else
+		ret = 0;
+
+	assert_true_with_message(ret, "value [%f] not in precision range of [%f] and [%f] (%f)", value, expected - (range_delta / 2), expected + (range_delta / 2), precision_error);
+}
+
 /* query_string tests */
 static void test_query_string_param() {
 	char *prog = get_query_string_param("name=kaz&prog=cgiscaler&year=2007","prog");
@@ -124,6 +152,26 @@ static void test_resize_to_fit_in() {
 	assert_equal(c.h, 1200);
 }
 
+static void test_reduce_filed() {
+	struct dimmensions a, b;
+
+	/* field = 100*200 = 20000 */
+	a.w = 100;
+	a.h = 200;
+
+	b = reduce_filed(a, 1234);
+	/* we check if reduction worked (within 10% lower precision margin) */
+	assert_equal_low_precision(b.w * b.h, 1234.0, 0.1);
+	/* we check if aspect ratio did not changed (within 10% precision margin) */
+	assert_equal_precision((float) b.w / b.h,(float) a.w / a.h, 0.1);
+
+	/* over reduction - nothing should change */
+	b = reduce_filed(a, 999999);
+	assert_equal(a.w, 100);
+	assert_equal(a.h, 200);
+}
+
+
 int main(int argc, char **argv) {
 	TestSuite *suite = create_test_suite();
 
@@ -136,6 +184,7 @@ int main(int argc, char **argv) {
 	add_suite(suite, query_string_suite);
 
 	add_test(geometry_math_suite, test_resize_to_fit_in);
+	add_test(geometry_math_suite, test_reduce_filed);
 	add_suite(suite, geometry_math_suite);
 
 	return run_test_suite(suite, create_text_reporter());
