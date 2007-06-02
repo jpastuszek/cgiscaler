@@ -21,6 +21,8 @@
 #define DEBUG
 //#define DEBUG_SYNC
 
+#define DEBUG_FILE "/tmp/cgiscaler.deb"
+
 #define WIDTH_PARAM "w"
 #define HEIGHT_PARAM "h"
 #define STRICT_PARAM "s"

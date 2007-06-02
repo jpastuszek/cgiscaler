@@ -17,16 +17,42 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
+/* This is test config file */
 
-#include <wand/MagickWand.h>
-#include <stdlib.h>
+#define WIDTH_PARAM "w"
+#define HEIGHT_PARAM "h"
+#define STRICT_PARAM "s"
+#define LOWQ_PARAM "wap"
 
-#include "query_string.h"
+#define TRUE_PARAM_VAL "t"
 
-MagickWand *load_image(char *file_name);
-void free_image(MagickWand *magick_wand);
-unsigned char *prepare_blob(MagickWand *magick_wand, struct query_params *params, size_t *blob_len);
-void free_blob(unsigned char *blob);
+#define MEDIA_PATH "./"
+#define CACHE_PATH "cache/"
 
-MagickWand *resize(MagickWand *magick_wand, struct dimmensions to_size);
-MagickWand *crop_and_resize(MagickWand *magick_wand, struct dimmensions size);
+
+#define OUT_FORMAT "JPEG"
+#define OUT_FORMAT_MIME_TYPE "image/jpeg"
+
+#define LOWQ_QUALITY 20
+#define NORMAL_QUALITY 80
+
+/* Possible resize filters 
+    BesselFilter   BlackmanFilter   BoxFilter
+    CatromFilter   CubicGaussianFilter
+    HanningFilter  HermiteFilter    LanczosFilter
+    MitchellFilter PointQuandraticFilter
+    SincFilter     TriangleFilter
+*/
+#define RESIZE_FILTER LanczosFilter
+/* "blur factor where > 1 is blurry, < 1 is sharp" */
+#define RESIZE_SMOOTH_FACTOR 1
+
+/* color to fill transparency when conferting from transparent gifs */
+#define DEFAULT_BACKGROUND_COLOR "#ffffff"
+
+#define MAX_PIXEL_NO 200000
+
+#define ERROR_FILE_PATH "error.jpg"
+#define ERROR_FILE_MIME_TYPE "image/jpeg"
+
+#define WRITE_BUFFER_LEN 8192

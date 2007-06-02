@@ -33,7 +33,7 @@ int main(int argc, char *argv[])
 	unsigned char *blob;
 	size_t blob_len;
 
-	debug_start("/tmp/cgiscaler.deb");
+	debug_start(DEBUG_FILE);
 	/* stopp debuging on exit */
 	atexit(debug_stop);
 	
@@ -86,7 +86,7 @@ int main(int argc, char *argv[])
 	write_blob_to_cache(blob, blob_len, params);
 
 	free_blob(blob);
-	DestroyMagickWand(magick_wand);
+	free_image(magick_wand);
 	free_query_params(params);
 	MagickWandTerminus();
 

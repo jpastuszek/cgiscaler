@@ -51,6 +51,7 @@ exit(-1); \
 /* TODO: Zero sized image will do orginal size? may by configuralble? :D */
 /* TODO: Performace tests... profiler? :D */
 
+/* Loads image, strips metadata and sets it's default bg color */
 MagickWand *load_image(char *file_name) {
 	char *path;
 	MagickWand *magick_wand;
@@ -70,6 +71,14 @@ MagickWand *load_image(char *file_name) {
 	status = MagickReadImage(magick_wand, path);
 	if (status == MagickFalse) {
 		debug(WARN,"Loading image '%s' failed", path);
+		DestroyMagickWand(magick_wand);
+		return 0;
+	}
+
+	/* this will remove meta data - this is very important as photos have loads of it */
+	status = MagickStripImage(magick_wand);
+	if (status == MagickFalse) {
+		debug(ERR,"Failed to Strip Image");
 		DestroyMagickWand(magick_wand);
 		return 0;
 	}
@@ -100,21 +109,16 @@ MagickWand *load_image(char *file_name) {
 	return magick_wand;
 }
 
+void free_image(MagickWand *magick_wand) {
+	DestroyMagickWand(magick_wand);
+}
+
 /* creates blob from wand according to quality param in params and returns it's size */
 unsigned char *prepare_blob(MagickWand *magick_wand, struct query_params *params, size_t *blob_len) {
 	unsigned char *blob;
 	MagickBooleanType status;
 
 	debug(DEB,"Preparing BLOB");
-
-	/* this will remove meta data - this is very important as photos have loads of it */
-	status = MagickStripImage(magick_wand);
-	if (status == MagickFalse) {
-		debug(ERR,"Failed to Strip Image");
-		DestroyMagickWand(magick_wand);
-		return 0;
-	}
-
 
 	status = MagickSetFormat(magick_wand, OUT_FORMAT);
 	if (status == MagickFalse) {

@@ -23,7 +23,12 @@
 #include "../cgreen/cgreen.h"
 #include "query_string.h"
 #include "geometry_math.h"
-#include "config.h"
+#include "cgiscaler.h"
+#include "test_config.h"
+
+#include "debug.h"
+
+#define PATTERN_TEST_FILE "quick_gimp_pattern_test.png"
 
 /* my own asserts */
 
@@ -171,12 +176,29 @@ static void test_reduce_filed() {
 	assert_equal(a.h, 200);
 }
 
+/* cgiscaler image tests */
+
+static void test_load_image() {
+	MagickWand *wand;
+
+	wand = load_image("non_existing_file.jpg");
+	assert_equal(wand, 0);
+
+	wand = load_image(PATTERN_TEST_FILE);
+	assert_not_equal(wand, 0);
+	
+	if (wand)
+		free_image(wand);
+
+	
+}
 
 int main(int argc, char **argv) {
 	TestSuite *suite = create_test_suite();
 
 	TestSuite *query_string_suite = create_test_suite();
 	TestSuite *geometry_math_suite = create_test_suite();
+	TestSuite *cgiscaler_suite = create_test_suite();
 
 	add_test(query_string_suite, test_query_string_param);
 	add_test(query_string_suite, test_process_file_name);
@@ -187,7 +209,14 @@ int main(int argc, char **argv) {
 	add_test(geometry_math_suite, test_reduce_filed);
 	add_suite(suite, geometry_math_suite);
 
+	add_test(cgiscaler_suite, test_load_image);
+	add_suite(suite, cgiscaler_suite);
+
+/* debug just in case of hmm... problems */
+//	debug_start(0);
+
 	return run_test_suite(suite, create_text_reporter());
 
+//	debug_stop();
 }
 
