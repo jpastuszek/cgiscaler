@@ -21,23 +21,23 @@
   <kdevautoproject>
     <general>
       <activetarget>tests/test</activetarget>
-      <useconfiguration>default</useconfiguration>
+      <useconfiguration>debug</useconfiguration>
       <useactivetarget>true</useactivetarget>
     </general>
     <run>
-      <mainprogram></mainprogram>
+      <mainprogram>/home/kazuya/Projects/cgiscaler/CGIScaler</mainprogram>
       <terminal>true</terminal>
       <runarguments>
-        <cgiscaler/>
-        <test/>
+        <cgiscaler></cgiscaler>
+        <test></test>
       </runarguments>
       <debugarguments>
-        <cgiscaler/>
-        <test/>
+        <cgiscaler></cgiscaler>
+        <test></test>
       </debugarguments>
       <cwd>
-        <cgiscaler>/home/kazuya/Projects/CGIScaler/debug/./src</cgiscaler>
-        <test>/home/kazuya/Projects/CGIScaler/tests</test>
+        <cgiscaler>/home/kazuya/Projects/CGIScaler</cgiscaler>
+        <test>/home/kazuya/Projects/CGIScaler</test>
       </cwd>
       <programargs></programargs>
       <globaldebugarguments></globaldebugarguments>
@@ -54,7 +54,17 @@
         <ccompiler>kdevgccoptions</ccompiler>
         <cxxcompiler>kdevgppoptions</cxxcompiler>
         <f77compiler>kdevg77options</f77compiler>
-        <cflags>-O2 -g0 </cflags>
+        <cflags>-O3 -g0 </cflags>
+        <envvars/>
+        <configargs></configargs>
+        <topsourcedir></topsourcedir>
+        <cppflags></cppflags>
+        <ldflags></ldflags>
+        <ccompilerbinary></ccompilerbinary>
+        <cxxcompilerbinary></cxxcompilerbinary>
+        <f77compilerbinary></f77compilerbinary>
+        <cxxflags></cxxflags>
+        <f77flags></f77flags>
       </optimized>
       <debug>
         <configargs>--enable-debug=full</configargs>
@@ -62,10 +72,33 @@
         <ccompiler>kdevgccoptions</ccompiler>
         <cxxcompiler>kdevgppoptions</cxxcompiler>
         <f77compiler>kdevg77options</f77compiler>
-        <cflags>-O0 -g3 </cflags>
+        <cflags>-O0 -g3  -D DEBUG</cflags>
+        <envvars/>
+        <topsourcedir></topsourcedir>
+        <cppflags></cppflags>
+        <ldflags></ldflags>
+        <ccompilerbinary></ccompilerbinary>
+        <cxxcompilerbinary></cxxcompilerbinary>
+        <f77compilerbinary></f77compilerbinary>
+        <cxxflags></cxxflags>
+        <f77flags></f77flags>
       </debug>
       <default>
         <envvars/>
+        <configargs></configargs>
+        <builddir></builddir>
+        <topsourcedir></topsourcedir>
+        <cppflags></cppflags>
+        <ldflags></ldflags>
+        <ccompiler>kdevgccoptions</ccompiler>
+        <cxxcompiler>kdevgppoptions</cxxcompiler>
+        <f77compiler>kdevg77options</f77compiler>
+        <ccompilerbinary></ccompilerbinary>
+        <cxxcompilerbinary></cxxcompilerbinary>
+        <f77compilerbinary></f77compilerbinary>
+        <cflags>-O2 -g0 </cflags>
+        <cxxflags></cxxflags>
+        <f77flags></f77flags>
       </default>
     </configurations>
     <make>
@@ -153,7 +186,7 @@
     <projectdoc>
       <docsystem>Doxygen Documentation Collection</docsystem>
       <docurl>cgiscaler.tag</docurl>
-      <usermanualurl></usermanualurl>
+      <usermanualurl/>
     </projectdoc>
   </kdevdocumentation>
   <substmap>
@@ -247,7 +280,7 @@
     </display>
   </kdevdebugger>
   <ctagspart>
-    <customArguments></customArguments>
+    <customArguments/>
     <customTagfilePath>/home/kazuya/Projects/cgiscaler/CGIScaler/tags</customTagfilePath>
     <activeTagsFiles/>
   </ctagspart>

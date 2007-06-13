@@ -19,7 +19,7 @@
  ***************************************************************************/
 /* This is test config file */
 
-#define IMAGE_TEST_FILE "quick_gimp_pattern_test.png"
+#define IMAGE_TEST_FILE "tests/quick_gimp_pattern_test.png"
 #define IMAGE_TEST_FILE_WIDTH 450
 #define IMAGE_TEST_FILE_HEIGHT 300
 
