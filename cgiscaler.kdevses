@@ -3,10 +3,10 @@
 <KDevPrjSession>
  <DocsAndViews NumberOfDocuments="9" >
   <Doc0 NumberOfViews="1" URL="file:///home/kazuya/Projects/CGIScaler/src/cgiscaler.c" >
-   <View0 Encoding="" line="293" Type="Source" />
+   <View0 Encoding="" Type="Source" />
   </Doc0>
   <Doc1 NumberOfViews="1" URL="file:///home/kazuya/Projects/CGIScaler/src/serve.c" >
-   <View0 Encoding="" line="26" Type="Source" />
+   <View0 Encoding="" line="47" Type="Source" />
   </Doc1>
   <Doc2 NumberOfViews="1" URL="file:///home/kazuya/Projects/CGIScaler/src/serve.h" >
    <View0 Encoding="" Type="Source" />
@@ -27,7 +27,7 @@
    <View0 Encoding="" Type="Source" />
   </Doc7>
   <Doc8 NumberOfViews="1" URL="file:///home/kazuya/Projects/CGIScaler/src/geometry_math.h" >
-   <View0 Encoding="" line="0" Type="Source" />
+   <View0 Encoding="" line="38" Type="Source" />
   </Doc8>
  </DocsAndViews>
  <pluginList>
