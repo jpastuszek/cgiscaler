@@ -18,7 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#define DEBUG
+//#define DEBUG
 //#define DEBUG_SYNC
 
 #define DEBUG_FILE "/tmp/cgiscaler.deb"
