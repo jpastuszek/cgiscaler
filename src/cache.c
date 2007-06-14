@@ -99,7 +99,7 @@ int check_if_cached(struct query_params *params) {
 	debug(DEB,"Orginal mtime: %d, Cache mtime: %d", orginal_mtime, cache_mtime);
 
 	if (!cache_mtime && !orginal_mtime)
-		return NO_ORIG & NO_CACHE;
+		return NO_ORIG | NO_CACHE;
 	
 	if (cache_mtime && !orginal_mtime)
 		return NO_ORIG;

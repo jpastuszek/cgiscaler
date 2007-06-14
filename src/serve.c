@@ -32,6 +32,8 @@
 #include "config.h"
 #include "debug.h"
 
+void remove_cache_file(char *cache_file_path);
+
 int serve_from_file(char *file_path, char *mime_type) {
 	unsigned char *buffer;
 	int error_file;
@@ -159,18 +161,36 @@ int serve_from_cache(struct query_params *params) {
 	cache_file_path = prepare_cache_file_path(params);
 	debug(DEB,"Trying cache file: '%s'", cache_file_path);
 
+/*
+Logick:
+_ _
+O C M
+
+1 1 0 - exit
+0 1 0 - exit
+1 0 0 - rm, exit
+0 0 1 - rm, exit
+0 0 0 - serve
+u*/
+
 	switch (check_if_cached(params)) {
-		/* unlink cache entry if orginal does not exist or mtime with orginal differs */
+		/* we don't have cache file or both... returning */
+		case NO_CACHE:
+		case NO_CACHE | NO_ORIG:
+			debug(DEB, "No cache file");
+			free(cache_file_path);
+			return 0;
+
+		/* we don't have orig or cache file old... remove cache file and return */
 		case NO_ORIG:
 		case MTIME_DIFFER:
-			if (unlink(cache_file_path) == -1)
-				debug(WARN, "Removing old cache file '%s' failed: %s", cache_file_path, strerror(errno));
-		/* we don't have valid cache file at all */
-		case NO_CACHE:
+			debug(DEB, "No orginal or mtime with orginal differ");
+			remove_cache_file(cache_file_path);
 			free(cache_file_path);
 			return 0;
 	}
 
+	/* serve */
 	debug(DEB,"Serving from cache file: '%s'", cache_file_path);
 	
 	ret = serve_from_file(cache_file_path, OUT_FORMAT_MIME_TYPE);
@@ -178,6 +198,12 @@ int serve_from_cache(struct query_params *params) {
 	free(cache_file_path);
 
 	return ret;
+}
+
+void remove_cache_file(char *cache_file_path) {
+	debug(DEB, "Removing old cache file '%s'", cache_file_path);
+	if (unlink(cache_file_path) == -1)
+		debug(WARN, "Removing old cache file '%s' failed: %s", cache_file_path, strerror(errno));
 }
 
 /* we will try error miage but if it does not exist we will fail back to error message */
