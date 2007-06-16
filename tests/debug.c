@@ -1,1 +1,1 @@
-/home/kazuya/Projects/CGIScaler/src/debug.c
+../src/debug.c

@@ -1,1 +1,1 @@
-/home/kazuya/Projects/CGIScaler/src/cache.c
+../src/cache.c

@@ -1,1 +1,1 @@
-/home/kazuya/Projects/CGIScaler/src/query_string.h
+../src/query_string.h

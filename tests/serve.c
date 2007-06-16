@@ -1,1 +1,1 @@
-/home/kazuya/Projects/CGIScaler/src/serve.c
+../src/serve.c
