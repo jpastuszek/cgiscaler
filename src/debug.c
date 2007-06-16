@@ -59,7 +59,9 @@ void debug_stop() {
 
 	debug("<<<<", "Stopping debug");
 
-	close(debug_file_fd);
+	/* Std* should not be closed */
+	if (debug_file_fd > 2)
+		close(debug_file_fd);
 	debug_on = 0;
 #endif
 }

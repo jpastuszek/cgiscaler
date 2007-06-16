@@ -68,7 +68,6 @@ void assert_image_pixel_color(MagickWand *magick_wand, int x, int y, const char 
 
 	/* we assert that we no longer have transparent pixel */
 	assert_string_equal(PixelGetColorAsString(pixel_wand), color);
-	printf("%s", PixelGetColorAsString(pixel_wand));
 
 	DestroyPixelWand(pixel_wand);
 }
@@ -330,15 +329,17 @@ static void test_transparent_resize_bg_color() {
 	magick_wand = load_image(IMAGE_TEST_FILE);
 	assert_not_equal(magick_wand, 0);
 
-	/* assert that at point(10,10) we have transparent pixel */
-	assert_image_pixel_alpha(magick_wand, 10, 10, 0.0);
+	/* assert we have our test image loaded ok */
+	assert_image_pixel_color(magick_wand, IMAGE_TEST_FILE_WIDTH - 1, IMAGE_TEST_FILE_HEIGHT - 1, "rgb240,0,255");
+
+	/* we assert that we don't have transparent pixel */
+	assert_image_pixel_alpha(magick_wand, 10, 10, 1.0);
+	/* and color is DEFAULT_BACKGROUND_COLOR_MAGICK_STR */
+	assert_image_pixel_color(magick_wand, 10, 10, DEFAULT_BACKGROUND_COLOR_MAGICK_STR);
 
 	magick_wand = strict_resize(magick_wand, a);
 	assert_not_equal(magick_wand, 0);
 
-	/* we assert that we no longer have transparent pixel */
-	assert_image_pixel_alpha(magick_wand, 10, 10, 1.0);
-	assert_image_pixel_color(magick_wand, 10, 10, "rgb11,22,33");
 
 	free_image(magick_wand);
 }
@@ -370,6 +371,13 @@ static void test_prepare_blob() {
 	free_blob(blob);
 }
 
+static void test_setup() {
+	debug_start(DEBUG_FILE);
+}
+
+static void test_teardown() {
+	debug_stop();
+}
 
 int main(int argc, char **argv) {
 	TestSuite *suite = create_test_suite();
@@ -395,11 +403,9 @@ int main(int argc, char **argv) {
 	add_test(cgiscaler_suite, test_prepare_blob);
 	add_suite(suite, cgiscaler_suite);
 
-/* debug just in case of hmm... problems */
-//	debug_start(0);
+	setup(suite, test_setup);
+	teardown(suite, test_teardown);
 
 	return run_test_suite(suite, create_text_reporter());
-
-//	debug_stop();
 }
 

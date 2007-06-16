@@ -19,6 +19,9 @@
  ***************************************************************************/
 /* This is test config file */
 
+#define DEBUG_FILE "/tmp/cgiscaler_test.deb"
+//#define DEBUG_SYNC
+
 #define IMAGE_TEST_FILE "tests/quick_gimp_pattern_test.png"
 #define IMAGE_TEST_FILE_WIDTH 450
 #define IMAGE_TEST_FILE_HEIGHT 300
@@ -51,8 +54,13 @@
 /* "blur factor where > 1 is blurry, < 1 is sharp" */
 #define RESIZE_SMOOTH_FACTOR 1
 
+/* if output format doesn't handle transparency (like JPG) uncomment HANDLE_TRANSPARENCY so when transparent image is scaled it's transpaency will be replaced by DEFAULT_BACKGROUND_COLOR */
+#define HANDLE_TRANSPARENCY
+
 /* color to fill transparency when conferting from transparent gifs - yellowishs*/
+/* #112233 hex -> rgb17,34,51 */
 #define DEFAULT_BACKGROUND_COLOR "#112233"
+#define DEFAULT_BACKGROUND_COLOR_MAGICK_STR "rgb17,34,51"
 
 #define MAX_PIXEL_NO ((IMAGE_TEST_FILE_WIDTH - 10) * (IMAGE_TEST_FILE_HEIGHT - 10) - 4000)
 
