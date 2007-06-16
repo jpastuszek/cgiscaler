@@ -29,49 +29,16 @@
 
 #include "cache.h"
 #include "serve.h"
+#include "file_utils.h"
 #include "config.h"
 #include "debug.h"
-
-time_t get_file_mtime(char *path);
-
-/* returns allocated cache file name string */
-char *prepare_cache_file_path(struct query_params *params) {
-	char *file_name;
-	int file_name_len, file_name_buff_len = 44;
-
-	/* we are allocating initial file name buffor */
-	file_name = malloc(file_name_buff_len);
-	if (!file_name)
-		exit(66);
-
-	/* now wi will loop until snprintf will return less than our buffor size */
-	while (1) {
-		file_name_len = snprintf(file_name, file_name_buff_len, "%s%s-%u-%u-%u-%u", CACHE_PATH, params->file_name, params->size.w, params->size.h, params->strict, params->lowq);
-	
-		/* it worked, we have less then file_name_buff_len */
-		if (file_name_len > -1 && file_name_len < file_name_buff_len)
-			break;
-		
-		/* we have more then file_name_buff_len */
-		if (file_name_len > -1)
-			file_name_buff_len = file_name_len + 1;
-		else
-			file_name_buff_len *= 2;
-	
-		/* resize to add more space */
-		if ((file_name = realloc(file_name, file_name_buff_len)) == NULL)
-			exit(66);
-	}
-
-	debug(DEB, "Cache file name entry: '%s'", file_name);
-	return file_name;
-}
 
 /* this function will check if cache file exists and if corresponding orginal file mtime differs with cached version
 Returns bitmask:
 	NO_ORIG orginal file does not exist
 	NO_CACHE cache file does not exist
 	MTIME_DIFFER orginal file mtime differs from cache file mtime
+or
 	CACHE_OK orginal file mtime is same as chache file mtime
 */
 int check_if_cached(struct query_params *params) {
@@ -85,7 +52,7 @@ int check_if_cached(struct query_params *params) {
 	strcpy(orginal_file_path, MEDIA_PATH);
 	strcat(orginal_file_path, params->file_name);
 
-	cache_file_path = prepare_cache_file_path(params);
+	cache_file_path = create_cache_file_path(params);
 	
 	debug(DEB, "Orginal file path: '%s' cache file path: '%s'", orginal_file_path, cache_file_path);
 
@@ -111,14 +78,6 @@ int check_if_cached(struct query_params *params) {
 		return MTIME_DIFFER;
 
 	return CACHE_OK;
-}
-
-/* returns file mtime or 0 if file does not exists */
-time_t get_file_mtime(char *path) {
-	struct stat s;
-	if (stat(path, &s) == -1)
-		return 0;
-	return s.st_mtime;
 }
 
 int create_dir_struct(char *file_path) {
@@ -202,7 +161,7 @@ int write_blob_to_cache(unsigned char *blob, int blob_len, struct query_params *
 		return 0;
 	}
 
-	file_path = prepare_cache_file_path(params);
+	file_path = create_cache_file_path(params);
 	if (!write_blob_to_file(blob, blob_len, file_path)) {
 		debug(ERR, "Writing blob to file '%s' failed", file_path);
 		free(file_path);

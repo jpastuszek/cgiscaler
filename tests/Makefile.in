@@ -46,8 +46,8 @@ CONFIG_HEADER = $(top_builddir)/config.h
 CONFIG_CLEAN_FILES =
 PROGRAMS = $(noinst_PROGRAMS)
 am_test_OBJECTS = cache.$(OBJEXT) cgiscaler.$(OBJEXT) debug.$(OBJEXT) \
-	geometry_math.$(OBJEXT) query_string.$(OBJEXT) serve.$(OBJEXT) \
-	test.$(OBJEXT)
+	file_utils.$(OBJEXT) geometry_math.$(OBJEXT) \
+	query_string.$(OBJEXT) serve.$(OBJEXT) test.$(OBJEXT)
 test_OBJECTS = $(am_test_OBJECTS)
 test_DEPENDENCIES = $(top_builddir)/cgreen/libcgreen.a
 DEFAULT_INCLUDES = -I. -I$(top_builddir)@am__isrc@
@@ -176,12 +176,12 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 METASOURCES = AUTO
 AM_CFLAGS = -Wall -lMagick -lWand
-noinst_HEADERS = cache.h cgiscaler.h config.h debug.h geometry_math.h \
-	query_string.h serve.h
+noinst_HEADERS = cache.h cgiscaler.h config.h debug.h file_utils.h \
+	geometry_math.h query_string.h serve.h
 
 test_LDADD = $(top_builddir)/cgreen/libcgreen.a
-test_SOURCES = cache.c cgiscaler.c debug.c geometry_math.c query_string.c \
-	serve.c test.c
+test_SOURCES = cache.c cgiscaler.c debug.c file_utils.c geometry_math.c \
+	query_string.c serve.c test.c
 
 all: all-am
 
@@ -236,6 +236,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cache.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cgiscaler.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/debug.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/file_utils.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/geometry_math.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/query_string.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/serve.Po@am__quote@

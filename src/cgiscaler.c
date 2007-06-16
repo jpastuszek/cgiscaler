@@ -23,11 +23,9 @@
 #include <config.h>
 #endif
 
-#include <stdio.h>
-#include <string.h>
-
 #include "cgiscaler.h"
 #include "config.h"
+#include "file_utils.h"
 #include "geometry_math.h"
 #include "cache.h"
 #include "serve.h"
@@ -59,9 +57,7 @@ MagickWand *load_image(char *file_name) {
 	MagickWand *image;
 	MagickBooleanType status;
 
-	path = malloc(strlen(MEDIA_PATH) + strlen(file_name) + 1);
-	strcpy(path, MEDIA_PATH);
-	strcat(path, file_name);
+	path = create_media_file_path(file_name);
 
 	debug(DEB,"Loading image: '%s'", path);
 

@@ -22,7 +22,7 @@
 #define DEBUG_FILE "/tmp/cgiscaler_test.deb"
 //#define DEBUG_SYNC
 
-#define IMAGE_TEST_FILE "tests/quick_gimp_pattern_test.png"
+#define IMAGE_TEST_FILE "quick_gimp_pattern_test.png"
 #define IMAGE_TEST_FILE_WIDTH 450
 #define IMAGE_TEST_FILE_HEIGHT 300
 
@@ -33,9 +33,8 @@
 
 #define TRUE_PARAM_VAL "t"
 
-#define MEDIA_PATH "./"
-#define CACHE_PATH "cache/"
-
+#define MEDIA_PATH "tests/"
+#define CACHE_PATH "/tmp/"
 
 #define OUT_FORMAT "JPEG"
 #define OUT_FORMAT_MIME_TYPE "image/jpeg"

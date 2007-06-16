@@ -18,23 +18,11 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef QUERY_STRING_H
-#define QUERY_STRING_H
+#include <sys/types.h>
+#include "query_string.h"
 
-#include "geometry_math.h"
-
-struct query_params {
-	struct dimmensions size;
-	char *file_name;
-	int strict;
-	int lowq;
-};
-
-struct query_params *get_query_params(char *file_name, char *query_string);
-void free_query_params(struct query_params *query_params);
-
-// private
-char *process_file_name(char *file_param);
-char *get_query_string_param(char *query_string, char *param_name);
-
-#endif
+char *create_media_file_path(char *file_name);
+char *create_cache_file_path(struct query_params *params);
+time_t get_file_mtime(char *path);
+char *make_file_name_relative(char *file_path);
+int check_for_double_dot(char *file_path);

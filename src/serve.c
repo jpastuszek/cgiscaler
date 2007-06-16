@@ -29,6 +29,7 @@
 
 #include "serve.h"
 #include "cache.h"
+#include "file_utils.h"
 #include "config.h"
 #include "debug.h"
 
@@ -158,7 +159,7 @@ int serve_from_cache(struct query_params *params) {
 	char *cache_file_path;
 	int ret;
 
-	cache_file_path = prepare_cache_file_path(params);
+	cache_file_path = create_cache_file_path(params);
 	debug(DEB,"Trying cache file: '%s'", cache_file_path);
 
 /*

@@ -38,7 +38,7 @@ int main(int argc, char *argv[])
 	/* stopp debuging on exit */
 	atexit(debug_stop);
 	
-	params = get_query_params();
+	params = get_query_params(getenv("PATH_INFO"), getenv("QUERY_STRING"));
 	if (!params) {
 		serve_error();
 		exit(70);

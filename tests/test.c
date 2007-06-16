@@ -23,9 +23,11 @@
 #include <magick/MagickCore.h>
 
 #include "../cgreen/cgreen.h"
+#include "file_utils.h"
 #include "query_string.h"
 #include "geometry_math.h"
 #include "cgiscaler.h"
+#include "cache.h"
 #include "test_config.h"
 
 #include "debug.h"
@@ -92,46 +94,108 @@ void assert_image_pixel_alpha(MagickWand *magick_wand, int x, int y, float alpha
 	DestroyPixelWand(pixel_wand);
 }
 
-/* query_string tests */
-static void test_query_string_param() {
-	char *prog = get_query_string_param("name=kaz&prog=cgiscaler&year=2007","prog");
-	char *name = get_query_string_param("name=kaz&prog=cgiscaler&year=2007","name");
-	char *year = get_query_string_param("name=kaz&prog=cgiscaler&year=2007","year");
-
-	assert_string_equal(prog, "cgiscaler");
-	free(prog);
-	assert_string_equal(name, "kaz");
-	free(name);
-	assert_string_equal(year, "2007");
-	free(year);
+/* file_utils.c tests */
+static void test_create_media_file_path() {
+	char *path;
+	/* we don't get too much in to as it would reproduce funcion it self :D */
+	path = create_media_file_path("test.jpg");
+	assert_not_equal(path, 0);
 }
 
-static void test_process_file_name() {
-	char *test1 = process_file_name("///00/ff/test.jpg");
-	char *dot_test = process_file_name("///00/../ff/test.jpg");
-	
-	assert_string_equal(test1, "00/ff/test.jpg");
-	free(test1);
+static void test_create_cache_file_path() {
+	char query_string[256];
+	char compare_cache_file[255];
+	char *cache_file;
+	struct query_params *params;	
 
-	assert_equal(dot_test, 0);
+	snprintf(query_string, 256, "%s=123&%s=213&beer=czech_lager&%s=%s&%s=%s", WIDTH_PARAM, HEIGHT_PARAM, STRICT_PARAM, TRUE_PARAM_VAL, LOWQ_PARAM, TRUE_PARAM_VAL);
+
+	params = get_query_params("test.jpg", query_string);
+	cache_file = create_cache_file_path(params);
+
+	snprintf(compare_cache_file, 256, "%s%s-123-213-1-1", CACHE_PATH, "test.jpg");
+	assert_string_equal(cache_file, compare_cache_file);
+
+	free_query_params(params);
+	free(cache_file);
+}
+
+static void test_get_file_mtime() {
+	char *real_file;
+
+	assert_equal(get_file_mtime("bogous"), 0);
+
+	real_file = create_media_file_path(IMAGE_TEST_FILE);
+
+	assert_not_equal(get_file_mtime(real_file), 0);
+
+	free(real_file);
+}
+
+static void test_make_file_name_relative() {
+	char *test = make_file_name_relative("///00/ff/test.jpg");
+	assert_not_equal(test, 0);	
+
+	assert_string_equal(test, "00/ff/test.jpg");
+	free(test);
+}
+
+static void test_check_for_double_dot() {
+	char *test = make_file_name_relative("///00/ff/test.jpg");
+	char *dot_test = make_file_name_relative("///00/../ff/test.jpg");
+
+	assert_equal(check_for_double_dot(test), 0);
+	assert_equal(check_for_double_dot(dot_test), 1);
+}
+
+
+/* query_string.c tests */
+static void test_query_string_param() {
+	char *prog;
+	char *name;
+	char *year;
+	char *null;
+
+	prog = get_query_string_param("name=kaz&prog=cgiscaler&year=2007","prog");
+	assert_string_equal(prog, "cgiscaler");
+	free(prog);
+
+	name = get_query_string_param("name=kaz&prog=cgiscaler&year=2007","name");
+	assert_string_equal(name, "kaz");
+	free(name);
+
+	year = get_query_string_param("name=kaz&prog=cgiscaler&year=2007","year");
+	assert_string_equal(year, "2007");
+	free(year);
+
+	null = get_query_string_param("name=kaz&prog=cgiscaler&year=2007","null");
+	assert_equal(null, 0);
 }
 
 static void test_get_query_params() {
 	struct query_params *params;
 	char test_query_string[256];
 
-	params = get_query_params();
+	/* testing no file name and no params */
+	params = get_query_params("", "");
 	assert_equal(params, 0);
+
+	/* testing defaults */
+	params = get_query_params("/some/path/funny.jpeg", "");
+	assert_not_equal(params, 0);
+	assert_equal(params->size.w, 0);
+	assert_equal(params->size.h, 0);
+	assert_equal(params->strict, 0);
+	assert_equal(params->lowq, 0);
+	free_query_params(params);
 
 	snprintf(test_query_string, 256, "%s=123&%s=213&beer=czech_lager&%s=%s&%s=%s", WIDTH_PARAM, HEIGHT_PARAM, STRICT_PARAM, TRUE_PARAM_VAL, LOWQ_PARAM, TRUE_PARAM_VAL);
 
-	setenv("QUERY_STRING", test_query_string, 1);
-	params = get_query_params();
+	/* testing no file name */
+	params = get_query_params("", test_query_string);
 	assert_equal(params, 0);
 
-	setenv("PATH_INFO", "/some/path/funny.jpeg", 1);
-
-	params = get_query_params();
+	params = get_query_params("/some/path/funny.jpeg", test_query_string);
 	assert_not_equal(params, 0);
 	assert_string_equal(params->file_name, "some/path/funny.jpeg");
 	assert_equal(params->size.w, 123);
@@ -142,9 +206,7 @@ static void test_get_query_params() {
 
 	snprintf(test_query_string, 256, "beer=czech_lager&%s=%s&%s=%s", STRICT_PARAM, "xbrna", LOWQ_PARAM, "false");
 
-	setenv("QUERY_STRING", test_query_string, 1);
-
-	params = get_query_params();
+	params = get_query_params("/some/path/funny.jpeg", test_query_string);
 	assert_not_equal(params, 0);
 	assert_string_equal(params->file_name, "some/path/funny.jpeg");
 	assert_equal(params->size.w, 0);
@@ -155,11 +217,9 @@ static void test_get_query_params() {
 
 	snprintf(test_query_string, 256, "beer=czech_lager&%s=%s&%s=%s", STRICT_PARAM, "xbrna", LOWQ_PARAM, TRUE_PARAM_VAL);
 
-	setenv("QUERY_STRING", test_query_string, 1);
-
-	params = get_query_params();
+	params = get_query_params("///some/path/funn/y2.jpeg", test_query_string);
 	assert_not_equal(params, 0);
-	assert_string_equal(params->file_name, "some/path/funny.jpeg");
+	assert_string_equal(params->file_name, "some/path/funn/y2.jpeg");
 	assert_equal(params->size.w, 0);
 	assert_equal(params->size.h, 0);
 	assert_equal(params->strict, 0);
@@ -167,7 +227,7 @@ static void test_get_query_params() {
 	free_query_params(params);
 }
 
-/* geometry_math tests */
+/* geometry_math.c tests */
 static void test_resize_to_fit_in() {
 	struct dimmensions a, b, c;
 
@@ -210,8 +270,7 @@ static void test_reduce_filed() {
 	assert_equal(a.h, 200);
 }
 
-/* cgiscaler image tests */
-
+/* cgiscaler.c tests */
 static void test_load_image() {
 	MagickWand *magick_wand;
 
@@ -318,7 +377,7 @@ static void test_resize_field_limiting() {
 	free_image(magick_wand);
 }
 
-static void test_transparent_resize_bg_color() {
+static void test_remove_transparentcy() {
 	MagickWand *magick_wand;
 	struct dimmensions a;
 
@@ -371,6 +430,24 @@ static void test_prepare_blob() {
 	free_blob(blob);
 }
 
+/* cache.c tests */
+static void test_if_cached() {
+	char query_string[256];
+	char *cache_file;
+	struct query_params *params;	
+
+	snprintf(query_string, 256, "%s=123&%s=213&beer=czech_lager&%s=%s&%s=%s", WIDTH_PARAM, HEIGHT_PARAM, STRICT_PARAM, TRUE_PARAM_VAL, LOWQ_PARAM, TRUE_PARAM_VAL);
+
+	params = get_query_params("test.jpg", query_string);
+	cache_file = create_cache_file_path(params);
+
+	
+
+	free_query_params(params);
+	free(cache_file);
+}
+
+/* seturp and teardown */
 static void test_setup() {
 	debug_start(DEBUG_FILE);
 }
@@ -382,12 +459,20 @@ static void test_teardown() {
 int main(int argc, char **argv) {
 	TestSuite *suite = create_test_suite();
 
+	TestSuite *file_utils_suite = create_test_suite();
 	TestSuite *query_string_suite = create_test_suite();
 	TestSuite *geometry_math_suite = create_test_suite();
 	TestSuite *cgiscaler_suite = create_test_suite();
+	TestSuite *cache_suite = create_test_suite();
 
+	add_test(file_utils_suite, test_create_media_file_path);
+	add_test(file_utils_suite, test_get_file_mtime);
+	add_test(file_utils_suite, test_make_file_name_relative);
+	add_test(file_utils_suite, test_check_for_double_dot);
+	add_test(file_utils_suite, test_create_cache_file_path);
+	add_suite(suite, file_utils_suite);
+	
 	add_test(query_string_suite, test_query_string_param);
-	add_test(query_string_suite, test_process_file_name);
 	add_test(query_string_suite, test_get_query_params);
 	add_suite(suite, query_string_suite);
 
@@ -399,9 +484,12 @@ int main(int argc, char **argv) {
 	add_test(cgiscaler_suite, test_fit_resize);
 	add_test(cgiscaler_suite, test_strict_resize);
 	add_test(cgiscaler_suite, test_resize_field_limiting);
-	add_test(cgiscaler_suite, test_transparent_resize_bg_color);
+	add_test(cgiscaler_suite, test_remove_transparentcy);
 	add_test(cgiscaler_suite, test_prepare_blob);
 	add_suite(suite, cgiscaler_suite);
+
+	add_test(cache_suite, test_if_cached);
+	add_suite(suite, cache_suite);
 
 	setup(suite, test_setup);
 	teardown(suite, test_teardown);

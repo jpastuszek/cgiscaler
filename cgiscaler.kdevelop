@@ -28,16 +28,16 @@
       <mainprogram>/home/kazuya/Projects/cgiscaler/CGIScaler</mainprogram>
       <terminal>true</terminal>
       <runarguments>
-        <cgiscaler/>
+        <cgiscaler></cgiscaler>
         <test></test>
       </runarguments>
       <debugarguments>
-        <cgiscaler/>
+        <cgiscaler></cgiscaler>
         <test></test>
       </debugarguments>
       <cwd>
         <cgiscaler>/home/kazuya/Projects/CGIScaler</cgiscaler>
-        <test>/home/kazuya/Projects/cgiscaler/CGIScaler</test>
+        <test>/home/kazuya/Projects/CGIScaler</test>
       </cwd>
       <programargs/>
       <globaldebugarguments/>

@@ -22,17 +22,15 @@
 #include <string.h>
 
 #include "query_string.h"
+#include "file_utils.h"
 #include "debug.h"
 #include "config.h"
 
-char *process_file_name(char *file_param);
 char *get_query_string_param(char *qurey_string, char *param_name);
 
 /* TODO: %xx in query string decoding */
 
-struct query_params *get_query_params() {
-	char *query_string;
-	char *file_name;
+struct query_params *get_query_params(char *file_name, char *query_string) {
 	char *w;
 	char *h;
 	char *s;
@@ -40,29 +38,24 @@ struct query_params *get_query_params() {
 
 	struct query_params *params;
 
-	query_string = getenv("QUERY_STRING");
-	file_name = getenv("PATH_INFO");
-
-/* we will use proper testing env
-	if we are running not from CGI than use test data
-	if (!getenv("SERVER_NAME")) {
-		if (!query_string)
-			query_string = "w=200&h=300&s=true";
-		if (!file_name)
-			file_name = "/00/ff/test.jpg";
-	}
-*/
 	/* strange env... failing */
 	if (!query_string || !file_name)
 		return 0;
 
-	file_name = process_file_name(file_name);
+	file_name = make_file_name_relative(file_name);
+
 	/* bad file name */
 	if (!file_name)
 		return 0;
 	/* empty file_name... failing */
 	if (file_name[0] == 0)
 		return 0;
+
+	if (check_for_double_dot(file_name)) {
+		debug(WARN, "Double dot found in file name! failing...");
+		free(file_name);
+		return 0;
+	}
 
 	debug(DEB, "Processing query string: '%s' target name: '%s'", query_string, file_name);
 
@@ -78,83 +71,46 @@ struct query_params *get_query_params() {
 
 	params->file_name = file_name;
 
-	if (w[0] == 0)
-		params->size.w = 0;
-	else
+	if (w) {
 		params->size.w = atoi(w);
+		free(w);
+	} else
+		params->size.w = 0;
 
-	if (h[0] == 0)
-		params->size.h = 0;
-	else
+	if (h) {
 		params->size.h = atoi(h);
+		free(h);
+	} else
+		params->size.h = 0;
 
-	if (!strcmp(s, TRUE_PARAM_VAL))
-		params->strict = 1;
-	else
+	if (s) {
+		if (!strcmp(s, TRUE_PARAM_VAL))
+			params->strict = 1;
+		else
+			params->strict = 0;
+		free(s);
+	} else
 		params->strict = 0;
 
-	if (!strcmp(lowq, TRUE_PARAM_VAL))
-		params->lowq = 1;
-	else
+	if (lowq) {
+		if (!strcmp(lowq, TRUE_PARAM_VAL))
+			params->lowq = 1;
+		else
+			params->lowq = 0;
+		free(lowq);
+	} else
 		params->lowq = 0;
 
 
 	debug(DEB, "Params: file: '%s', size w: %d h: %d, strict: %d lowq: %d", params->file_name, params->size.w, params->size.h, params->strict, params->lowq);
 
 	/* we don't free file_name as it is used in param structure and will be freed on free_query_params */
-	free(w);
-	free(h);
-	free(s);
-	free(lowq);
-
 	return params;
 }
 
 void free_query_params(struct query_params *query_params) {
 	free(query_params->file_name);
 	free(query_params);
-}
-
-char *allocate_empty_string() {
-	char *ret;
-	ret = malloc(1);
-	if (!ret)
-		exit(66);
-	ret[0] = 0;
-	return ret;
-}
-
-/* Will return sanitized file name, returned pointers shoudl be freed */
-char *process_file_name(char *file_param) {
-	char *return_name;
-	int offset = 0;
-	char *dot;
-	int dot_offset;
-	
-	if (file_param[0] == 0)
-		return allocate_empty_string();
-
-	// removing front '/'
-	while(file_param[offset] == '/')
-		offset++;
-
-	file_param += offset;
-	return_name = malloc(strlen(file_param) + 1);
-	if (!return_name)
-		exit(66);
-
-	strcpy(return_name, file_param);
-
-	dot_offset = 0;
-	while ((dot = index(return_name + dot_offset,'.')) != 0) {
-		if (*(dot+1) == '.') {
-			debug(WARN, "Double dot found in file name! failing...");
-			return 0;
-		}
-		dot_offset = dot - return_name + 1;
-	}
-
-	return return_name;
 }
 
 /* it could be probably implemented with scanf sort of functions */
@@ -182,7 +138,7 @@ char *get_query_string_param(char *query_string, char *param_name) {
 
 		until_equal = index(query_string, '=');
 		if (!until_equal)
-			return allocate_empty_string();
+			return 0;
 
 		name_len = until_equal - query_string;
 //		debug(DEB,"Name len: %i we are at index %d", name_len, query_string - start_query_string);
