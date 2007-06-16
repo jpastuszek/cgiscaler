@@ -1,1 +1,1 @@
-../src/config.h
+test_config.h
