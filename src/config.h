@@ -50,8 +50,8 @@
 /* "blur factor where > 1 is blurry, < 1 is sharp" */
 #define RESIZE_SMOOTH_FACTOR 1
 
-/* if output format doesn't handle transparency (like JPG) uncomment HANDLE_TRANSPARENCY so when transparent image is scaled it's transpaency will be replaced by DEFAULT_BACKGROUND_COLOR */
-#define HANDLE_TRANSPARENCY
+/* if output format doesn't handle transparency (like JPG) uncomment REMOVE_TRANSPARENCY so when transparent image is scaled it's transpaency will be replaced by DEFAULT_BACKGROUND_COLOR */
+#define REMOVE_TRANSPARENCY
 /* color to fill transparency when converting from transparent gifs/pngs... */
 #define DEFAULT_BACKGROUND_COLOR "#ffffff"
 

@@ -48,7 +48,7 @@ description=(char *) MagickRelinquishMemory(description); \
 exit(-1); \
 }
 
-MagickWand *handle_transparency(MagickWand *image);
+MagickWand *remove_transparency(MagickWand *image);
 
 /* TODO: Zero sized image will do orginal size? may by configuralble? :D */
 /* TODO: Performace tests... profiler? :D */
@@ -86,10 +86,10 @@ MagickWand *load_image(char *file_name) {
 		return 0;
 	}
 
-#ifdef HANDLE_TRANSPARENCY
-	image = handle_transparency(image);
+#ifdef REMOVE_TRANSPARENCY
+	image = remove_transparency(image);
 	if (!image) {
-		debug(ERR, "Handling transparency failed!");
+		debug(ERR, "Removing transparency failed!");
 		return 0;
 	}
 #endif
@@ -97,8 +97,8 @@ MagickWand *load_image(char *file_name) {
 	return image;
 }
 
-/* If image is transparent and we are scaling to non transparency capable format we will replace transparent places with DEFAULT_BACKGROUND_COLOR */
-MagickWand *handle_transparency(MagickWand *image) {
+/* If image has transparency/mate/alpha channel will replace transparent places with DEFAULT_BACKGROUND_COLOR */
+MagickWand *remove_transparency(MagickWand *image) {
 	MagickBooleanType status;
 	MagickWand *new_image;
 	PixelWand *bg_color;
@@ -107,7 +107,7 @@ MagickWand *handle_transparency(MagickWand *image) {
 	if (MagickGetImageMatte(image) == MagickFalse)
 		return image;
 
-	debug(DEB, "Coloring transparency to background color '%s'", DEFAULT_BACKGROUND_COLOR);
+	debug(DEB, "Removing transparency and colloring it to background color '%s'", DEFAULT_BACKGROUND_COLOR);
 
 	/* Set background to DEFAULT_BACKGROUND_COLOR - in case of transparent gifs or png */
 	bg_color = NewPixelWand();
