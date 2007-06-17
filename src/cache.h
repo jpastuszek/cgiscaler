@@ -26,5 +26,4 @@
 #define CACHE_OK 0
 
 int check_if_cached(struct query_params *params);
-char *prepare_cache_file_path(struct query_params *params);
 int write_blob_to_cache(unsigned char *blob, int blob_len, struct query_params *params);

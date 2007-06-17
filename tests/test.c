@@ -22,6 +22,8 @@
 #include <strings.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <utime.h>
+#include <fcntl.h>
 #include <unistd.h>
 #include <string.h>
 #include <magick/MagickCore.h>
@@ -104,6 +106,30 @@ void assert_dir_exists(char *dir_path) {
 	assert_true_with_message(S_ISDIR(s.st_mode), "dir [%s] is not a directory", dir_path);
 }
 
+void assert_file_exists(char *file_path) {
+	int fd;
+	fd = open(file_path, O_RDONLY);
+	assert_not_equal_with_message(fd, -1, "file [%s] does not exist", file_path);
+	if (fd != -1)
+		close(fd);
+}
+
+void assert_file_size(char *file_path, off_t size) {
+	int fd;
+	off_t pos;
+
+	assert_file_exists(file_path);
+
+	fd = open(file_path, O_RDONLY);
+	pos = lseek(fd, 0, SEEK_END);
+	assert_not_equal(pos, -1);
+
+	assert_equal_with_message(pos, size, "file [%s] size is [%d] while should be [%d]", file_path, pos, size);
+
+	if (fd != -1)
+		close(fd);
+}
+
 /* file_utils.c tests */
 static void test_create_media_file_path() {
 	char *path;
@@ -128,6 +154,14 @@ static void test_create_cache_file_path() {
 
 	free_query_params(params);
 	free(cache_file);
+}
+
+static void test_check_for_double_dot() {
+	char *test = make_file_name_relative("///00/ff/test.jpg");
+	char *dot_test = make_file_name_relative("///00/../ff/test.jpg");
+
+	assert_equal(check_for_double_dot(test), 0);
+	assert_equal(check_for_double_dot(dot_test), 1);
 }
 
 static void test_create_cache_dir_struct() {
@@ -176,14 +210,6 @@ static void test_make_file_name_relative() {
 
 	assert_string_equal(test, "00/ff/test.jpg");
 	free(test);
-}
-
-static void test_check_for_double_dot() {
-	char *test = make_file_name_relative("///00/ff/test.jpg");
-	char *dot_test = make_file_name_relative("///00/../ff/test.jpg");
-
-	assert_equal(check_for_double_dot(test), 0);
-	assert_equal(check_for_double_dot(dot_test), 1);
 }
 
 
@@ -470,19 +496,87 @@ static void test_prepare_blob() {
 
 /* cache.c tests */
 static void test_if_cached() {
-	char query_string[256];
-	char *cache_file;
+	char query_string[80];
+	char *cache_file_path;
+	char *orig_file_path;
 	struct query_params *params;	
+	int test_fd;
+	struct utimbuf time_buf;
 
 	snprintf(query_string, 256, "%s=123&%s=213&beer=czech_lager&%s=%s&%s=%s", WIDTH_PARAM, HEIGHT_PARAM, STRICT_PARAM, TRUE_PARAM_VAL, LOWQ_PARAM, TRUE_PARAM_VAL);
 
-	params = get_query_params("test.jpg", query_string);
-	cache_file = create_cache_file_path(params);
+	/* tests with bogo file */
+	params = get_query_params("bogo.jpg", query_string);
+	cache_file_path = create_cache_file_path(params);
 
+	assert_equal(check_if_cached(params), NO_ORIG | NO_CACHE);
+
+	/* creating test file */
+	test_fd = open(cache_file_path, O_CREAT|O_WRONLY|O_TRUNC);
+	assert_not_equal(test_fd, -1);
+	close(test_fd);
 	
+	assert_equal(check_if_cached(params), NO_ORIG);
+
+	/* cleanin up test file */
+	assert_not_equal(unlink(cache_file_path), -1);
+
+	free(cache_file_path);
+	free_query_params(params);
+
+	/* and now with real file */
+	params = get_query_params(IMAGE_TEST_FILE, query_string);
+	cache_file_path = create_cache_file_path(params);
+	orig_file_path = create_media_file_path(IMAGE_TEST_FILE);
+
+	assert_equal(check_if_cached(params), NO_CACHE);
+
+	/* creating test file */
+	test_fd = open(cache_file_path, O_CREAT|O_WRONLY|O_TRUNC);
+	assert_not_equal(test_fd, -1);
+	close(test_fd);
+
+	assert_equal(check_if_cached(params), MTIME_DIFFER);
+
+	/* now we will set mtime to match original file */
+	time_buf.actime = time_buf.modtime = get_file_mtime(orig_file_path);
+	assert_not_equal(utime(cache_file_path, &time_buf), -1);
+
+	assert_equal(check_if_cached(params), CACHE_OK);
+
+	/* cleanin up test file */
+	assert_not_equal(unlink(cache_file_path), -1);
+	
+	free(orig_file_path);
+	free(cache_file_path);
+	free_query_params(params);
+}
+
+static void test_write_blob_to_cache() {
+	unsigned char *test_blob;
+	char *cache_file_path;
+	struct query_params *params;
+
+	/* tests with bogo file */
+	params = get_query_params("blob.test", "");	
+	test_blob = malloc(3000);
+
+	assert_equal(write_blob_to_cache(test_blob, 3000, params), 0);
 
 	free_query_params(params);
-	free(cache_file);
+
+	/* now we will try existing orginal file */
+	params = get_query_params(IMAGE_TEST_FILE, "");
+	cache_file_path = create_cache_file_path(params);
+
+	assert_not_equal(write_blob_to_cache(test_blob, 3000, params), 0);
+	assert_file_size(cache_file_path, 3000);
+
+	/* cleanin up test file */
+	assert_not_equal(unlink(cache_file_path), -1);
+
+	free(cache_file_path);
+	free_query_params(params);
 }
 
 /* seturp and teardown */
@@ -505,10 +599,10 @@ int main(int argc, char **argv) {
 
 	add_test(file_utils_suite, test_create_media_file_path);
 	add_test(file_utils_suite, test_create_cache_file_path);
+	add_test(file_utils_suite, test_check_for_double_dot);
 	add_test(file_utils_suite, test_create_cache_dir_struct);
 	add_test(file_utils_suite, test_get_file_mtime);
 	add_test(file_utils_suite, test_make_file_name_relative);
-	add_test(file_utils_suite, test_check_for_double_dot);
 	add_suite(suite, file_utils_suite);
 	
 	add_test(query_string_suite, test_query_string_param);
@@ -528,6 +622,7 @@ int main(int argc, char **argv) {
 	add_suite(suite, cgiscaler_suite);
 
 	add_test(cache_suite, test_if_cached);
+	add_test(cache_suite, test_write_blob_to_cache);
 	add_suite(suite, cache_suite);
 
 	setup(suite, test_setup);
