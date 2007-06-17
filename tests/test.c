@@ -20,6 +20,10 @@
 
 #include <stdio.h>
 #include <strings.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <string.h>
 #include <magick/MagickCore.h>
 
 #include "../cgreen/cgreen.h"
@@ -94,6 +98,12 @@ void assert_image_pixel_alpha(MagickWand *magick_wand, int x, int y, float alpha
 	DestroyPixelWand(pixel_wand);
 }
 
+void assert_dir_exists(char *dir_path) {
+	struct stat s;
+	assert_not_equal_with_message(stat(dir_path, &s), -1, "dir [%s] does not exist", dir_path);
+	assert_true_with_message(S_ISDIR(s.st_mode), "dir [%s] is not a directory", dir_path);
+}
+
 /* file_utils.c tests */
 static void test_create_media_file_path() {
 	char *path;
@@ -118,6 +128,34 @@ static void test_create_cache_file_path() {
 
 	free_query_params(params);
 	free(cache_file);
+}
+
+static void test_create_cache_dir_struct() {
+	char path1[80], path2[80], path3[80];
+	int status;
+
+	status = create_cache_dir_struct("abc/def/ghi/test.jpg");
+	assert_not_equal(status, 0);
+
+	strcpy(path1, CACHE_PATH);
+	strcat(path1, "abc");
+
+	strcpy(path2, CACHE_PATH);
+	strcat(path2, "abc/def");
+
+	strcpy(path3, CACHE_PATH);
+	strcat(path3, "abc/def/ghi");
+
+	assert_dir_exists(path1);
+	assert_dir_exists(path2);
+	assert_dir_exists(path3);
+
+	assert_not_equal(rmdir(path3),-1);
+	assert_not_equal(rmdir(path2),-1);
+	assert_not_equal(rmdir(path1),-1);
+
+	status = create_cache_dir_struct("abc/../def/ghi/test.jpg");
+	assert_equal(status, 0);
 }
 
 static void test_get_file_mtime() {
@@ -466,10 +504,11 @@ int main(int argc, char **argv) {
 	TestSuite *cache_suite = create_test_suite();
 
 	add_test(file_utils_suite, test_create_media_file_path);
+	add_test(file_utils_suite, test_create_cache_file_path);
+	add_test(file_utils_suite, test_create_cache_dir_struct);
 	add_test(file_utils_suite, test_get_file_mtime);
 	add_test(file_utils_suite, test_make_file_name_relative);
 	add_test(file_utils_suite, test_check_for_double_dot);
-	add_test(file_utils_suite, test_create_cache_file_path);
 	add_suite(suite, file_utils_suite);
 	
 	add_test(query_string_suite, test_query_string_param);

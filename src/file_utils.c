@@ -24,6 +24,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <errno.h>
 
 #include "file_utils.h"
 #include "config.h"
@@ -70,6 +71,64 @@ char *create_cache_file_path(struct query_params *params) {
 
 	debug(DEB, "Cache file name entry: '%s'", file_name);
 	return file_name;
+}
+
+int create_cache_dir_struct(char *file_path) {
+	char *next_slash;
+	char *full_path;
+	char *dir_name;
+	int dir_name_len;
+
+	/* if we have ".." in path... failing */
+	if (check_for_double_dot(file_path))
+		return 0;
+
+	/* we are not going to include tailing '/' */
+	full_path = malloc(strlen(CACHE_PATH));
+	if (!full_path)
+		exit(66);
+
+	strncpy(full_path, CACHE_PATH, strlen(CACHE_PATH) - 1);
+	full_path[strlen(CACHE_PATH) - 1] = 0;
+
+	while ((next_slash = index(file_path, '/')) != 0) {
+		/* if next char in file path is '/' we skip it (in case of "////" like stuff */
+		if (next_slash == file_path + 1) {
+			file_path++;
+			continue;
+		}
+		
+		dir_name_len = next_slash - file_path;
+		dir_name = malloc(dir_name_len + 1);
+		if (!dir_name)
+			exit(66);
+	
+		strncpy(dir_name, file_path, dir_name_len);
+		dir_name[dir_name_len] = 0;
+		debug(DEB, "Dir name: '%s'", dir_name);
+
+		full_path = realloc(full_path, strlen(full_path) + 1 + dir_name_len + 1);
+		if (!full_path)
+			exit(66);
+
+		strcat(full_path, "/");
+		strcat(full_path, dir_name);
+		file_path += dir_name_len + 1;
+		free(dir_name);
+
+		debug(DEB, "Creating directory: '%s'", full_path);
+		if (mkdir(full_path, 0777) == -1) {
+			if (errno == EEXIST)
+				continue;
+			
+			debug(ERR, "Failed to create directory: '%s': %s", full_path, strerror(errno));
+			free(full_path);
+			return 0;
+		}
+	}
+
+	free(full_path);
+	return 1;
 }
 
 /* returns file mtime or 0 if file does not exists */

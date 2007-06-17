@@ -80,60 +80,6 @@ int check_if_cached(struct query_params *params) {
 	return CACHE_OK;
 }
 
-int create_dir_struct(char *file_path) {
-	char *next_slash;
-	char *full_path;
-	char *dir_name;
-	int dir_name_len;
-
-	/* we are not going to include tailing '/' */
-	full_path = malloc(strlen(CACHE_PATH));
-	if (!full_path)
-		exit(66);
-
-	strncpy(full_path, CACHE_PATH, strlen(CACHE_PATH) - 1);
-	full_path[strlen(CACHE_PATH) - 1] = 0;
-
-	while ((next_slash = index(file_path, '/')) != 0) {
-		/* if next char in file path is '/' we skip it (in case of "////" like stuff */
-		if (next_slash == file_path + 1) {
-			file_path++;
-			continue;
-		}
-		
-		dir_name_len = next_slash - file_path;
-		dir_name = malloc(dir_name_len + 1);
-		if (!dir_name)
-			exit(66);
-	
-		strncpy(dir_name, file_path, dir_name_len);
-		dir_name[dir_name_len] = 0;
-		debug(DEB, "Dir name: '%s'", dir_name);
-
-		full_path = realloc(full_path, strlen(full_path) + 1 + dir_name_len + 1);
-		if (!full_path)
-			exit(66);
-
-		strcat(full_path, "/");
-		strcat(full_path, dir_name);
-		file_path += dir_name_len + 1;
-		free(dir_name);
-
-		debug(DEB, "Creating directory: '%s'", full_path);
-		if (mkdir(full_path, 0777) == -1) {
-			if (errno == EEXIST)
-				continue;
-			
-			debug(ERR, "Failed to create directory: '%s': %s", full_path, strerror(errno));
-			free(full_path);
-			return 0;
-		}
-	}
-
-	free(full_path);
-	return 1;
-}
-
 int write_blob_to_cache(unsigned char *blob, int blob_len, struct query_params *params) {
 	char *file_path;
 	char *orginal_file_path;
@@ -156,7 +102,7 @@ int write_blob_to_cache(unsigned char *blob, int blob_len, struct query_params *
 	free(orginal_file_path);
 
 	/* writting cache file */
-	if (!create_dir_struct(params->file_name)) {
+	if (!create_cache_dir_struct(params->file_name)) {
 		debug(ERR, "Cannot create path structure for ptath: '%s'", params->file_name);
 		return 0;
 	}

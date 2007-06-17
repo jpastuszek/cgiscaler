@@ -23,6 +23,7 @@
 
 char *create_media_file_path(char *file_name);
 char *create_cache_file_path(struct query_params *params);
+int create_cache_dir_struct(char *file_path);
 time_t get_file_mtime(char *path);
 char *make_file_name_relative(char *file_path);
 int check_for_double_dot(char *file_path);
