@@ -212,6 +212,21 @@ static void test_make_file_name_relative() {
 	free(test);
 }
 
+static void test_write_blob_to_file() {
+	unsigned char *test_blob;
+	char file_path[80];
+
+	test_blob = malloc(3666);
+	snprintf(file_path, 80, "%s/test.file", CACHE_PATH);
+
+	assert_not_equal(write_blob_to_file(test_blob, 3666, file_path), 0);
+	assert_file_size(file_path, 3666);
+
+	/* cleanin up test file */
+	assert_not_equal(unlink(file_path), -1);
+	
+	free(test_blob);
+}
 
 /* query_string.c tests */
 static void test_query_string_param() {
@@ -557,9 +572,10 @@ static void test_write_blob_to_cache() {
 	char *cache_file_path;
 	struct query_params *params;
 
+	test_blob = malloc(3000);
+
 	/* tests with bogo file */
 	params = get_query_params("blob.test", "");	
-	test_blob = malloc(3000);
 
 	assert_equal(write_blob_to_cache(test_blob, 3000, params), 0);
 
@@ -577,6 +593,7 @@ static void test_write_blob_to_cache() {
 
 	free(cache_file_path);
 	free_query_params(params);
+	free(test_blob);
 }
 
 /* seturp and teardown */
@@ -603,6 +620,7 @@ int main(int argc, char **argv) {
 	add_test(file_utils_suite, test_create_cache_dir_struct);
 	add_test(file_utils_suite, test_get_file_mtime);
 	add_test(file_utils_suite, test_make_file_name_relative);
+	add_test(file_utils_suite, test_write_blob_to_file);
 	add_suite(suite, file_utils_suite);
 	
 	add_test(query_string_suite, test_query_string_param);

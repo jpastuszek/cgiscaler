@@ -24,6 +24,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <fcntl.h>
 #include <errno.h>
 
 #include "file_utils.h"
@@ -171,3 +172,37 @@ int check_for_double_dot(char *file_path) {
 	return 0;
 }
 
+
+int write_blob_to_file(unsigned char *blob, int blob_len, char *file_path) {
+	int out_file;
+	size_t bytes_written;
+	size_t total_blob_written;
+
+	debug(DEB, "Writing BLOB to file: '%s'", file_path);
+
+	out_file = open(file_path, O_WRONLY | O_CREAT | O_EXCL, 0666);
+	if (out_file == -1) {
+		debug(ERR, "Error while opening BLOB write file '%s': %s", file_path, strerror(errno));
+		return 0;
+	}
+
+	total_blob_written = 0;
+	while(1) {
+		debug(DEB, "Writing %d bytes to '%s'", blob_len - total_blob_written, file_path);
+
+		bytes_written = write(out_file, blob + total_blob_written, blob_len - total_blob_written);
+		debug(DEB, "%d bytes written", bytes_written);
+		if (bytes_written == -1) {
+			debug(ERR, "Error writting to '%s': %s", file_path, strerror(errno));
+			return 0;
+		}
+		
+		total_blob_written += bytes_written;
+
+		if (total_blob_written >= blob_len)
+			break;
+	}
+
+	close(out_file);
+	return 1;
+}

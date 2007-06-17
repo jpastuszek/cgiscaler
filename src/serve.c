@@ -105,7 +105,7 @@ int serve_from_file(char *file_path, char *mime_type) {
 			}
 			bytes_read -= bytes_written;
 			total_bytes_written += bytes_written;
-			fsync(1);
+			/* fsync(1); - this will only work on fs fils not stdout */
 		} while(bytes_read);
 		
 	}
@@ -132,7 +132,7 @@ void serve_from_blob(unsigned char *blob, size_t blob_len, char *mime_type) {
 	/* using stdout (FILE *) write instead of fd 1 is safer as printf also is using stdout */
 /*	fwrite(blob, blob_len, 1, stdout); */
 
-/* using write is risky as we are writing to fd directly... where using printf we are writting to stdout (FILE *) buffers */
+/* using write is risky as we are writing to fd directly... where using printf we are writting to stdout (FILE *) buffers but at this poing we should have buffers flushed */
 	total_blob_written = 0;
 	while(1) {
 		debug(DEB, "Writing %d bytes to stdout", blob_len - total_blob_written);
@@ -147,7 +147,7 @@ void serve_from_blob(unsigned char *blob, size_t blob_len, char *mime_type) {
 
 		if (total_blob_written >= blob_len)
 			break;
-		fsync(1);
+		/* fsync(1); - this will only work on fs fils not stdout */
 	}
 }
 
@@ -227,41 +227,7 @@ void serve_error_message() {
 	printf("Content-Type: text/plain\n");
 	printf("\n");
 
-	printf("Something went wrong...\n");
+	printf("[Error and error image not found]\n");
 	fflush(stdout);
-}
-
-int write_blob_to_file(unsigned char *blob, int blob_len, char *file_path) {
-	int out_file;
-	size_t bytes_written;
-	size_t total_blob_written;
-
-	debug(DEB, "Writing BLOB to file: '%s'", file_path);
-
-	out_file = open(file_path, O_WRONLY | O_CREAT | O_EXCL, 0666);
-	if (out_file == -1) {
-		debug(ERR, "Error while opening BLOB write file '%s': %s", file_path, strerror(errno));
-		return 0;
-	}
-
-	total_blob_written = 0;
-	while(1) {
-		debug(DEB, "Writing %d bytes to '%s'", blob_len - total_blob_written, file_path);
-
-		bytes_written = write(out_file, blob + total_blob_written, blob_len - total_blob_written);
-		debug(DEB, "%d bytes written", bytes_written);
-		if (bytes_written == -1) {
-			debug(ERR, "Error writting to '%s': %s", file_path, strerror(errno));
-			return 0;
-		}
-		
-		total_blob_written += bytes_written;
-
-		if (total_blob_written >= blob_len)
-			break;
-	}
-
-	close(out_file);
-	return 1;
 }
 

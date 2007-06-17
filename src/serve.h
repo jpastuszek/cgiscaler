@@ -26,5 +26,3 @@ void serve_from_blob(unsigned char *blob, size_t blob_len, char *mime_type);
 int serve_from_cache(struct query_params *params);
 void serve_error();
 void serve_error_message();
-
-int write_blob_to_file(unsigned char *blob, int blob_len, char *file_path);
