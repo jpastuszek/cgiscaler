@@ -23,6 +23,6 @@
 
 int serve_from_file(char *file_path, char *mime_type);
 void serve_from_blob(unsigned char *blob, size_t blob_len, char *mime_type);
-int serve_from_cache(struct query_params *params);
+int serve_from_cache(struct query_params *params, char *mime_type);
 void serve_error();
 void serve_error_message();

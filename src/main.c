@@ -45,7 +45,7 @@ int main(int argc, char *argv[])
 	}
 	
 	/* if we have served from cache ok... clenup and exit success */
-	if (serve_from_cache(params)) {
+	if (serve_from_cache(params, OUT_FORMAT_MIME_TYPE)) {
 		free_query_params(params);
 		exit(0);
 	}

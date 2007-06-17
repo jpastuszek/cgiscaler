@@ -36,6 +36,10 @@
 #define OUT_FORMAT "JPEG"
 #define OUT_FORMAT_MIME_TYPE "image/jpeg"
 
+#define ERROR_FILE_PATH "error.jpg"
+#define ERROR_FILE_MIME_TYPE "image/jpeg"
+#define ERROR_FAILBACK_MESSAGE "[Error and error image not found]\n"
+
 #define LOWQ_QUALITY 20
 #define NORMAL_QUALITY 80
 
@@ -56,8 +60,5 @@
 #define DEFAULT_BACKGROUND_COLOR "#ffffff"
 
 #define MAX_PIXEL_NO 200000
-
-#define ERROR_FILE_PATH "error.jpg"
-#define ERROR_FILE_MIME_TYPE "image/jpeg"
 
 #define WRITE_BUFFER_LEN 8192

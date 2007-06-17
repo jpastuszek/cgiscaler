@@ -34,9 +34,12 @@
 #include "geometry_math.h"
 #include "cgiscaler.h"
 #include "cache.h"
+#include "serve.h"
 #include "test_config.h"
 
 #include "debug.h"
+
+ssize_t get_file_size(char *file_path);
 
 /* my own asserts */
 
@@ -115,6 +118,68 @@ void assert_file_exists(char *file_path) {
 }
 
 void assert_file_size(char *file_path, off_t size) {
+	ssize_t fs;
+	fs = get_file_size(file_path);
+
+	assert_equal_with_message(fs, size, "file [%s] size is [%d] while should be [%d]", file_path, fs, size);
+}
+
+/* This function will read from fd until EOF and check if it read bytes number of bytes */
+void assert_byte_read(int fd, ssize_t bytes) {
+	int bread;
+	int btotal;
+	char buf[256];
+
+	btotal = 0;
+
+	do {
+		bread = read(fd, buf, 256);
+		if (bread == -1)
+			assert_true_with_message(0, "read from fd [%d] failed", fd);
+		btotal += bread;
+
+		/* debug(DEB, "Test: Bytes read %d", bread); */
+	} while(bread > 0);
+
+	assert_equal_with_message(btotal, bytes, "byte read [%d] from fd [%d] not equal [%d]", btotal, fd, bytes);
+}
+
+/* This function will look for \n\n in first 1000 bytes */
+void assert_headers_read(int fd) {
+	int bread;
+	int btotal;
+	char buf[1];
+	int has_end_line;
+
+	btotal = 0;
+	has_end_line = 0;
+
+	do {
+		bread = read(fd, buf, 1);
+		if (bread == -1)
+			assert_true_with_message(0, "read from fd [%d] failed", fd);
+		btotal += bread;
+
+		if (buf[0] == '\n')
+			has_end_line++;
+		else
+			has_end_line = 0;
+
+		if (has_end_line == 2)
+			break;
+		/* debug(DEB, "Test: Bytes read %d", bread); */
+	} while(bread > 0);
+
+	if (btotal > 1000)
+		assert_true_with_message(0, "headers not in first 1000 bytes");
+	assert_equal_with_message(has_end_line, 2, "no double end line found while reading from fd [%d]", fd);
+}
+
+
+/* helpers */
+
+/* Returns file size in bytes or -1 */
+ssize_t get_file_size(char *file_path) {
 	int fd;
 	off_t pos;
 
@@ -124,10 +189,45 @@ void assert_file_size(char *file_path, off_t size) {
 	pos = lseek(fd, 0, SEEK_END);
 	assert_not_equal(pos, -1);
 
-	assert_equal_with_message(pos, size, "file [%s] size is [%d] while should be [%d]", file_path, pos, size);
-
 	if (fd != -1)
 		close(fd);
+
+	return pos;
+}
+
+int orginal_stdout = 0;
+
+/* Returns stdout sccociated with file discriptor */
+int capture_stdout() {
+	int p[2];
+	
+	/* saving orginal stdout */
+	if (!orginal_stdout)
+		orginal_stdout = dup(1);
+
+	assert_not_equal(orginal_stdout, 0);
+
+	assert_not_equal(pipe(p), -1);
+
+	assert_not_equal(close(1), -1);
+	/* use write pipe end as stdout */
+	assert_not_equal(dup2(p[1], 1), -1);
+
+	/* closing orignal write pipe end as we have it duplicated */
+	assert_not_equal(close(p[1]), -1);
+
+	/* return read pipe end */
+	return p[0];
+}
+
+/* Brings back normal stdout */
+void restore_stdout() {
+	/* close write pipe end */
+	assert_not_equal(close(1), -1);
+
+	/* and resotre form saved */
+	if (orginal_stdout)
+		assert_not_equal(dup2(orginal_stdout, 1), -1);
 }
 
 /* file_utils.c tests */
@@ -596,6 +696,191 @@ static void test_write_blob_to_cache() {
 	free(test_blob);
 }
 
+/* serve.c tests */
+
+/* this funciont will fork and redirect chld stdout to stdout_fd pipe end */
+static int fork_with_stdout_capture(int *stdout_fd) {
+	*stdout_fd = capture_stdout();
+	if(!fork())
+		return 0;
+
+	/* We restore our local stdout */
+	restore_stdout();
+	return 1;
+}
+
+static void test_serve_from_file() {
+	int stdout_fd;
+	int status;
+	char *media_file_path;
+
+	/* real file */
+	media_file_path = create_media_file_path(IMAGE_TEST_FILE);
+
+	if (!fork_with_stdout_capture(&stdout_fd)) {
+		status = serve_from_file(media_file_path, OUT_FORMAT_MIME_TYPE);
+		if (!status) {
+			restore_stdout();
+			assert_true_with_message(0, "serve_from_file failed");
+		}
+		exit(0);
+	}
+
+	assert_headers_read(stdout_fd);
+	assert_byte_read(stdout_fd, get_file_size(media_file_path));
+
+	close(stdout_fd);
+	free(media_file_path);
+
+	/* bogous file */
+	if (!fork_with_stdout_capture(&stdout_fd)) {
+		status = serve_from_file(media_file_path, OUT_FORMAT_MIME_TYPE);
+		if (status) {
+			restore_stdout();
+			assert_true_with_message(0, "serve_from_file failed");
+		}
+		exit(0);
+	}
+	close(stdout_fd);
+
+}
+
+static void test_serve_from_blob() {
+	int stdout_fd;
+	unsigned char *blob;
+
+	blob = malloc(31666);
+	assert_not_equal(blob, 0);
+
+	if (!fork_with_stdout_capture(&stdout_fd)) {
+		serve_from_blob(blob, 31666, OUT_FORMAT_MIME_TYPE);
+		exit(0);
+	}
+	free(blob);
+
+	assert_headers_read(stdout_fd);
+	assert_byte_read(stdout_fd, 31666);
+
+	close(stdout_fd);
+}
+
+static void test_serve_from_cache() {
+	int stdout_fd;
+	int status;
+	unsigned char *blob;
+	struct query_params *params;
+	char *cache_file_path;
+	blob = malloc(3000);
+
+	/* tests with real file */
+	params = get_query_params(IMAGE_TEST_FILE, "");	
+	cache_file_path = create_cache_file_path(params);
+
+	/* create test cache file - mtime should be set properly */
+	assert_equal(write_blob_to_cache(blob, 3000, params), 1);
+
+	if (!fork_with_stdout_capture(&stdout_fd)) {
+		status = serve_from_cache(params, OUT_FORMAT_MIME_TYPE);
+		if (!status) {
+			restore_stdout();
+			assert_true_with_message(0, "serve_from_cache failed");
+		}
+		exit(0);
+	}
+
+	assert_headers_read(stdout_fd);
+	assert_byte_read(stdout_fd, 3000);
+
+	/* cleanin up test file */
+	assert_not_equal(unlink(cache_file_path), -1);
+
+	/* test with wrong mtime */
+	/* create test file - mtime should be set to current time */
+	assert_equal(write_blob_to_file(blob, 3000, cache_file_path), 1);
+
+	if (!fork_with_stdout_capture(&stdout_fd)) {
+		status = serve_from_cache(params, OUT_FORMAT_MIME_TYPE);
+		if (status) {
+			restore_stdout();
+			assert_true_with_message(0, "serve_from_cache failed");
+		}
+		exit(0);
+	}
+
+	/* there should be no chache file as it should be removed */
+	assert_equal(unlink(cache_file_path), -1);
+
+	/* test with no cache */
+	if (!fork_with_stdout_capture(&stdout_fd)) {
+		status = serve_from_cache(params, OUT_FORMAT_MIME_TYPE);
+		if (status) {
+			restore_stdout();
+			assert_true_with_message(0, "serve_from_cache failed");
+		}
+		exit(0);
+	}
+
+	close(stdout_fd);
+
+	free(cache_file_path);
+	free_query_params(params);
+
+	/* test with no orginal file */
+	params = get_query_params("bogo.file", "");
+	cache_file_path = create_cache_file_path(params);
+
+	/* create test cache file */
+	assert_equal(write_blob_to_file(blob, 3000, cache_file_path), 1);
+
+	if (!fork_with_stdout_capture(&stdout_fd)) {
+		status = serve_from_cache(params, OUT_FORMAT_MIME_TYPE);
+		if (status) {
+			restore_stdout();
+			assert_true_with_message(0, "serve_from_cache failed");
+		}
+		exit(0);
+	}
+
+	close(stdout_fd);
+	free_query_params(params);
+
+	/* there should be no chache file as it should be removed */
+	assert_equal(unlink(cache_file_path), -1);
+	free(cache_file_path);
+	free(blob);
+}
+
+static void test_serve_error() {
+	int stdout_fd;
+	char *media_file_path;
+
+	if (!fork_with_stdout_capture(&stdout_fd)) {
+		serve_error();
+		exit(0);
+	}
+	
+	media_file_path = create_media_file_path(ERROR_FILE_PATH);
+
+	assert_headers_read(stdout_fd);
+	assert_byte_read(stdout_fd, get_file_size(media_file_path));
+
+	close(stdout_fd);
+}
+
+static void test_serve_error_message() {
+	int stdout_fd;
+
+	if (!fork_with_stdout_capture(&stdout_fd)) {
+		serve_error_message();
+		exit(0);
+	}
+
+	assert_headers_read(stdout_fd);
+	assert_byte_read(stdout_fd, strlen(ERROR_FAILBACK_MESSAGE));
+
+	close(stdout_fd);
+}
+
 /* seturp and teardown */
 static void test_setup() {
 	debug_start(DEBUG_FILE);
@@ -613,6 +898,7 @@ int main(int argc, char **argv) {
 	TestSuite *geometry_math_suite = create_test_suite();
 	TestSuite *cgiscaler_suite = create_test_suite();
 	TestSuite *cache_suite = create_test_suite();
+	TestSuite *serve_suite = create_test_suite();
 
 	add_test(file_utils_suite, test_create_media_file_path);
 	add_test(file_utils_suite, test_create_cache_file_path);
@@ -642,6 +928,13 @@ int main(int argc, char **argv) {
 	add_test(cache_suite, test_if_cached);
 	add_test(cache_suite, test_write_blob_to_cache);
 	add_suite(suite, cache_suite);
+
+	add_test(serve_suite, test_serve_from_file);
+	add_test(serve_suite, test_serve_from_blob);
+	add_test(serve_suite, test_serve_from_cache);
+	add_test(serve_suite, test_serve_error);
+	add_test(serve_suite, test_serve_error_message);
+	add_suite(suite, serve_suite);
 
 	setup(suite, test_setup);
 	teardown(suite, test_teardown);

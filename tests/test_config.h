@@ -39,6 +39,10 @@
 #define OUT_FORMAT "JPEG"
 #define OUT_FORMAT_MIME_TYPE "image/jpeg"
 
+#define ERROR_FILE_PATH "quick_gimp_pattern_test.gif"
+#define ERROR_FILE_MIME_TYPE "image/jpeg"
+#define ERROR_FAILBACK_MESSAGE "[Error and error image not found]\n"
+
 #define LOWQ_QUALITY 20
 #define NORMAL_QUALITY 80
 
@@ -62,8 +66,5 @@
 #define DEFAULT_BACKGROUND_COLOR_MAGICK_STR "rgb17,34,51"
 
 #define MAX_PIXEL_NO ((IMAGE_TEST_FILE_WIDTH - 10) * (IMAGE_TEST_FILE_HEIGHT - 10) - 4000)
-
-#define ERROR_FILE_PATH "error.jpg"
-#define ERROR_FILE_MIME_TYPE "image/jpeg"
 
 #define WRITE_BUFFER_LEN 8192

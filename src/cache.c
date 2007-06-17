@@ -95,6 +95,7 @@ int write_blob_to_cache(unsigned char *blob, int blob_len, struct query_params *
 
 	orginal_mtime = get_file_mtime(orginal_file_path);
 	if (!orginal_mtime) {
+		debug(WARN, "No orginal file while writting BLOB to cache file!");
 		free(orginal_file_path);
 		return 0;
 	}

@@ -155,7 +155,7 @@ void serve_from_blob(unsigned char *blob, size_t blob_len, char *mime_type) {
 Serves image from cache file
 Returns: 1 on success 0 when no proper cache file or read failure 
 */
-int serve_from_cache(struct query_params *params) {
+int serve_from_cache(struct query_params *params, char *mime_type) {
 	char *cache_file_path;
 	int ret;
 
@@ -194,7 +194,7 @@ u*/
 	/* serve */
 	debug(DEB,"Serving from cache file: '%s'", cache_file_path);
 	
-	ret = serve_from_file(cache_file_path, OUT_FORMAT_MIME_TYPE);
+	ret = serve_from_file(cache_file_path, mime_type);
 
 	free(cache_file_path);
 
@@ -227,7 +227,7 @@ void serve_error_message() {
 	printf("Content-Type: text/plain\n");
 	printf("\n");
 
-	printf("[Error and error image not found]\n");
+	printf(ERROR_FAILBACK_MESSAGE);
 	fflush(stdout);
 }
 
