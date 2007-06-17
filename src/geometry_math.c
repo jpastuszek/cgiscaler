@@ -23,10 +23,10 @@
 #include "geometry_math.h"
 #include "debug.h"
 
-/* This functin will return dimmensions that will be resoult of fitting rectangle of dimmensions a in to rectangle of dimmensions b without loosing it's aspect ratio */
-struct dimmensions resize_to_fit_in(struct dimmensions a, struct dimmensions b) {
+/* This function will return dimensions that will be result of fitting rectangle of dimensions a in to rectangle of dimensions b without loosing it's aspect ratio */
+struct dimensions resize_to_fit_in(struct dimensions a, struct dimensions b) {
 	double wf, hf, f;
-	struct dimmensions out;
+	struct dimensions out;
 
 	wf = (double) b.w / a.w;
 	hf = (double) b.h / a.h;
@@ -42,10 +42,10 @@ struct dimmensions resize_to_fit_in(struct dimmensions a, struct dimmensions b) 
 	return out;
 }
 
-/* This function will return dimmension a with reduced field to value of field parameter without loosing it's aspect ratio */
-struct dimmensions reduce_filed(struct dimmensions a, int field) {
+/* This function will return dimension a with reduced field to value of field parameter without loosing it's aspect ratio */
+struct dimensions reduce_filed(struct dimensions a, int field) {
 	int in_field;
-	struct dimmensions ret;
+	struct dimensions ret;
 	double f;
 
 	debug(DEB,"Reducing rectangle field %d x %d to %d pixels", a.w, a.h, field);

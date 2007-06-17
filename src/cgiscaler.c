@@ -48,10 +48,10 @@ exit(-1); \
 
 MagickWand *remove_transparency(MagickWand *image);
 
-/* TODO: Zero sized image will do orginal size? may by configuralble? :D */
-/* TODO: Performace tests... profiler? :D */
+/* TODO: Zero sized image will do original size? may by configurable? :D */
+/* TODO: Performance tests... profiler? :D */
 
-/* Loads image, strips metadata and sets it's default bg color */
+/* Loads image, strips meta-data and sets it's default bg color */
 MagickWand *load_image(char *file_name) {
 	char *path;
 	MagickWand *image;
@@ -99,7 +99,7 @@ MagickWand *remove_transparency(MagickWand *image) {
 	MagickWand *new_image;
 	PixelWand *bg_color;
 
-	/* If image dosn't have alpha/transparency/mate channel we do nothing here */
+	/* If image doesn't have alpha/transparency/mate channel we do nothing here */
 	if (MagickGetImageMatte(image) == MagickFalse)
 		return image;
 
@@ -185,7 +185,7 @@ unsigned char *prepare_blob(MagickWand *image, int quality, size_t *blob_len,con
 		return 0;
 	}
 
-	debug(DEB,"Prepared BLOB szie: %u", *blob_len);
+	debug(DEB,"Prepared BLOB size: %u", *blob_len);
 	return blob;
 }
 
@@ -193,11 +193,11 @@ void free_blob(unsigned char *blob) {
 	MagickRelinquishMemory(blob);
 }
 
-/* TODO: implement non aspect ratio keeping resize */
+/* TODO: implement non aspect ratio keeping re-size */
 
-/* Resize the image to to_size dimmensons keeping aspect ration and fitting into to_size dimmensions effectivly using to_size width and height as the limits */
-MagickWand *fit_resize(MagickWand *image, struct dimmensions to_size) {
-	struct dimmensions image_size;
+/* Re-size the image to to_size dimensions keeping aspect ration and fitting into to_size dimensions effectively using to_size width and height as the limits */
+MagickWand *fit_resize(MagickWand *image, struct dimensions to_size) {
+	struct dimensions image_size;
 	MagickBooleanType status;
 
 	image_size.w = MagickGetImageWidth(image);
@@ -217,25 +217,25 @@ MagickWand *fit_resize(MagickWand *image, struct dimmensions to_size) {
 	return image;
 }
 
-/* This will do so called strict scaling. It will resize the image to to_size dimmensions cutting off image regions to keep constant aspect ratio */
-MagickWand *strict_resize(MagickWand *image, struct dimmensions to_size) {
-	struct dimmensions image_size, crop_size;
+/* This will do so called strict scaling. It will re-size the image to to_size dimensions cutting off image regions to keep constant aspect ratio */
+MagickWand *strict_resize(MagickWand *image, struct dimensions to_size) {
+	struct dimensions image_size, crop_size;
 	int x, y;
 	MagickBooleanType status;
 
 	image_size.w = MagickGetImageWidth(image);
 	image_size.h = MagickGetImageHeight(image);
 
-	debug(DEB, "Doing CropResize: orginal: %d x %d to: %d x %d", image_size.w, image_size.h, to_size.w, to_size.h);
+	debug(DEB, "Doing CropResize: original: %d x %d to: %d x %d", image_size.w, image_size.h, to_size.w, to_size.h);
 
-	/* fit to_szie into image_size */
+	/* fit to_size into image_size */
 	crop_size = resize_to_fit_in(to_size, image_size);
 	debug(DEB, "Crop size: %d x %d", crop_size.w, crop_size.h);
 
-	/* calculate to center crop */
+	/* calculate to centre crop */
 	x = (image_size.w - crop_size.w) / 2;
 	y = (image_size.h - crop_size.h) / 2;
-	debug(DEB, "Crop center: %d x %d", x, y);
+	debug(DEB, "Crop centre: %d x %d", x, y);
 
 	status = MagickCropImage(image, crop_size.w, crop_size.h, x, y);
 	if (status == MagickFalse) {
@@ -246,7 +246,7 @@ MagickWand *strict_resize(MagickWand *image, struct dimmensions to_size) {
 	/* we are reducing requested thumbnail resolution to MAX_PIXEL_NO */
 	to_size = reduce_filed(to_size, MAX_PIXEL_NO);
 
-	/* now it is time to resize to to_szie */
+	/* now it is time to re-size to to_size */
 	status = MagickResizeImage(image, to_size.w, to_size.h, RESIZE_FILTER, RESIZE_SMOOTH_FACTOR);
 	if (status == MagickFalse) {
 		DestroyMagickWand(image);

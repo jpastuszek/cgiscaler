@@ -33,13 +33,13 @@
 #include "config.h"
 #include "debug.h"
 
-/* this function will check if cache file exists and if corresponding orginal file mtime differs with cached version
-Returns bitmask:
-	NO_ORIG orginal file does not exist
+/* this function will check if cache file exists and if corresponding original file mtime differs with cached version
+Returns bit-mask:
+	NO_ORIG original file does not exist
 	NO_CACHE cache file does not exist
-	MTIME_DIFFER orginal file mtime differs from cache file mtime
+	MTIME_DIFFER original file mtime differs from cache file mtime
 or
-	CACHE_OK orginal file mtime is same as chache file mtime
+	CACHE_OK original file mtime is same as cache file mtime
 */
 int check_if_cached(struct query_params *params) {
 	char *cache_file_path;
@@ -54,7 +54,7 @@ int check_if_cached(struct query_params *params) {
 
 	cache_file_path = create_cache_file_path(params);
 	
-	debug(DEB, "Orginal file path: '%s' cache file path: '%s'", orginal_file_path, cache_file_path);
+	debug(DEB, "Original file path: '%s' cache file path: '%s'", orginal_file_path, cache_file_path);
 
 
 	orginal_mtime = get_file_mtime(orginal_file_path);
@@ -63,7 +63,7 @@ int check_if_cached(struct query_params *params) {
 	free(orginal_file_path);
 	free(cache_file_path);
 
-	debug(DEB,"Orginal mtime: %d, Cache mtime: %d", orginal_mtime, cache_mtime);
+	debug(DEB,"Original mtime: %d, Cache mtime: %d", orginal_mtime, cache_mtime);
 
 	if (!cache_mtime && !orginal_mtime)
 		return NO_ORIG | NO_CACHE;
@@ -95,7 +95,7 @@ int write_blob_to_cache(unsigned char *blob, int blob_len, struct query_params *
 
 	orginal_mtime = get_file_mtime(orginal_file_path);
 	if (!orginal_mtime) {
-		debug(WARN, "No orginal file while writting BLOB to cache file!");
+		debug(WARN, "No original file while writing BLOB to cache file!");
 		free(orginal_file_path);
 		return 0;
 	}
@@ -104,7 +104,7 @@ int write_blob_to_cache(unsigned char *blob, int blob_len, struct query_params *
 
 	/* writting cache file */
 	if (!create_cache_dir_struct(params->file_name)) {
-		debug(ERR, "Cannot create path structure for ptath: '%s'", params->file_name);
+		debug(ERR, "Cannot create path structure for path: '%s'", params->file_name);
 		return 0;
 	}
 

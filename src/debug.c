@@ -93,7 +93,7 @@ void debug(const char *level, const char *fmt, ...) {
 		else
 			size *= 2;
 	
-		/* resize to add more space */
+		/* re-size to add more space */
 		if ((new_msg = realloc(msg, size)) == NULL)
 			exit(66);
 	

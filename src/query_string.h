@@ -24,7 +24,7 @@
 #include "geometry_math.h"
 
 struct query_params {
-	struct dimmensions size;
+	struct dimensions size;
 	char *file_name;
 	int strict;
 	int lowq;

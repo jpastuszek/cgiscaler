@@ -98,15 +98,15 @@ void assert_image_pixel_alpha(MagickWand *magick_wand, int x, int y, float alpha
 	if (tested_alpha == alpha)
 		true = 1;
 
-	assert_true_with_message(true, "pixel alpha shoud be [%f] but is [%f]", alpha, tested_alpha);
+	assert_true_with_message(true, "pixel alpha should be [%f] but is [%f]", alpha, tested_alpha);
 
 	DestroyPixelWand(pixel_wand);
 }
 
 void assert_dir_exists(char *dir_path) {
 	struct stat s;
-	assert_not_equal_with_message(stat(dir_path, &s), -1, "dir [%s] does not exist", dir_path);
-	assert_true_with_message(S_ISDIR(s.st_mode), "dir [%s] is not a directory", dir_path);
+	assert_not_equal_with_message(stat(dir_path, &s), -1, "directory [%s] does not exist", dir_path);
+	assert_true_with_message(S_ISDIR(s.st_mode), "directory [%s] is not a directory", dir_path);
 }
 
 void assert_file_exists(char *file_path) {
@@ -197,11 +197,11 @@ ssize_t get_file_size(char *file_path) {
 
 int orginal_stdout = 0;
 
-/* Returns stdout sccociated with file discriptor */
+/* Returns stdout associated with file descriptor */
 int capture_stdout() {
 	int p[2];
 	
-	/* saving orginal stdout */
+	/* saving original stdout */
 	if (!orginal_stdout)
 		orginal_stdout = dup(1);
 
@@ -213,7 +213,7 @@ int capture_stdout() {
 	/* use write pipe end as stdout */
 	assert_not_equal(dup2(p[1], 1), -1);
 
-	/* closing orignal write pipe end as we have it duplicated */
+	/* closing original write pipe end as we have it duplicated */
 	assert_not_equal(close(p[1]), -1);
 
 	/* return read pipe end */
@@ -225,7 +225,7 @@ void restore_stdout() {
 	/* close write pipe end */
 	assert_not_equal(close(1), -1);
 
-	/* and resotre form saved */
+	/* and restore form saved */
 	if (orginal_stdout)
 		assert_not_equal(dup2(orginal_stdout, 1), -1);
 }
@@ -233,7 +233,7 @@ void restore_stdout() {
 /* file_utils.c tests */
 static void test_create_media_file_path() {
 	char *path;
-	/* we don't get too much in to as it would reproduce funcion it self :D */
+	/* we don't get too much in to as it would reproduce function it self :D */
 	path = create_media_file_path("test.jpg");
 	assert_not_equal(path, 0);
 }
@@ -322,7 +322,7 @@ static void test_write_blob_to_file() {
 	assert_not_equal(write_blob_to_file(test_blob, 3666, file_path), 0);
 	assert_file_size(file_path, 3666);
 
-	/* cleanin up test file */
+	/* cleaning up test file */
 	assert_not_equal(unlink(file_path), -1);
 	
 	free(test_blob);
@@ -408,7 +408,7 @@ static void test_get_query_params() {
 
 /* geometry_math.c tests */
 static void test_resize_to_fit_in() {
-	struct dimmensions a, b, c;
+	struct dimensions a, b, c;
 
 	a.w = 100;
 	a.h = 200;
@@ -431,7 +431,7 @@ static void test_resize_to_fit_in() {
 }
 
 static void test_reduce_filed() {
-	struct dimmensions a, b;
+	struct dimensions a, b;
 
 	/* field = 100*200 = 20000 */
 	a.w = 100;
@@ -464,7 +464,7 @@ static void test_load_image() {
 	/* Checking if comment was striped off */
 	/* MagickGetImageAttribute is depricated but not yet in IM v. 6.3.0 */
 	assert_equal(MagickGetImageAttribute(magick_wand, "comment"), 0);
-/* TODO: ./configure should gatere IM version and if newer versions are used use instead:	
+/* TODO: ./configure should generate IM version and if newer versions are used use instead:	
 	assert_equal(MagickGetImageProperty(magick_wand, "comment"), 0);
 */
 
@@ -473,7 +473,7 @@ static void test_load_image() {
 
 static void test_fit_resize() {
 	MagickWand *magick_wand;
-	struct dimmensions a, img, b;
+	struct dimensions a, img, b;
 
 	a.w = 100;
 	a.h = 200;
@@ -487,7 +487,7 @@ static void test_fit_resize() {
 	magick_wand = fit_resize(magick_wand, a);
 	assert_not_equal(magick_wand, 0);
 
-	/* as we know this works from previous tests we can calculete image size to see if it works */
+	/* as we know this works from previous tests we can calculate image size to see if it works */
 	b = resize_to_fit_in(img, a);
 
 	assert_equal(MagickGetImageWidth(magick_wand), b.w);
@@ -498,7 +498,7 @@ static void test_fit_resize() {
 
 static void test_strict_resize() {
 	MagickWand *magick_wand;
-	struct dimmensions a;
+	struct dimensions a;
 
 	a.w = 100;
 	a.h = 200;
@@ -517,9 +517,9 @@ static void test_strict_resize() {
 
 static void test_resize_field_limiting() {
 	MagickWand *magick_wand;
-	struct dimmensions a;
+	struct dimensions a;
 
-	/* we will resize a little bit so resizing will take effect */
+	/* we will re-size a little bit so resizing will take effect */
 	a.w = IMAGE_TEST_FILE_WIDTH - 10;
 	a.h = IMAGE_TEST_FILE_HEIGHT - 10;
 
@@ -558,16 +558,16 @@ static void test_resize_field_limiting() {
 
 static void test_remove_transparentcy() {
 	MagickWand *magick_wand;
-	struct dimmensions a;
+	struct dimensions a;
 
-	/* we resize just 1 pixel so we don't loose our transparent region at (10,10) */
+	/* we re-size just 1 pixel so we don't loose our transparent region at (10,10) */
 	a.w = IMAGE_TEST_FILE_WIDTH - 1;
 	a.h = IMAGE_TEST_FILE_HEIGHT - 1;
 
 	magick_wand = load_image(IMAGE_TEST_FILE);
 	assert_not_equal(magick_wand, 0);
 
-	/* assert we have our test image loaded ok */
+	/* assert we have our test image loaded OK */
 	assert_image_pixel_color(magick_wand, IMAGE_TEST_FILE_WIDTH - 1, IMAGE_TEST_FILE_HEIGHT - 1, "rgb240,0,255");
 
 	/* we assert that we don't have transparent pixel */
@@ -584,7 +584,7 @@ static void test_remove_transparentcy() {
 
 static void test_prepare_blob() {
 	MagickWand *magick_wand;
-	struct dimmensions a;
+	struct dimensions a;
 	size_t blob_len;
 	unsigned char *blob;
 
@@ -602,7 +602,7 @@ static void test_prepare_blob() {
 	assert_not_equal(blob, 0);
 	assert_not_equal(blob_len, 0);
 
-	/* JPEG data magick number */
+	/* JPEG data magic number */
 	assert_equal(blob[0], 0xff);
 	assert_equal(blob[1], 0xd8);
 
@@ -633,7 +633,7 @@ static void test_if_cached() {
 	
 	assert_equal(check_if_cached(params), NO_ORIG);
 
-	/* cleanin up test file */
+	/* cleaning up test file */
 	assert_not_equal(unlink(cache_file_path), -1);
 
 	free(cache_file_path);
@@ -659,7 +659,7 @@ static void test_if_cached() {
 
 	assert_equal(check_if_cached(params), CACHE_OK);
 
-	/* cleanin up test file */
+	/* cleaning up test file */
 	assert_not_equal(unlink(cache_file_path), -1);
 	
 	free(orig_file_path);
@@ -681,14 +681,14 @@ static void test_write_blob_to_cache() {
 
 	free_query_params(params);
 
-	/* now we will try existing orginal file */
+	/* now we will try existing original file */
 	params = get_query_params(IMAGE_TEST_FILE, "");
 	cache_file_path = create_cache_file_path(params);
 
 	assert_not_equal(write_blob_to_cache(test_blob, 3000, params), 0);
 	assert_file_size(cache_file_path, 3000);
 
-	/* cleanin up test file */
+	/* cleaning up test file */
 	assert_not_equal(unlink(cache_file_path), -1);
 
 	free(cache_file_path);
@@ -698,7 +698,7 @@ static void test_write_blob_to_cache() {
 
 /* serve.c tests */
 
-/* this funciont will fork and redirect chld stdout to stdout_fd pipe end */
+/* this function will fork and redirect child stdout to stdout_fd pipe end */
 static int fork_with_stdout_capture(int *stdout_fd) {
 	*stdout_fd = capture_stdout();
 	if(!fork())
@@ -732,7 +732,7 @@ static void test_serve_from_file() {
 	close(stdout_fd);
 	free(media_file_path);
 
-	/* bogous file */
+	/* bogus file */
 	if (!fork_with_stdout_capture(&stdout_fd)) {
 		status = serve_from_file(media_file_path, OUT_FORMAT_MIME_TYPE);
 		if (status) {
@@ -791,7 +791,7 @@ static void test_serve_from_cache() {
 	assert_headers_read(stdout_fd);
 	assert_byte_read(stdout_fd, 3000);
 
-	/* cleanin up test file */
+	/* cleaning up test file */
 	assert_not_equal(unlink(cache_file_path), -1);
 
 	/* test with wrong mtime */
@@ -807,7 +807,7 @@ static void test_serve_from_cache() {
 		exit(0);
 	}
 
-	/* there should be no chache file as it should be removed */
+	/* there should be no cache file as it should be removed */
 	assert_equal(unlink(cache_file_path), -1);
 
 	/* test with no cache */
@@ -825,7 +825,7 @@ static void test_serve_from_cache() {
 	free(cache_file_path);
 	free_query_params(params);
 
-	/* test with no orginal file */
+	/* test with no original file */
 	params = get_query_params("bogo.file", "");
 	cache_file_path = create_cache_file_path(params);
 
@@ -844,7 +844,7 @@ static void test_serve_from_cache() {
 	close(stdout_fd);
 	free_query_params(params);
 
-	/* there should be no chache file as it should be removed */
+	/* there should be no cache file as it should be removed */
 	assert_equal(unlink(cache_file_path), -1);
 	free(cache_file_path);
 	free(blob);
@@ -881,7 +881,7 @@ static void test_serve_error_message() {
 	close(stdout_fd);
 }
 
-/* seturp and teardown */
+/* setup and teardown */
 static void test_setup() {
 	debug_start(DEBUG_FILE);
 }

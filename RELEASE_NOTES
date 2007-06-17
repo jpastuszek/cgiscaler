@@ -1,0 +1,16 @@
+CGIscaler release notes:
+
+- Initial Release v0.1
+	Features:
+		- strict scaling
+		- aspect ratio keeping scaling (fit re-size)
+		- high/low output compression quality (ex. for WML pages)
+		- customisable URL query parameters matching
+		- full caching with cleanup
+		- error image serving on errors like original file not found
+		- configurable output formats/mime-type
+		- configurable matte/transparency/alpha channel removal
+		- configurable scaling filter parameters
+		- configurable maximum output pixel number
+		- pass through file/cache serving with configurable buffer size
+		- full unit tests coverage

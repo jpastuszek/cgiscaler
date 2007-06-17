@@ -35,7 +35,7 @@ int main(int argc, char *argv[])
 	int quality;
 
 	debug_start(DEBUG_FILE);
-	/* stopp debuging on exit */
+	/* stop debugging on exit */
 	atexit(debug_stop);
 	
 	params = get_query_params(getenv("PATH_INFO"), getenv("QUERY_STRING"));
@@ -44,7 +44,7 @@ int main(int argc, char *argv[])
 		exit(70);
 	}
 	
-	/* if we have served from cache ok... clenup and exit success */
+	/* if we have served from cache OK... cleanup and exit success */
 	if (serve_from_cache(params, OUT_FORMAT_MIME_TYPE)) {
 		free_query_params(params);
 		exit(0);
@@ -62,7 +62,7 @@ int main(int argc, char *argv[])
 		exit(71);
 	}
 
-	/* according to strict value we are resizing or cropresizing... if failes wand == 0 */
+	/* according to strict value we are resizing or cropresizing... if fails wand == 0 */
 	if (params->strict)
 		magick_wand = strict_resize(magick_wand, params->size);
 	else

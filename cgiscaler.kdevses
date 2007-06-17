@@ -1,34 +1,10 @@
 <?xml version = '1.0' encoding = 'UTF-8'?>
 <!DOCTYPE KDevPrjSession>
 <KDevPrjSession>
- <DocsAndViews NumberOfDocuments="9" >
-  <Doc0 NumberOfViews="1" URL="file:///home/kazuya/Projects/CGIScaler/tests/test.c" >
-   <View0 Encoding="" line="443" Type="Source" />
+ <DocsAndViews NumberOfDocuments="1" >
+  <Doc0 NumberOfViews="1" URL="file:///home/kazuya/Projects/CGIScaler/RELEASE_NOTES" >
+   <View0 Encoding="" line="0" Type="Source" />
   </Doc0>
-  <Doc1 NumberOfViews="1" URL="file:///home/kazuya/Projects/CGIScaler/tests/test_config.h" >
-   <View0 Encoding="" line="13" Type="Source" />
-  </Doc1>
-  <Doc2 NumberOfViews="1" URL="file:///home/kazuya/Projects/CGIScaler/src/cache.c" >
-   <View0 Encoding="" line="163" Type="Source" />
-  </Doc2>
-  <Doc3 NumberOfViews="1" URL="file:///home/kazuya/Projects/CGIScaler/src/cache.h" >
-   <View0 Encoding="" line="27" Type="Source" />
-  </Doc3>
-  <Doc4 NumberOfViews="1" URL="file:///home/kazuya/Projects/CGIScaler/src/cgiscaler.c" >
-   <View0 Encoding="" line="44" Type="Source" />
-  </Doc4>
-  <Doc5 NumberOfViews="1" URL="file:///home/kazuya/Projects/CGIScaler/src/file_utils.c" >
-   <View0 Encoding="" line="72" Type="Source" />
-  </Doc5>
-  <Doc6 NumberOfViews="1" URL="file:///home/kazuya/Projects/CGIScaler/src/file_utils.h" >
-   <View0 Encoding="" line="24" Type="Source" />
-  </Doc6>
-  <Doc7 NumberOfViews="1" URL="file:///home/kazuya/Projects/CGIScaler/src/query_string.c" >
-   <View0 Encoding="" line="71" Type="Source" />
-  </Doc7>
-  <Doc8 NumberOfViews="1" URL="file:///home/kazuya/Projects/CGIScaler/src/serve.c" >
-   <View0 Encoding="" line="219" Type="Source" />
-  </Doc8>
  </DocsAndViews>
  <pluginList>
   <kdevdebugger>
@@ -36,12 +12,15 @@
    <showInternalCommands value="0" />
   </kdevdebugger>
   <kdevfilelist>
+   <projectview name="Release" >
+    <file line="0" url="RELEASE_NOTES" col="0" encoding="" />
+   </projectview>
    <projectview name="Test writting session" >
-    <file line="366" url="file:///home/kazuya/Projects/CGIScaler/tests/test.c" col="0" encoding="" />
-    <file line="24" url="file:///home/kazuya/Projects/CGIScaler/tests/test_config.h" col="25" encoding="" />
-    <file line="37" url="file:///home/kazuya/Projects/CGIScaler/src/cache.c" col="29" encoding="" />
-    <file line="2" url="file:///home/kazuya/Projects/CGIScaler/src/cache.h" col="18" encoding="" />
-    <file line="40" url="file:///home/kazuya/Projects/CGIScaler/src/main.c" col="46" encoding="" />
+    <file line="366" url="tests/test.c" col="0" encoding="" />
+    <file line="24" url="tests/test_config.h" col="25" encoding="" />
+    <file line="37" url="src/cache.c" col="29" encoding="" />
+    <file line="2" url="src/cache.h" col="18" encoding="" />
+    <file line="40" url="src/main.c" col="46" encoding="" />
    </projectview>
    <defaultview name="" />
   </kdevfilelist>
@@ -52,8 +31,9 @@
   <kdevbookmarks>
    <bookmarks>
     <bookmark url="/home/kazuya/Projects/CGIScaler/tests/test.c" >
-     <mark line="468" />
-     <mark line="96" />
+     <mark line="918" />
+     <mark line="178" />
+     <mark line="864" />
     </bookmark>
    </bookmarks>
   </kdevbookmarks>

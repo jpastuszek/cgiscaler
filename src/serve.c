@@ -68,17 +68,17 @@ int serve_from_file(char *file_path, char *mime_type) {
 	printf("Content-Length: %u\n", (unsigned int) file_size);
 	printf("\n");
 
-	/* Fflush is neccessary to avoid overwriting buffered headers by direct fd writes */
+	/* Fflush is necessary to avoid overwriting buffered headers by direct fd writes */
 	fflush(stdout);
 
-	/* After we have sent headers we donnot return 0 */
+	/* After we have sent headers we don't return 0 */
 
 	/* Allocating buffer */
 	buffer = malloc(WRITE_BUFFER_LEN);
 	if (!buffer)
 		exit(66);
 
-	/* Lets pipe data throut the buffer to stdout */
+	/* Lets pipe data through the buffer to stdout */
 	bytes_read = total_bytes_read = 0;
 	while(1) {
 		/* reading buffer size or less amount of data */
@@ -100,12 +100,12 @@ int serve_from_file(char *file_path, char *mime_type) {
 			bytes_written = write(1, buffer + total_bytes_written, bytes_read);
 			debug(DEB, "%d bytes written", bytes_written);
 			if (bytes_written == -1) {
-				debug(ERR,"Failed writting to stdout: %s", strerror(errno));
+				debug(ERR,"Failed writing to stdout: %s", strerror(errno));
 				exit(10);
 			}
 			bytes_read -= bytes_written;
 			total_bytes_written += bytes_written;
-			/* fsync(1); - this will only work on fs fils not stdout */
+			/* fsync(1); - this will only work on fs files not stdout */
 		} while(bytes_read);
 		
 	}
@@ -126,20 +126,20 @@ void serve_from_blob(unsigned char *blob, size_t blob_len, char *mime_type) {
 	printf("Content-Length: %u\n", (unsigned int) blob_len);
 
 	printf("\n");
-	/* flushing buffers befor we do direct fd write */
+	/* flushing buffers before we do direct fd write */
 	fflush(stdout);
 
 	/* using stdout (FILE *) write instead of fd 1 is safer as printf also is using stdout */
 /*	fwrite(blob, blob_len, 1, stdout); */
 
-/* using write is risky as we are writing to fd directly... where using printf we are writting to stdout (FILE *) buffers but at this poing we should have buffers flushed */
+/* using write is risky as we are writing to fd directly... where using printf we are writing to stdout (FILE *) buffers but at this point we should have buffers flushed */
 	total_blob_written = 0;
 	while(1) {
 		debug(DEB, "Writing %d bytes to stdout", blob_len - total_blob_written);
 		bytes_written = write(1, blob + total_blob_written, blob_len - total_blob_written);
 		debug(DEB, "%d bytes written", bytes_written);
 		if (bytes_written == -1) {
-			debug(ERR, "Error writting to stdout %s", strerror(errno));
+			debug(ERR, "Error writing to stdout %s", strerror(errno));
 			exit(10);
 		}
 		
@@ -147,7 +147,7 @@ void serve_from_blob(unsigned char *blob, size_t blob_len, char *mime_type) {
 
 		if (total_blob_written >= blob_len)
 			break;
-		/* fsync(1); - this will only work on fs fils not stdout */
+		/* fsync(1); - this will only work on fs files not stdout */
 	}
 }
 
@@ -185,7 +185,7 @@ u*/
 		/* we don't have orig or cache file old... remove cache file and return */
 		case NO_ORIG:
 		case MTIME_DIFFER:
-			debug(DEB, "No orginal or mtime with orginal differ");
+			debug(DEB, "No original or mtime with original differ");
 			remove_cache_file(cache_file_path);
 			free(cache_file_path);
 			return 0;
@@ -207,7 +207,7 @@ void remove_cache_file(char *cache_file_path) {
 		debug(WARN, "Removing old cache file '%s' failed: %s", cache_file_path, strerror(errno));
 }
 
-/* we will try error miage but if it does not exist we will fail back to error message */
+/* we will try error image but if it does not exist we will fail back to error message */
 void serve_error() {
 	char *file_path;
 
@@ -222,7 +222,7 @@ void serve_error() {
 	free(file_path);
 }
 
-/* serving plain text message as an absolute failback */
+/* serving plain text message as an absolute fail-back */
 void serve_error_message() {
 	printf("Content-Type: text/plain\n");
 	printf("\n");

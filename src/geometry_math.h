@@ -21,7 +21,7 @@
 #ifndef GEOMETRY_MATH_H
 #define GEOMETRY_MATH_H
 
-struct dimmensions {
+struct dimensions {
 	int w;
 	int h;
 };
@@ -33,11 +33,11 @@ struct point {
 
 struct box {
 	struct point position;
-	struct dimmensions size;
+	struct dimensions size;
 };
 
 
-struct dimmensions resize_to_fit_in(struct dimmensions a, struct dimmensions b);
-struct dimmensions reduce_filed(struct dimmensions a, int field);
+struct dimensions resize_to_fit_in(struct dimensions a, struct dimensions b);
+struct dimensions reduce_filed(struct dimensions a, int field);
 
 #endif

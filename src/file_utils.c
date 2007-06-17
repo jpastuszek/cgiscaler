@@ -51,7 +51,7 @@ char *create_cache_file_path(struct query_params *params) {
 	if (!file_name)
 		exit(66);
 
-	/* now we will loop until snprintf will return less than our buffor size */
+	/* now we will loop until snprintf will return less than our buffer size */
 	while (1) {
 		file_name_len = snprintf(file_name, file_name_buff_len, "%s%s-%u-%u-%u-%u", CACHE_PATH, params->file_name, params->size.w, params->size.h, params->strict, params->lowq);
 	
@@ -65,7 +65,7 @@ char *create_cache_file_path(struct query_params *params) {
 		else
 			file_name_buff_len *= 2;
 	
-		/* resize to add more space */
+		/* re-size to add more space */
 		if ((file_name = realloc(file_name, file_name_buff_len)) == NULL)
 			exit(66);
 	}
@@ -140,7 +140,7 @@ time_t get_file_mtime(char *path) {
 	return s.st_mtime;
 }
 
-/* Returns relative file path (no beggining /) */
+/* Returns relative file path (no beginning /) */
 char *make_file_name_relative(char *file_path) {
 	char *return_name;
 	
@@ -193,7 +193,7 @@ int write_blob_to_file(unsigned char *blob, int blob_len, char *file_path) {
 		bytes_written = write(out_file, blob + total_blob_written, blob_len - total_blob_written);
 		debug(DEB, "%d bytes written", bytes_written);
 		if (bytes_written == -1) {
-			debug(ERR, "Error writting to '%s': %s", file_path, strerror(errno));
+			debug(ERR, "Error writing to '%s': %s", file_path, strerror(errno));
 			return 0;
 		}
 		

@@ -28,5 +28,5 @@ void free_image(MagickWand *image);
 unsigned char *prepare_blob(MagickWand *image, int quality, size_t *blob_len,const char *format);
 void free_blob(unsigned char *blob);
 
-MagickWand *fit_resize(MagickWand *image, struct dimmensions to_size);
-MagickWand *strict_resize(MagickWand *image, struct dimmensions size);
+MagickWand *fit_resize(MagickWand *image, struct dimensions to_size);
+MagickWand *strict_resize(MagickWand *image, struct dimensions size);
