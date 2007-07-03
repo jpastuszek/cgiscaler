@@ -1,5 +1,6 @@
 Installation
 ==================
+= Linux:
 
 Configure source tree:
   ./configure
@@ -12,6 +13,27 @@ Build:
 
 Run unit tests
   tests/test
+
+= Solaris:
+
+Set up environment:
+  export PATH=$PATH:/usr/local/bin:/usr/bin:/usr/sbin:/bin:/sbin:/usr/sfw/bin:/usr/sfw/sbin
+  export LD_LIBRARY_PATH=/usr/local/lib:/usr/lib:$LD_LIBRARY_PATH
+
+Configure source tree:
+  32 bit ImageMagick:
+    ./configure
+  64 bit ImageMagick:
+    CFLAGS="-m64" LDFLAGS="-m64" GNUMAKE=gmake ./configure
+
+Edit configuration to match your needs:
+  vi src/config.h
+
+Build:
+  make
+
+Run unit tests
+  tests/test  
 
 Apache Configuration
 ===================
