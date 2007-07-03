@@ -27,6 +27,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <magick/MagickCore.h>
+#include <sys/wait.h>
 
 #include "../cgreen/cgreen.h"
 #include "file_utils.h"
@@ -195,41 +196,6 @@ ssize_t get_file_size(char *file_path) {
 		close(fd);
 
 	return pos;
-}
-
-int orginal_stdout = 0;
-
-/* Returns stdout associated with file descriptor */
-int capture_stdout() {
-	int p[2];
-	
-	/* saving original stdout */
-	if (!orginal_stdout)
-		orginal_stdout = dup(1);
-
-	assert_not_equal(orginal_stdout, 0);
-
-	assert_not_equal(pipe(p), -1);
-
-	assert_not_equal(close(1), -1);
-	/* use write pipe end as stdout */
-	assert_not_equal(dup2(p[1], 1), -1);
-
-	/* closing original write pipe end as we have it duplicated */
-	assert_not_equal(close(p[1]), -1);
-
-	/* return read pipe end */
-	return p[0];
-}
-
-/* Brings back normal stdout */
-void restore_stdout() {
-	/* close write pipe end */
-	assert_not_equal(close(1), -1);
-
-	/* and restore form saved */
-	if (orginal_stdout)
-		assert_not_equal(dup2(orginal_stdout, 1), -1);
 }
 
 /* file_utils.c tests */
@@ -700,7 +666,44 @@ static void test_write_blob_to_cache() {
 
 /* serve.c tests */
 
-/* this function will fork and redirect child stdout to stdout_fd pipe end */
+/* some serving specific helpers */
+
+int orginal_stdout = 0;
+
+/* Returns stdout associated with file descriptor */
+int capture_stdout() {
+	int p[2];
+	
+	/* saving original stdout */
+	if (!orginal_stdout)
+		orginal_stdout = dup(1);
+
+	assert_not_equal(orginal_stdout, 0);
+
+	assert_not_equal(pipe(p), -1);
+
+	assert_not_equal(close(1), -1);
+	/* use write pipe end as stdout */
+	assert_not_equal(dup2(p[1], 1), -1);
+
+	/* closing original write pipe end as we have it duplicated */
+	assert_not_equal(close(p[1]), -1);
+
+	/* return read pipe end */
+	return p[0];
+}
+
+/* Brings back normal stdout */
+void restore_stdout() {
+	/* close write pipe end */
+	assert_not_equal(close(1), -1);
+
+	/* and restore form saved */
+	if (orginal_stdout)
+		assert_not_equal(dup2(orginal_stdout, 1), -1);
+}
+
+/* this function will fork and redirect child stdout to stdout_fd pipe end; stdout_ft needs to be freed with finish_fork witch will also wait until child exists */
 static int fork_with_stdout_capture(int *stdout_fd) {
 	*stdout_fd = capture_stdout();
 	if(!fork())
@@ -709,6 +712,16 @@ static int fork_with_stdout_capture(int *stdout_fd) {
 	/* We restore our local stdout */
 	restore_stdout();
 	return 1;
+}
+
+/* make sure you finish_fork after doing fork_with_stdout_capture, between this two calls things will happen simultaneously */
+static void finish_fork(int stdout_fd) {
+	int status;
+	/* we will wait for child to finish */
+	wait(&status);
+
+	/* and close stdout redirect pipe */
+	close(stdout_fd);
 }
 
 static void test_serve_from_file() {
@@ -731,7 +744,7 @@ static void test_serve_from_file() {
 	assert_headers_read(stdout_fd);
 	assert_byte_read(stdout_fd, get_file_size(media_file_path));
 
-	close(stdout_fd);
+	finish_fork(stdout_fd);
 	free(media_file_path);
 
 	/* bogus file */
@@ -743,8 +756,8 @@ static void test_serve_from_file() {
 		}
 		exit(0);
 	}
-	close(stdout_fd);
-
+	
+	finish_fork(stdout_fd);
 }
 
 static void test_serve_from_blob() {
@@ -758,12 +771,12 @@ static void test_serve_from_blob() {
 		serve_from_blob(blob, 31666, OUT_FORMAT_MIME_TYPE);
 		exit(0);
 	}
-	free(blob);
 
 	assert_headers_read(stdout_fd);
 	assert_byte_read(stdout_fd, 31666);
 
-	close(stdout_fd);
+	finish_fork(stdout_fd);
+	free(blob);
 }
 
 static void test_serve_from_cache() {
@@ -793,6 +806,8 @@ static void test_serve_from_cache() {
 	assert_headers_read(stdout_fd);
 	assert_byte_read(stdout_fd, 3000);
 
+	finish_fork(stdout_fd);
+
 	/* cleaning up test file */
 	assert_not_equal(-1, unlink(cache_file_path));
 
@@ -809,6 +824,8 @@ static void test_serve_from_cache() {
 		exit(0);
 	}
 
+	finish_fork(stdout_fd);
+
 	/* there should be no cache file as it should be removed */
 	assert_file_not_exists(cache_file_path);
 
@@ -822,7 +839,7 @@ static void test_serve_from_cache() {
 		exit(0);
 	}
 
-	close(stdout_fd);
+	finish_fork(stdout_fd);
 
 	free(cache_file_path);
 	free_query_params(params);
@@ -843,11 +860,12 @@ static void test_serve_from_cache() {
 		exit(0);
 	}
 
-	close(stdout_fd);
+	finish_fork(stdout_fd);
 	free_query_params(params);
 
 	/* there should be no cache file as it should be removed */
 	assert_file_not_exists(cache_file_path);
+
 	free(cache_file_path);
 	free(blob);
 }
@@ -856,17 +874,19 @@ static void test_serve_error() {
 	int stdout_fd;
 	char *media_file_path;
 
+	media_file_path = create_media_file_path(ERROR_FILE_PATH);
+
 	if (!fork_with_stdout_capture(&stdout_fd)) {
 		serve_error();
 		exit(0);
 	}
-	
-	media_file_path = create_media_file_path(ERROR_FILE_PATH);
 
 	assert_headers_read(stdout_fd);
 	assert_byte_read(stdout_fd, get_file_size(media_file_path));
 
-	close(stdout_fd);
+	finish_fork(stdout_fd);
+	free(media_file_path);
+
 }
 
 static void test_serve_error_message() {
@@ -880,7 +900,7 @@ static void test_serve_error_message() {
 	assert_headers_read(stdout_fd);
 	assert_byte_read(stdout_fd, strlen(ERROR_FAILBACK_MESSAGE));
 
-	close(stdout_fd);
+	finish_fork(stdout_fd);
 }
 
 /* setup and teardown */
