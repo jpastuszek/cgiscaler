@@ -194,6 +194,7 @@ int write_blob_to_file(unsigned char *blob, int blob_len, char *file_path) {
 		debug(DEB, "%d bytes written", bytes_written);
 		if (bytes_written == -1) {
 			debug(ERR, "Error writing to '%s': %s", file_path, strerror(errno));
+			close(out_file);
 			return 0;
 		}
 		

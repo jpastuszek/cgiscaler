@@ -110,11 +110,13 @@ void assert_dir_exists(char *dir_path) {
 }
 
 void assert_file_exists(char *file_path) {
-	int fd;
-	fd = open(file_path, O_RDONLY);
-	assert_not_equal_with_message(fd, -1, "file [%s] does not exist", file_path);
-	if (fd != -1)
-		close(fd);
+        struct stat s;
+        assert_not_equal_with_message(stat(file_path, &s), -1, "file [%s] does not exist", file_path);
+}
+
+void assert_file_not_exists(char *file_path) {
+	struct stat s;
+        assert_equal_with_message(stat(file_path, &s), -1, "file [%s] exist", file_path);
 }
 
 void assert_file_size(char *file_path, off_t size) {
@@ -734,7 +736,7 @@ static void test_serve_from_file() {
 
 	/* bogus file */
 	if (!fork_with_stdout_capture(&stdout_fd)) {
-		status = serve_from_file(media_file_path, OUT_FORMAT_MIME_TYPE);
+		status = serve_from_file("bogo_file_name.jpg", OUT_FORMAT_MIME_TYPE);
 		if (status) {
 			restore_stdout();
 			assert_true_with_message(0, "serve_from_file failed");
@@ -792,7 +794,7 @@ static void test_serve_from_cache() {
 	assert_byte_read(stdout_fd, 3000);
 
 	/* cleaning up test file */
-	assert_not_equal(unlink(cache_file_path), -1);
+	assert_not_equal(-1, unlink(cache_file_path));
 
 	/* test with wrong mtime */
 	/* create test file - mtime should be set to current time */
@@ -808,7 +810,7 @@ static void test_serve_from_cache() {
 	}
 
 	/* there should be no cache file as it should be removed */
-	assert_equal(unlink(cache_file_path), -1);
+	assert_file_not_exists(cache_file_path);
 
 	/* test with no cache */
 	if (!fork_with_stdout_capture(&stdout_fd)) {
@@ -845,7 +847,7 @@ static void test_serve_from_cache() {
 	free_query_params(params);
 
 	/* there should be no cache file as it should be removed */
-	assert_equal(unlink(cache_file_path), -1);
+	assert_file_not_exists(cache_file_path);
 	free(cache_file_path);
 	free(blob);
 }
