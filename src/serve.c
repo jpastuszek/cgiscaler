@@ -37,28 +37,28 @@ void remove_cache_file(char *cache_file_path);
 
 int serve_from_file(char *file_path, char *mime_type) {
 	unsigned char *buffer;
-	int error_file;
+	int file;
 	size_t bytes_read, bytes_written, total_bytes_read, total_bytes_written;
 	off_t file_size;
 
 	debug(DEB,"Serving from file: '%s' mime-type: '%s'", file_path, mime_type);
 
-	error_file = open(file_path, O_RDONLY);
-	if (error_file == -1) {
-		debug(WARN,"Failed to open error file '%s': %s", file_path, strerror(errno));
+	file = open(file_path, O_RDONLY);
+	if (file == -1) {
+		debug(WARN,"Failed to open file '%s': %s", file_path, strerror(errno));
 		return 0;
 	}
 
 	/* Getting image size */
-	file_size = lseek(error_file, 0, SEEK_END);
+	file_size = lseek(file, 0, SEEK_END);
 	if (file_size == -1) {
-		close(error_file);
+		close(file);
 		debug(WARN,"Failed to get file size: %s", strerror(errno));
 		return 0;
 	}
 
-	if (lseek(error_file, 0, SEEK_SET) == -1) {
-		close(error_file);
+	if (lseek(file, 0, SEEK_SET) == -1) {
+		close(file);
 		debug(WARN,"Failed to reposition file offset: %s", strerror(errno));
 		return 0;
 	}
@@ -82,14 +82,23 @@ int serve_from_file(char *file_path, char *mime_type) {
 	bytes_read = total_bytes_read = 0;
 	while(1) {
 		/* reading buffer size or less amount of data */
-		bytes_read = read(error_file, buffer, WRITE_BUFFER_LEN);
+		bytes_read = read(file, buffer, WRITE_BUFFER_LEN);
 		if (bytes_read == -1) {
-			debug(ERR,"Failed reading error file: %s", strerror(errno));
+			debug(ERR,"Failed reading file: %s", strerror(errno));
 			exit(10);
 		}
+
 		/* all done */
-		if (!bytes_read)
+		if (!bytes_read) {
+			/* check if we have served what we supposed to */
+			if (total_bytes_read != file_size) {
+				debug(ERR,"Failed to serve all data: bytes served: %d content length sent: %d", total_bytes_read, file_size);
+				close(file);
+				free(buffer);
+				return(0);
+			}
 			break;
+		}
 
 		total_bytes_read += bytes_read;
 		
@@ -101,6 +110,8 @@ int serve_from_file(char *file_path, char *mime_type) {
 			debug(DEB, "%d bytes written", bytes_written);
 			if (bytes_written == -1) {
 				debug(ERR,"Failed writing to stdout: %s", strerror(errno));
+				close(file);
+				free(buffer);
 				exit(10);
 			}
 			bytes_read -= bytes_written;
@@ -110,7 +121,7 @@ int serve_from_file(char *file_path, char *mime_type) {
 		
 	}
 
-	close(error_file);
+	close(file);
 	free(buffer);
 	return 1;
 }
