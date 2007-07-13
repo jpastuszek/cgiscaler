@@ -1,10 +1,13 @@
 <?xml version = '1.0' encoding = 'UTF-8'?>
 <!DOCTYPE KDevPrjSession>
 <KDevPrjSession>
- <DocsAndViews NumberOfDocuments="1" >
-  <Doc0 NumberOfViews="1" URL="file:///home/kazuya/Projects/CGIScaler/RELEASE_NOTES" >
-   <View0 Encoding="" line="0" Type="Source" />
+ <DocsAndViews NumberOfDocuments="2" >
+  <Doc0 NumberOfViews="1" URL="file:///home/kazuya/Projects/CGIScaler/src/file_utils.c" >
+   <View0 Encoding="" line="199" Type="Source" />
   </Doc0>
+  <Doc1 NumberOfViews="1" URL="file:///home/kazuya/Projects/CGIScaler/tests/test.c" >
+   <View0 Encoding="" line="868" Type="Source" />
+  </Doc1>
  </DocsAndViews>
  <pluginList>
   <kdevdebugger>
@@ -13,7 +16,8 @@
   </kdevdebugger>
   <kdevfilelist>
    <projectview name="Release" >
-    <file line="0" url="RELEASE_NOTES" col="0" encoding="" />
+    <file line="16" url="RELEASE_NOTES" col="0" encoding="" />
+    <file line="45" url="INSTALL" col="0" encoding="" />
    </projectview>
    <projectview name="Test writting session" >
     <file line="366" url="tests/test.c" col="0" encoding="" />
@@ -31,9 +35,9 @@
   <kdevbookmarks>
    <bookmarks>
     <bookmark url="/home/kazuya/Projects/CGIScaler/tests/test.c" >
-     <mark line="918" />
-     <mark line="178" />
-     <mark line="864" />
+     <mark line="903" />
+     <mark line="853" />
+     <mark line="167" />
     </bookmark>
    </bookmarks>
   </kdevbookmarks>

@@ -70,6 +70,7 @@ void assert_equal_precision(double value, double expected, double precision_erro
 	assert_true_with_message(ret, "value [%f] not in precision range of [%f] and [%f] (%f)", value, expected - (range_delta / 2), expected + (range_delta / 2), precision_error);
 }
 
+/* TODO: Different quantum and different versions of IM returns different strings */
 void assert_image_pixel_color(MagickWand *magick_wand, int x, int y, const char *color) {
 	PixelWand *pixel_wand;
 	MagickBooleanType status;
@@ -78,7 +79,6 @@ void assert_image_pixel_color(MagickWand *magick_wand, int x, int y, const char 
 	status = MagickGetImagePixelColor(magick_wand, x, y, pixel_wand);
 	assert_not_equal(status, MagickFalse);
 
-	/* we assert that we no longer have transparent pixel */
 	assert_string_equal(PixelGetColorAsString(pixel_wand), color);
 
 	DestroyPixelWand(pixel_wand);

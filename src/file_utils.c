@@ -195,6 +195,9 @@ int write_blob_to_file(unsigned char *blob, int blob_len, char *file_path) {
 		if (bytes_written == -1) {
 			debug(ERR, "Error writing to '%s': %s", file_path, strerror(errno));
 			close(out_file);
+			/* as we have failed we will remove the file so it won't be considered as valid thumbnail */
+			debug(ERR, "Removing erroneous file '%s': %s", file_path, strerror(errno));
+			unlink(file_path);
 			return 0;
 		}
 		
