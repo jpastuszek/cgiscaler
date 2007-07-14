@@ -19,12 +19,12 @@
  ***************************************************************************/
 
 /* enable debuging - not suitable for production env! */
-//#define DEBUG
+#define DEBUG
 /* sync every line written to debug file... slow */
 //#define DEBUG_SYNC
 
 /* debug file path if debugging enabled */
-#define DEBUG_FILE "/tmp/cgiscaler.deb"
+#define DEBUG_FILE "/tmp/cgiscaler.gallery.deb"
 
 /* URL Query parameter names */
 #define WIDTH_PARAM "w"
@@ -33,12 +33,12 @@
 #define LOWQ_PARAM "wap"
 
 /* URL Query true value: what string will match as true */
-#define TRUE_PARAM_VAL "t"
+#define TRUE_PARAM_VAL "true"
 
 /* Path to media source directory (note tailing / char)*/
-#define MEDIA_PATH "/home/kazuya/Photos/"
+#define MEDIA_PATH "/home/kazuya/Projects/Gallery/public/system/photos/"
 /* Path were to write cache files (note tailing / char) */
-#define CACHE_PATH "/home/kazuya/Temp/cache/"
+#define CACHE_PATH "/home/kazuya/Projects/Gallery/public/system/cache/"
 
 /* output format (ex. JPEG, GIF, PNG) */
 #define OUT_FORMAT "JPEG"
@@ -57,7 +57,7 @@
 /* Use this quality when creating thumbnails */
 #define NORMAL_QUALITY 80
 
-/* Possible re-size filters 
+/* Possible re-size filters
     BesselFilter   BlackmanFilter   BoxFilter
     CatromFilter   CubicGaussianFilter
     HanningFilter  HermiteFilter    LanczosFilter

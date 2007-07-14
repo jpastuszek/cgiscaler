@@ -236,17 +236,17 @@ static void test_create_cache_dir_struct() {
 	char path1[80], path2[80], path3[80];
 	int status;
 
-	status = create_cache_dir_struct("abc/def/ghi/test.jpg");
+	status = create_cache_dir_struct("abc/d///ghi/test.jpg");
 	assert_not_equal(status, 0);
 
 	strcpy(path1, CACHE_PATH);
 	strcat(path1, "abc");
 
 	strcpy(path2, CACHE_PATH);
-	strcat(path2, "abc/def");
+	strcat(path2, "abc/d");
 
 	strcpy(path3, CACHE_PATH);
-	strcat(path3, "abc/def/ghi");
+	strcat(path3, "abc/d/ghi");
 
 	assert_dir_exists(path1);
 	assert_dir_exists(path2);

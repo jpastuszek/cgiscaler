@@ -93,13 +93,14 @@ int create_cache_dir_struct(char *file_path) {
 	full_path[strlen(CACHE_PATH) - 1] = 0;
 
 	while ((next_slash = index(file_path, '/')) != 0) {
+		
+		dir_name_len = next_slash - file_path;
 		/* if next char in file path is '/' we skip it (in case of "////" like stuff */
-		if (next_slash == file_path + 1) {
+		if (!dir_name_len) {
 			file_path++;
 			continue;
 		}
-		
-		dir_name_len = next_slash - file_path;
+
 		dir_name = malloc(dir_name_len + 1);
 		if (!dir_name)
 			exit(66);
