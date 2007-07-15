@@ -111,3 +111,22 @@ void debug(const char *level, const char *fmt, ...) {
 	free(msg);
 #endif
 }
+
+void timer_start(struct timer *t) {
+#ifdef DEBUG
+	struct timeval time;
+	gettimeofday(&time, NULL);
+	t->start = (double) time.tv_sec + ((double) time.tv_usec / 1000000);
+#endif
+}
+
+double timer_stop(struct timer *t) {
+#ifdef DEBUG
+	struct timeval time;
+	gettimeofday(&time, NULL);
+	t->stop = (double) time.tv_sec + ((double) time.tv_usec / 1000000);
+	return t->stop - t->start;
+#else
+	return 0;
+#endif
+}

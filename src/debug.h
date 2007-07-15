@@ -19,10 +19,21 @@
  ***************************************************************************/
 
 #define DEB "DEBUG"
+#define PROF "PROF"
+#define INFO "INFO"
 #define WARN "WARN"
 #define ERR "ERR"
-#define INFO "INFO"
 
 void debug_start(char *file);
 void debug_stop();
 void debug(const char *level, const char *fmt, ...);
+
+struct timer {
+#ifdef DEBUG
+	double start;
+	double stop;
+#endif
+};
+
+void timer_start(struct timer *t);
+double timer_stop(struct timer *t);

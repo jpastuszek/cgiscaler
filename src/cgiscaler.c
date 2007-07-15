@@ -31,6 +31,10 @@
 #include "serve.h"
 #include "debug.h"
 
+#ifdef DEBUG
+#include <sys/time.h>
+#endif
+
 
 #define ThrowWandException(wand) \
 { \
@@ -56,10 +60,12 @@ MagickWand *load_image(char *file_name) {
 	char *path;
 	MagickWand *image;
 	MagickBooleanType status;
+	struct timer timeing;	
 
 	path = create_media_file_path(file_name);
 
 	debug(DEB,"Loading image: '%s'", path);
+	timer_start(&timeing);
 
 	image = NewMagickWand();
 	if (!image) {
@@ -73,6 +79,8 @@ MagickWand *load_image(char *file_name) {
 		DestroyMagickWand(image);
 		return 0;
 	}
+
+	debug(PROF, "Loading took %.3f s",  timer_stop(&timeing));
 
 	/* this will remove meta data - this is very important as photos have loads of it */
 	status = MagickStripImage(image);
@@ -98,12 +106,15 @@ MagickWand *remove_transparency(MagickWand *image) {
 	MagickBooleanType status;
 	MagickWand *new_image;
 	PixelWand *bg_color;
+	struct timer timeing;	
+
 
 	/* If image doesn't have alpha/transparency/mate channel we do nothing here */
 	if (MagickGetImageMatte(image) == MagickFalse)
 		return image;
 
 	debug(DEB, "Removing transparency and colloring it to background color '%s'", DEFAULT_BACKGROUND_COLOR);
+	timer_start(&timeing);
 
 	/* Set background to DEFAULT_BACKGROUND_COLOR - in case of transparent gifs or png */
 	bg_color = NewPixelWand();
@@ -149,6 +160,7 @@ MagickWand *remove_transparency(MagickWand *image) {
 	}
 
 	DestroyMagickWand(image);
+	debug(PROF, "Removing transparency took %.3f s",  timer_stop(&timeing));
 
 	return new_image;
 }
@@ -199,6 +211,7 @@ void free_blob(unsigned char *blob) {
 MagickWand *fit_resize(MagickWand *image, struct dimensions to_size) {
 	struct dimensions image_size;
 	MagickBooleanType status;
+	struct timer timeing;	
 
 	image_size.w = MagickGetImageWidth(image);
 	image_size.h = MagickGetImageHeight(image);
@@ -208,11 +221,15 @@ MagickWand *fit_resize(MagickWand *image, struct dimensions to_size) {
 	/* we are reducing requested thumbnail resolution to MAX_PIXEL_NO */
 	to_size = reduce_filed(to_size, MAX_PIXEL_NO);
 
+	timer_start(&timeing);
+
 	status = MagickResizeImage(image, to_size.w, to_size.h, RESIZE_FILTER, RESIZE_SMOOTH_FACTOR);
 	if (status == MagickFalse) {
 		DestroyMagickWand(image);
 		return 0;
 	}
+
+	debug(PROF, "Fit resize took %.3f s",  timer_stop(&timeing));
 
 	return image;
 }
@@ -222,6 +239,7 @@ MagickWand *strict_resize(MagickWand *image, struct dimensions to_size) {
 	struct dimensions image_size, crop_size;
 	int x, y;
 	MagickBooleanType status;
+	struct timer timeing;	
 
 	image_size.w = MagickGetImageWidth(image);
 	image_size.h = MagickGetImageHeight(image);
@@ -236,6 +254,8 @@ MagickWand *strict_resize(MagickWand *image, struct dimensions to_size) {
 	x = (image_size.w - crop_size.w) / 2;
 	y = (image_size.h - crop_size.h) / 2;
 	debug(DEB, "Crop centre: %d x %d", x, y);
+
+	timer_start(&timeing);
 
 	status = MagickCropImage(image, crop_size.w, crop_size.h, x, y);
 	if (status == MagickFalse) {
@@ -252,6 +272,8 @@ MagickWand *strict_resize(MagickWand *image, struct dimensions to_size) {
 		DestroyMagickWand(image);
 		return 0;
 	}
+
+	debug(PROF, "Fit resize took %.3f s",  timer_stop(&timeing));
 
 	return image;
 }
