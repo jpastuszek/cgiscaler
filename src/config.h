@@ -57,6 +57,12 @@
 /* Use this quality when creating thumbnails */
 #define NORMAL_QUALITY 80
 
+/* some defults (0 means false, 1 true) */
+#define DEFAULT_WIDTH 64
+#define DEFAULT_HEIGHT 64
+#define DEFAULT_STRICT 0
+#define DEFAULT_LOWQ 0
+
 /* Possible re-size filters
     BesselFilter   BlackmanFilter   BoxFilter
     CatromFilter   CubicGaussianFilter

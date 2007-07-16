@@ -20,6 +20,7 @@
 
 #include "cgiscaler.h"
 #include "query_string.h"
+#include "commandline.h"
 #include "serve.h"
 #include "cache.h"
 #include "config.h"
@@ -40,8 +41,11 @@ int main(int argc, char *argv[])
 	
 	params = get_query_params(getenv("PATH_INFO"), getenv("QUERY_STRING"));
 	if (!params) {
-		serve_error();
-		exit(70);
+		params = get_query_params_from_commandline(argc, argv);
+		if (!params) {
+			serve_error();
+			exit(70);
+		}
 	}
 	
 	/* if we have served from cache OK... cleanup and exit success */

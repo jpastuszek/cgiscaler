@@ -80,7 +80,8 @@ void debug(const char *level, const char *fmt, ...) {
 	if (!debug_on)
 		return;
 
-	if ((msg = malloc(size)) == NULL)
+	msg = malloc(size);
+	if (!msg)
 		exit(66);
 
 	while (1) {
@@ -99,7 +100,8 @@ void debug(const char *level, const char *fmt, ...) {
 			size *= 2;
 	
 		/* re-size to add more space */
-		if ((new_msg = realloc(msg, size)) == NULL)
+		new_msg = realloc(msg, size);
+		if (!new_msg)
 			exit(66);
 	
 		msg = new_msg;
@@ -138,6 +140,8 @@ void debug(const char *level, const char *fmt, ...) {
 	}
 
 	write(debug_file_fd, full_msg, full_msg_len);
+
+	free(full_msg);
 
 #ifdef DEBUG_SYNC
 	fsync(debug_file_fd);

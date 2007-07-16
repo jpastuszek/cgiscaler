@@ -330,10 +330,10 @@ static void test_get_query_params() {
 	/* testing defaults */
 	params = get_query_params("/some/path/funny.jpeg", "");
 	assert_not_equal(params, 0);
-	assert_equal(params->size.w, 0);
-	assert_equal(params->size.h, 0);
-	assert_equal(params->strict, 0);
-	assert_equal(params->lowq, 0);
+	assert_equal(params->size.w, DEFAULT_WIDTH);
+	assert_equal(params->size.h, DEFAULT_HEIGHT);
+	assert_equal(params->strict, DEFAULT_STRICT);
+	assert_equal(params->lowq, DEFAULT_LOWQ);
 	free_query_params(params);
 
 	snprintf(test_query_string, 256, "%s=123&%s=213&beer=czech_lager&%s=%s&%s=%s", WIDTH_PARAM, HEIGHT_PARAM, STRICT_PARAM, TRUE_PARAM_VAL, LOWQ_PARAM, TRUE_PARAM_VAL);
@@ -356,10 +356,10 @@ static void test_get_query_params() {
 	params = get_query_params("/some/path/funny.jpeg", test_query_string);
 	assert_not_equal(params, 0);
 	assert_string_equal(params->file_name, "some/path/funny.jpeg");
-	assert_equal(params->size.w, 0);
-	assert_equal(params->size.h, 0);
+	assert_equal(params->size.w, DEFAULT_WIDTH);
+	assert_equal(params->size.h, DEFAULT_HEIGHT);
 	assert_equal(params->strict, 0);
-	assert_equal(params->lowq, 0);
+	assert_equal(params->lowq, DEFAULT_LOWQ);
 	free_query_params(params);
 
 	snprintf(test_query_string, 256, "beer=czech_lager&%s=%s&%s=%s", STRICT_PARAM, "xbrna", LOWQ_PARAM, TRUE_PARAM_VAL);
@@ -367,8 +367,8 @@ static void test_get_query_params() {
 	params = get_query_params("///some/path/funn/y2.jpeg", test_query_string);
 	assert_not_equal(params, 0);
 	assert_string_equal(params->file_name, "some/path/funn/y2.jpeg");
-	assert_equal(params->size.w, 0);
-	assert_equal(params->size.h, 0);
+	assert_equal(params->size.w, DEFAULT_WIDTH);
+	assert_equal(params->size.h, DEFAULT_HEIGHT);
 	assert_equal(params->strict, 0);
 	assert_equal(params->lowq, 1);
 	free_query_params(params);

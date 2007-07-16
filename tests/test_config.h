@@ -46,6 +46,13 @@
 #define LOWQ_QUALITY 20
 #define NORMAL_QUALITY 80
 
+/* some defults (0 means false, 1 true) */
+#define DEFAULT_WIDTH 64
+#define DEFAULT_HEIGHT 32
+#define DEFAULT_STRICT 1
+#define DEFAULT_LOWQ 0
+
+
 /* Possible resize filters 
     BesselFilter   BlackmanFilter   BoxFilter
     CatromFilter   CubicGaussianFilter

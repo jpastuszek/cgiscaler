@@ -70,6 +70,7 @@ MagickWand *load_image(char *file_name) {
 	image = NewMagickWand();
 	if (!image) {
 		debug(ERR, "Creating new magick wand failed!");
+		free(path);
 		return 0;
 	}
 
@@ -77,8 +78,11 @@ MagickWand *load_image(char *file_name) {
 	if (status == MagickFalse) {
 		debug(WARN,"Loading image '%s' failed", path);
 		DestroyMagickWand(image);
+		free(path);
 		return 0;
 	}
+
+	free(path);
 
 	debug(PROF, "Loading took %.3f s",  timer_stop(&timeing));
 

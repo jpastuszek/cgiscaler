@@ -28,7 +28,27 @@
 
 char *get_query_string_param(char *qurey_string, char *param_name);
 
-/* TODO: %xx in query string decoding */
+/* TODO: %xx in query string decoding... no need for filename? */
+
+struct query_params *alloc_default_query_params() {
+	struct query_params *params;
+	params = malloc(sizeof(struct query_params));
+	if (!params)
+		exit(66);
+
+	params->file_name = 0;
+	params->size.w = DEFAULT_WIDTH;
+	params->size.h = DEFAULT_HEIGHT;
+	params->strict = DEFAULT_STRICT;
+	params->lowq = DEFAULT_LOWQ;
+
+	return params;
+}
+
+void free_query_params(struct query_params *query_params) {
+	free(query_params->file_name);
+	free(query_params);
+}
 
 struct query_params *get_query_params(char *file_name, char *query_string) {
 	char *w;
@@ -65,23 +85,19 @@ struct query_params *get_query_params(char *file_name, char *query_string) {
 	lowq = get_query_string_param(query_string, LOWQ_PARAM);
 
 	/* now we set all qurey_param fields */
-	params = malloc(sizeof(struct query_params));
-	if (!params)
-		exit(66);
+	params = alloc_default_query_params();
 
 	params->file_name = file_name;
 
 	if (w) {
 		params->size.w = atoi(w);
 		free(w);
-	} else
-		params->size.w = 0;
+	}
 
 	if (h) {
 		params->size.h = atoi(h);
 		free(h);
-	} else
-		params->size.h = 0;
+	}
 
 	if (s) {
 		if (!strcmp(s, TRUE_PARAM_VAL))
@@ -89,8 +105,7 @@ struct query_params *get_query_params(char *file_name, char *query_string) {
 		else
 			params->strict = 0;
 		free(s);
-	} else
-		params->strict = 0;
+	}
 
 	if (lowq) {
 		if (!strcmp(lowq, TRUE_PARAM_VAL))
@@ -98,19 +113,12 @@ struct query_params *get_query_params(char *file_name, char *query_string) {
 		else
 			params->lowq = 0;
 		free(lowq);
-	} else
-		params->lowq = 0;
-
+	}
 
 	debug(DEB, "Params: file: '%s', size w: %d h: %d, strict: %d lowq: %d", params->file_name, params->size.w, params->size.h, params->strict, params->lowq);
 
 	/* we don't free file_name as it is used in param structure and will be freed on free_query_params */
 	return params;
-}
-
-void free_query_params(struct query_params *query_params) {
-	free(query_params->file_name);
-	free(query_params);
 }
 
 /* it could be probably implemented with scanf sort of functions */

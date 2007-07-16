@@ -48,8 +48,9 @@ am__installdirs = "$(DESTDIR)$(cgiscalerdir)"
 cgiscalerPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(cgiscaler_PROGRAMS)
 am_cgiscaler_OBJECTS = cache.$(OBJEXT) cgiscaler.$(OBJEXT) \
-	debug.$(OBJEXT) file_utils.$(OBJEXT) geometry_math.$(OBJEXT) \
-	main.$(OBJEXT) query_string.$(OBJEXT) serve.$(OBJEXT)
+	commandline.$(OBJEXT) debug.$(OBJEXT) file_utils.$(OBJEXT) \
+	geometry_math.$(OBJEXT) main.$(OBJEXT) query_string.$(OBJEXT) \
+	serve.$(OBJEXT)
 cgiscaler_OBJECTS = $(am_cgiscaler_OBJECTS)
 cgiscaler_LDADD = $(LDADD)
 DEFAULT_INCLUDES = -I. -I$(top_builddir)@am__isrc@
@@ -181,11 +182,11 @@ INCLUDES = $(all_includes)
 
 # the library search path.
 cgiscalerdir = /var/www/localhost/cgi-bin/scaler
-noinst_HEADERS = cache.h cgiscaler.h debug.h file_utils.h geometry_math.h \
-	query_string.h serve.h
+noinst_HEADERS = cache.h cgiscaler.h commandline.h debug.h file_utils.h \
+	geometry_math.h query_string.h serve.h
 
-cgiscaler_SOURCES = cache.c cgiscaler.c debug.c file_utils.c geometry_math.c \
-	main.c query_string.c serve.c
+cgiscaler_SOURCES = cache.c cgiscaler.c commandline.c debug.c file_utils.c \
+	geometry_math.c main.c query_string.c serve.c
 
 AM_CFLAGS = -Wall -lMagick -lWand
 all: all-am
@@ -261,6 +262,7 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cache.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cgiscaler.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/commandline.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/debug.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/file_utils.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/geometry_math.Po@am__quote@
