@@ -26,12 +26,14 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
+#include <sys/time.h>
 
 #include "debug.h"
 #include "config.h"
 
 int debug_file_fd;
 int debug_on;
+pid_t pid;
 
 void debug_start(char *file) {
 #ifdef DEBUG
@@ -46,6 +48,8 @@ void debug_start(char *file) {
 		debug_on = 0;
 		return;	
 	}
+
+	pid = getpid();
 	debug_on = 1;
 
 	debug(">>>>", "Starting debug");
@@ -68,8 +72,9 @@ void debug_stop() {
 
 void debug(const char *level, const char *fmt, ...) {
 #ifdef DEBUG
-	int size = 40, msg_len;
+	int size = 40, msg_len, full_msg_len, full_msg_buff_len = 80;
 	char *msg, *new_msg;
+	char *full_msg;
 	va_list ap;
 
 	if (!debug_on)
@@ -101,10 +106,39 @@ void debug(const char *level, const char *fmt, ...) {
 		va_end(ap);
 	}
 
+/*
 	write(debug_file_fd, level, strlen(level));
 	write(debug_file_fd, ": ", 2);
 	write(debug_file_fd, msg, msg_len);
 	write(debug_file_fd, "\n", 1);
+*/
+
+	/* we are allocating initial file name buffer */
+	full_msg = malloc(full_msg_buff_len);
+	if (!full_msg)
+		exit(66);
+
+	/* now we will loop until snprintf will return less than our buffer size */
+	while (1) {
+		full_msg_len = snprintf(full_msg, full_msg_buff_len, "%i %s: %s\n", pid, level, msg);
+	
+		/* it worked, we have less then full_msg_buff_len */
+		if (full_msg_len > -1 && full_msg_len < full_msg_buff_len)
+			break;
+		
+		/* we have more then full_msg_buff_len */
+		if (full_msg_len > -1)
+			full_msg_buff_len = full_msg_len + 1;
+		else
+			full_msg_buff_len *= 2;
+	
+		/* re-size to add more space */
+		if ((full_msg = realloc(full_msg, full_msg_buff_len)) == NULL)
+			exit(66);
+	}
+
+	write(debug_file_fd, full_msg, full_msg_len);
+
 #ifdef DEBUG_SYNC
 	fsync(debug_file_fd);
 #endif
