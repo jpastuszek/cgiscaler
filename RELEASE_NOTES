@@ -1,5 +1,17 @@
 CGIscaler release notes:
 
+- Bug Fix Release v0.2
+	Bug Fixes:
+		- fixed single character directory name not recreated in caching directory
+		- fixed stdout capturing tests on Solaris - they will now be synchronised with main process properly
+		- fixed unlinking problem during tests on Solaris
+	Additions:
+		- simple profiling info in debug output (image load time and re-size time)
+		- pid no. in debug output
+	Known Issues:
+		- building may not work properly with older autotools
+		- pixel color tests may fail with different ImageMagick builds and versions
+
 - Initial Release v0.1
 	Features:
 		- strict scaling

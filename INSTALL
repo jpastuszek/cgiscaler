@@ -46,7 +46,7 @@ Without sudo support:
     cp src/cgiscaler /var/www/localhost/cgi-bin
 
   Prelink with libraries if prelink available:
-    prelink --random --force  /var/www/localhost/cgi-bin/cgiscaler
+    prelink --random /var/www/localhost/cgi-bin/cgiscaler
 
   Reload Apache:
     /etc/init.d/apache reload
@@ -66,7 +66,7 @@ With sudo support:
     chown kazuya:users /var/www/localhost/cgi-bin/scaler/cgiscaler
 
   Prelink with libraries if prelink available:
-    prelink --random --force  /var/www/localhost/cgi-bin/scaler/cgiscaler
+    prelink --random /var/www/localhost/cgi-bin/scaler/cgiscaler
 
   Reload Apache:
     /etc/init.d/apache reload
