@@ -26,99 +26,58 @@
 #include "debug.h"
 #include "config.h"
 
-char *get_query_string_param(char *qurey_string, char *param_name);
-
 /* TODO: %xx in query string decoding... no need for filename? */
 
-struct query_params *alloc_default_query_params() {
-	struct query_params *params;
-	params = malloc(sizeof(struct query_params));
-	if (!params)
-		exit(66);
-
-	params->file_name = 0;
-	params->size.w = DEFAULT_WIDTH;
-	params->size.h = DEFAULT_HEIGHT;
-	params->strict = DEFAULT_STRICT;
-	params->lowq = DEFAULT_LOWQ;
-
-	return params;
-}
-
-void free_query_params(struct query_params *query_params) {
-	free(query_params->file_name);
-	free(query_params);
-}
-
-struct query_params *get_query_params(char *file_name, char *query_string) {
+void apply_query_string_config(struct runtime_config *config, char *file_name, char *query_string) {
 	char *w;
 	char *h;
 	char *s;
 	char *lowq;
 
-	struct query_params *params;
-
 	/* strange env... failing */
-	if (!query_string || !file_name)
-		return 0;
+	if (!config || !file_name)
+		return;
 
-	file_name = make_file_name_relative(file_name);
+	debug(DEB, "Processing query file name: '%s'", file_name);
 
-	/* bad file name */
-	if (!file_name)
-		return 0;
-	/* empty file_name... failing */
-	if (file_name[0] == 0)
-		return 0;
-
-	if (check_for_double_dot(file_name)) {
-		debug(WARN, "Double dot found in file name! failing...");
-		free(file_name);
-		return 0;
-	}
+	file_name = sanitize_file_path(file_name);
+	if (file_name)
+		config->file_name = file_name;
 
 	debug(DEB, "Processing query string: '%s' target name: '%s'", query_string, file_name);
 
-	w = get_query_string_param(query_string, WIDTH_PARAM);
-	h = get_query_string_param(query_string, HEIGHT_PARAM);
-	s = get_query_string_param(query_string, STRICT_PARAM);
-	lowq = get_query_string_param(query_string, LOWQ_PARAM);
-
-	/* now we set all qurey_param fields */
-	params = alloc_default_query_params();
-
-	params->file_name = file_name;
+	w = get_query_string_param(query_string, QUERY_WIDTH_PARAM);
+	h = get_query_string_param(query_string, QUERY_HEIGHT_PARAM);
+	s = get_query_string_param(query_string, QUERY_STRICT_PARAM);
+	lowq = get_query_string_param(query_string, QUERY_LOWQ_PARAM);
 
 	if (w) {
-		params->size.w = atoi(w);
+		config->size.w = atoi(w);
 		free(w);
 	}
 
 	if (h) {
-		params->size.h = atoi(h);
+		config->size.h = atoi(h);
 		free(h);
 	}
 
 	if (s) {
-		if (!strcmp(s, TRUE_PARAM_VAL))
-			params->strict = 1;
+		if (!strcmp(s, QUERY_TRUE_VAL))
+			config->strict = 1;
 		else
-			params->strict = 0;
+			config->strict = 0;
 		free(s);
 	}
 
 	if (lowq) {
-		if (!strcmp(lowq, TRUE_PARAM_VAL))
-			params->lowq = 1;
-		else
-			params->lowq = 0;
+		if (!strcmp(lowq, QUERY_TRUE_VAL))
+			config->quality = LOWQ_QUALITY;
 		free(lowq);
 	}
 
-	debug(DEB, "Params: file: '%s', size w: %d h: %d, strict: %d lowq: %d", params->file_name, params->size.w, params->size.h, params->strict, params->lowq);
+	debug(DEB, "Run-time conifg after query string: file: '%s', size w: %d h: %d, strict: %d quality: %d", config->file_name, config->size.w, config->size.h, config->strict, config->quality);
 
-	/* we don't free file_name as it is used in param structure and will be freed on free_query_params */
-	return params;
+	/* we don't free file_name as it is used in param structure and will be freed on free_runtime_config */
 }
 
 /* it could be probably implemented with scanf sort of functions */

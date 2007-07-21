@@ -25,5 +25,5 @@
 #define MTIME_DIFFER 4
 #define CACHE_OK 0
 
-int check_if_cached(struct query_params *params);
-int write_blob_to_cache(unsigned char *blob, int blob_len, struct query_params *params);
+int check_if_cached(char *media_file_path, char *cache_file_path);
+int write_blob_to_cache(unsigned char *blob, int blob_len, char *media_file_path, char *cache_file_path);

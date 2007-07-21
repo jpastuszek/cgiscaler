@@ -22,36 +22,55 @@
 #define DEBUG_FILE "/tmp/cgiscaler_test.deb"
 //#define DEBUG_SYNC
 
-#define IMAGE_TEST_FILE "quick_gimp_pattern_test.png"
-#define IMAGE_TEST_FILE_WIDTH 450
-#define IMAGE_TEST_FILE_HEIGHT 300
 
-#define WIDTH_PARAM "w"
-#define HEIGHT_PARAM "h"
-#define STRICT_PARAM "s"
-#define LOWQ_PARAM "wap"
+/* Default Run-time configuration (0 means false, 1 true) */
+#define DEFAULT_WIDTH 64
+#define DEFAULT_HEIGHT 64
+#define DEFAULT_STRICT 0
+#define DEFAULT_QUALITY 80
+#define DEFAULT_NO_CACHE 0
+#define DEFAULT_NO_SERVE 0
 
-#define TRUE_PARAM_VAL "t"
 
+/* Command-line configuration */
+#define COMMANDLINE_WIDTH_SWITCH "w"
+#define COMMANDLINE_HEIGHT_SWITCH "h"
+#define COMMANDLINE_STRICT_SWITCH "s"
+#define COMMANDLINE_LOWQ_SWITCH "wap"
+
+#define COMMANDLINE_TRUE_VAL "true"
+
+/* CGI Query configuration */
+/* CGI Query parameter names */
+#define QUERY_WIDTH_PARAM "w"
+#define QUERY_HEIGHT_PARAM "h"
+#define QUERY_STRICT_PARAM "s"
+#define QUERY_LOWQ_PARAM "wap"
+
+/* CGI Query true value: what string will match as true */
+#define QUERY_TRUE_VAL "true"
+
+/* When LOWQ_PARAM/SWITCH=TRUE_VAL output data will use this compression parameter (0-100 best) or else DEFAULT_QUALITY will be used */
+#define LOWQ_QUALITY 20
+
+/* Path to media source directory (note tailing / char)*/
 #define MEDIA_PATH "tests/"
+/* Path were to write cache files (note tailing / char) */
 #define CACHE_PATH "/tmp/"
 
+/* output format (ex. JPEG, GIF, PNG) */
 #define OUT_FORMAT "JPEG"
+#define OUT_FORMAT_EXTENSION "jpg"
+/* Mime-type to match output format - will be send in HTTP headers */
 #define OUT_FORMAT_MIME_TYPE "image/jpeg"
 
 #define ERROR_FILE_PATH "quick_gimp_pattern_test.gif"
 #define ERROR_FILE_MIME_TYPE "image/jpeg"
 #define ERROR_FAILBACK_MESSAGE "[Error and error image not found]\n"
 
-#define LOWQ_QUALITY 20
-#define NORMAL_QUALITY 80
-
-/* some defults (0 means false, 1 true) */
-#define DEFAULT_WIDTH 64
-#define DEFAULT_HEIGHT 32
-#define DEFAULT_STRICT 1
-#define DEFAULT_LOWQ 0
-
+#define IMAGE_TEST_FILE "quick_gimp_pattern_test.png"
+#define IMAGE_TEST_FILE_WIDTH 450
+#define IMAGE_TEST_FILE_HEIGHT 300
 
 /* Possible resize filters 
     BesselFilter   BlackmanFilter   BoxFilter

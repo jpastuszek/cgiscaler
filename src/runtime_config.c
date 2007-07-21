@@ -18,9 +18,29 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include <stdlib.h>
 #include "runtime_config.h"
+#include "config.h"
 
-void apply_query_string_config(struct runtime_config *config, char *file_name, char *query_string);
+struct runtime_config *alloc_default_runtime_config() {
+	struct runtime_config *config;
+	config = malloc(sizeof(struct runtime_config));
+	if (!config)
+		exit(66);
 
-/* private - exported for tests */
-char *get_query_string_param(char *query_string, char *param_name);
+	config->file_name = 0;
+	config->size.w = DEFAULT_WIDTH;
+	config->size.h = DEFAULT_HEIGHT;
+	config->strict = DEFAULT_STRICT;
+	config->quality = DEFAULT_QUALITY;
+	config->no_cache = DEFAULT_NO_CACHE;
+	config->no_serve = DEFAULT_NO_SERVE;
+
+	return config;
+}
+
+void free_runtime_config(struct runtime_config *config) {
+	if (config->file_name)
+		free(config->file_name);
+	free(config);
+}

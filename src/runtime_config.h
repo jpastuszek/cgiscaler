@@ -18,9 +18,21 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include "runtime_config.h"
+#ifndef RUNTIME_CONFIG_H 
+#define RUNTIME_CONFIG_H
 
-void apply_query_string_config(struct runtime_config *config, char *file_name, char *query_string);
+#include "geometry_math.h"
 
-/* private - exported for tests */
-char *get_query_string_param(char *query_string, char *param_name);
+struct runtime_config {
+	char *file_name;
+	struct dimensions size;
+	int strict;
+	int quality;
+	int no_cache;
+	int no_serve;
+};
+
+struct runtime_config *alloc_default_runtime_config();
+void free_runtime_config(struct runtime_config *config);
+
+#endif

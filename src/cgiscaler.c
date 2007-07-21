@@ -56,33 +56,26 @@ MagickWand *remove_transparency(MagickWand *image);
 /* TODO: Performance tests... profiler? :D */
 
 /* Loads image, strips meta-data and sets it's default bg color */
-MagickWand *load_image(char *file_name) {
-	char *path;
+MagickWand *load_image(char *file_path) {
 	MagickWand *image;
 	MagickBooleanType status;
 	struct timer timeing;	
 
-	path = create_media_file_path(file_name);
-
-	debug(DEB,"Loading image: '%s'", path);
+	debug(DEB,"Loading image: '%s'", file_path);
 	timer_start(&timeing);
 
 	image = NewMagickWand();
 	if (!image) {
 		debug(ERR, "Creating new magick wand failed!");
-		free(path);
 		return 0;
 	}
 
-	status = MagickReadImage(image, path);
+	status = MagickReadImage(image, file_path);
 	if (status == MagickFalse) {
-		debug(WARN,"Loading image '%s' failed", path);
+		debug(WARN,"Loading image '%s' failed", file_path);
 		DestroyMagickWand(image);
-		free(path);
 		return 0;
 	}
-
-	free(path);
 
 	debug(PROF, "Loading took %.3f s",  timer_stop(&timeing));
 

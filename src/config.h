@@ -26,14 +26,37 @@
 /* debug file path if debugging enabled */
 #define DEBUG_FILE "/tmp/cgiscaler.gallery.deb"
 
-/* URL Query parameter names */
-#define WIDTH_PARAM "w"
-#define HEIGHT_PARAM "h"
-#define STRICT_PARAM "s"
-#define LOWQ_PARAM "wap"
 
-/* URL Query true value: what string will match as true */
-#define TRUE_PARAM_VAL "true"
+/* Default Run-time configuration (0 means false, 1 true) */
+#define DEFAULT_WIDTH 64
+#define DEFAULT_HEIGHT 64
+#define DEFAULT_STRICT 0
+#define DEFAULT_QUALITY 80
+#define DEFAULT_NO_CACHE 0
+#define DEFAULT_NO_SERVE 0
+
+
+/* Command-line configuration */
+#define COMMANDLINE_WIDTH_SWITCH "w"
+#define COMMANDLINE_HEIGHT_SWITCH "h"
+#define COMMANDLINE_STRICT_SWITCH "s"
+#define COMMANDLINE_LOWQ_SWITCH "wap"
+
+#define COMMANDLINE_TRUE_VAL "true"
+
+/* CGI Query configuration */
+/* CGI Query parameter names */
+#define QUERY_WIDTH_PARAM "w"
+#define QUERY_HEIGHT_PARAM "h"
+#define QUERY_STRICT_PARAM "s"
+#define QUERY_LOWQ_PARAM "wap"
+
+/* CGI Query true value: what string will match as true */
+#define QUERY_TRUE_VAL "true"
+
+/* When LOWQ_PARAM/SWITCH=TRUE_VAL output data will use this compression parameter (0-100 best) or else DEFAULT_QUALITY will be used */
+#define LOWQ_QUALITY 20
+
 
 /* Path to media source directory (note tailing / char)*/
 #define MEDIA_PATH "/home/kazuya/Projects/Gallery/public/system/photos/"
@@ -42,6 +65,7 @@
 
 /* output format (ex. JPEG, GIF, PNG) */
 #define OUT_FORMAT "JPEG"
+#define OUT_FORMAT_EXTENSION "jpg"
 /* Mime-type to match output format - will be send in HTTP headers */
 #define OUT_FORMAT_MIME_TYPE "image/jpeg"
 
@@ -52,16 +76,6 @@
 /* Message that will be sent as plain text in case of error and no ERROR_FILE_PATH exists */
 #define ERROR_FAILBACK_MESSAGE "[Error and error image not found]\n"
 
-/* When LOWQ_PARAM=TRUE_PARAM_VAL output data will use this compression parameter (0-100 best) */
-#define LOWQ_QUALITY 20
-/* Use this quality when creating thumbnails */
-#define NORMAL_QUALITY 80
-
-/* some defults (0 means false, 1 true) */
-#define DEFAULT_WIDTH 64
-#define DEFAULT_HEIGHT 64
-#define DEFAULT_STRICT 0
-#define DEFAULT_LOWQ 0
 
 /* Possible re-size filters
     BesselFilter   BlackmanFilter   BoxFilter

@@ -42,36 +42,39 @@ char *create_media_file_path(char *file_name) {
 }
 
 /* Returns allocated cache file name string */
-char *create_cache_file_path(struct query_params *params) {
-	char *file_name;
-	int file_name_len, file_name_buff_len = 44;
+char *create_cache_file_path(char *file_name, char *file_extension, int w, int h, int strict, int quality) {
+	char *cache_file_name;
+	int cache_file_name_len, cache_file_name_buff_len = 40;
 
 	/* we are allocating initial file name buffer */
-	file_name = malloc(file_name_buff_len);
-	if (!file_name)
+	cache_file_name = malloc(cache_file_name_buff_len);
+	if (!cache_file_name)
 		exit(66);
 
 	/* now we will loop until snprintf will return less than our buffer size */
 	while (1) {
-		file_name_len = snprintf(file_name, file_name_buff_len, "%s%s-%u-%u-%u-%u", CACHE_PATH, params->file_name, params->size.w, params->size.h, params->strict, params->lowq);
+		cache_file_name_len = snprintf(cache_file_name, cache_file_name_buff_len, "%s%s-%d-%d-%d-%d.%s", CACHE_PATH, file_name, w, h, strict, quality, file_extension);
 	
 		/* it worked, we have less then file_name_buff_len */
-		if (file_name_len > -1 && file_name_len < file_name_buff_len)
+		if (cache_file_name_len > -1 && cache_file_name_len < cache_file_name_buff_len)
 			break;
 		
-		/* we have more then file_name_buff_len */
-		if (file_name_len > -1)
-			file_name_buff_len = file_name_len + 1;
+		/* if we have a valure -> alloc precise else double buffer len */
+		if (cache_file_name_len > -1)
+			cache_file_name_buff_len = cache_file_name_len + 1;
 		else
-			file_name_buff_len *= 2;
+			cache_file_name_buff_len *= 2;
 	
+		debug(DEB, "## reallocing to: %d", cache_file_name_buff_len);
+
 		/* re-size to add more space */
-		if ((file_name = realloc(file_name, file_name_buff_len)) == NULL)
+		cache_file_name = realloc(cache_file_name, cache_file_name_buff_len);
+		if (!cache_file_name)
 			exit(66);
 	}
 
-	debug(DEB, "Cache file name entry: '%s'", file_name);
-	return file_name;
+	debug(DEB, "Cache file name entry: '%s'", cache_file_name);
+	return cache_file_name;
 }
 
 int create_cache_dir_struct(char *file_path) {
@@ -139,6 +142,27 @@ time_t get_file_mtime(char *path) {
 	if (stat(path, &s) == -1)
 		return 0;
 	return s.st_mtime;
+}
+
+char *sanitize_file_path(char *file_path) {
+	file_path = make_file_name_relative(file_path);
+
+	/* bad file name */
+	if (!file_path)
+		return 0;
+	/* empty file_name... failing */
+	if (file_path[0] == 0) {
+		free(file_path);
+		return 0;
+	}
+
+	if (check_for_double_dot(file_path)) {
+		debug(WARN, "Double dot found in file path! failing...");
+		free(file_path);
+		return 0;
+	}
+
+	return file_path;
 }
 
 /* Returns relative file path (no beginning /) */

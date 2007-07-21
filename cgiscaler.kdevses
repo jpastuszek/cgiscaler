@@ -1,28 +1,40 @@
 <?xml version = '1.0' encoding = 'UTF-8'?>
 <!DOCTYPE KDevPrjSession>
 <KDevPrjSession>
- <DocsAndViews NumberOfDocuments="7" >
-  <Doc0 NumberOfViews="1" URL="file:///home/kazuya/Projects/CGIScaler/src/config.h" >
-   <View0 Encoding="" line="29" Type="Source" />
+ <DocsAndViews NumberOfDocuments="11" >
+  <Doc0 NumberOfViews="1" URL="file:///home/kazuya/Projects/CGIScaler/src/main.c" >
+   <View0 Encoding="" line="112" Type="Source" />
   </Doc0>
-  <Doc1 NumberOfViews="1" URL="file:///home/kazuya/Projects/CGIScaler/src/main.c" >
-   <View0 Encoding="" line="47" Type="Source" />
+  <Doc1 NumberOfViews="1" URL="file:///home/kazuya/Projects/CGIScaler/tests/test.c" >
+   <View0 Encoding="" line="631" Type="Source" />
   </Doc1>
-  <Doc2 NumberOfViews="1" URL="file:///home/kazuya/Projects/CGIScaler/src/query_string.c" >
-   <View0 Encoding="" line="105" Type="Source" />
+  <Doc2 NumberOfViews="1" URL="file:///home/kazuya/Projects/CGIScaler/tests/test_config.h" >
+   <View0 Encoding="" line="15" Type="Source" />
   </Doc2>
-  <Doc3 NumberOfViews="1" URL="file:///home/kazuya/Projects/CGIScaler/src/query_string.h" >
-   <View0 Encoding="" line="25" Type="Source" />
+  <Doc3 NumberOfViews="1" URL="file:///home/kazuya/Projects/CGIScaler/src/cache.c" >
+   <View0 Encoding="" line="71" Type="Source" />
   </Doc3>
-  <Doc4 NumberOfViews="1" URL="file:///home/kazuya/Projects/CGIScaler/src/file_utils.c" >
-   <View0 Encoding="" line="0" Type="Source" />
+  <Doc4 NumberOfViews="1" URL="file:///home/kazuya/Projects/CGIScaler/src/cache.h" >
+   <View0 Encoding="" line="15" Type="Source" />
   </Doc4>
-  <Doc5 NumberOfViews="1" URL="file:///home/kazuya/Projects/CGIScaler/src/commandline.h" >
-   <View0 Encoding="" line="22" Type="Source" />
+  <Doc5 NumberOfViews="1" URL="file:///home/kazuya/Projects/CGIScaler/src/runtime_config.h" >
+   <View0 Encoding="" line="35" Type="Source" />
   </Doc5>
-  <Doc6 NumberOfViews="1" URL="file:///home/kazuya/Projects/CGIScaler/src/commandline.c" >
-   <View0 Encoding="" line="63" Type="Source" />
+  <Doc6 NumberOfViews="1" URL="file:///home/kazuya/Projects/CGIScaler/src/query_string.h" >
+   <View0 Encoding="" line="25" Type="Source" />
   </Doc6>
+  <Doc7 NumberOfViews="1" URL="file:///home/kazuya/Projects/CGIScaler/src/file_utils.h" >
+   <View0 Encoding="" line="31" Type="Source" />
+  </Doc7>
+  <Doc8 NumberOfViews="1" URL="file:///home/kazuya/Projects/CGIScaler/src/file_utils.c" >
+   <View0 Encoding="" line="75" Type="Source" />
+  </Doc8>
+  <Doc9 NumberOfViews="1" URL="file:///home/kazuya/Projects/CGIScaler/src/query_string.c" >
+   <View0 Encoding="" line="30" Type="Source" />
+  </Doc9>
+  <Doc10 NumberOfViews="1" URL="file:///home/kazuya/Projects/CGIScaler/src/serve.h" >
+   <View0 Encoding="" line="25" Type="Source" />
+  </Doc10>
  </DocsAndViews>
  <pluginList>
   <kdevdebugger>
@@ -35,17 +47,27 @@
     <file line="45" url="INSTALL" col="0" encoding="" />
    </projectview>
    <projectview name="Test writting session" >
-    <file line="366" url="tests/test.c" col="0" encoding="" />
-    <file line="24" url="tests/test_config.h" col="25" encoding="" />
+    <file line="52" url="src/main.c" col="0" encoding="" />
+    <file line="258" url="tests/test.c" col="0" encoding="" />
+    <file line="24" url="tests/test_config.h" col="0" encoding="" />
     <file line="37" url="src/cache.c" col="29" encoding="" />
     <file line="2" url="src/cache.h" col="18" encoding="" />
-    <file line="40" url="src/main.c" col="46" encoding="" />
+    <file line="35" url="src/runtime_config.h" col="24" encoding="" />
+    <file line="25" url="src/query_string.h" col="67" encoding="" />
+    <file line="31" url="src/file_utils.h" col="34" encoding="" />
+    <file line="33" url="src/file_utils.c" col="0" encoding="" />
+    <file line="30" url="src/query_string.c" col="0" encoding="" />
    </projectview>
    <projectview name="coding" >
+    <file line="0" url="src/debug.h" col="0" encoding="" />
     <file line="83" url="src/cgiscaler.c" col="0" encoding="" />
     <file line="21" url="src/config.h" col="0" encoding="" />
     <file line="127" url="src/debug.c" col="27" encoding="" />
-    <file line="39" url="src/debug.h" col="0" encoding="" />
+    <file line="8" url="src/query_string.h" col="33" encoding="" />
+    <file line="2" url="src/commandline.h" col="29" encoding="" />
+    <file line="28" url="src/commandline.c" col="10" encoding="" />
+    <file line="32" url="src/query_string.c" col="10" encoding="" />
+    <file line="45" url="src/main.c" col="6" encoding="" />
    </projectview>
    <defaultview name="" />
   </kdevfilelist>
@@ -56,9 +78,8 @@
   <kdevbookmarks>
    <bookmarks>
     <bookmark url="/home/kazuya/Projects/CGIScaler/tests/test.c" >
-     <mark line="903" />
-     <mark line="853" />
-     <mark line="167" />
+     <mark line="835" />
+     <mark line="684" />
     </bookmark>
    </bookmarks>
   </kdevbookmarks>
@@ -67,7 +88,7 @@
   </kdevsubversion>
   <kdevvalgrind>
    <executable path="" params="" />
-   <valgrind path="" params="" />
+   <valgrind path="valgrind" params=" --tool=memcheck --leak-check=yes" />
    <calltree path="" params="" />
    <kcachegrind path="" />
   </kdevvalgrind>

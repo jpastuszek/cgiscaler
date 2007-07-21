@@ -20,7 +20,4 @@
 
 #include "runtime_config.h"
 
-void apply_query_string_config(struct runtime_config *config, char *file_name, char *query_string);
-
-/* private - exported for tests */
-char *get_query_string_param(char *query_string, char *param_name);
+void apply_commandline_config(struct runtime_config *config, int argc, char *argv[]);

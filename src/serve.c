@@ -166,13 +166,8 @@ void serve_from_blob(unsigned char *blob, size_t blob_len, char *mime_type) {
 Serves image from cache file
 Returns: 1 on success 0 when no proper cache file or read failure 
 */
-int serve_from_cache(struct query_params *params, char *mime_type) {
-	char *cache_file_path;
-	int ret;
-
-	cache_file_path = create_cache_file_path(params);
+int serve_from_cache_file(char *media_file_path, char *cache_file_path, char *mime_type) {
 	debug(DEB,"Trying cache file: '%s'", cache_file_path);
-
 /*
 Logick:
 _ _
@@ -183,14 +178,13 @@ O C M
 1 0 0 - rm, exit
 0 0 1 - rm, exit
 0 0 0 - serve
-u*/
+*/
 
-	switch (check_if_cached(params)) {
+	switch (check_if_cached(media_file_path, cache_file_path)) {
 		/* we don't have cache file or both... returning */
 		case NO_CACHE:
 		case NO_CACHE | NO_ORIG:
 			debug(DEB, "No cache file");
-			free(cache_file_path);
 			return 0;
 
 		/* we don't have orig or cache file old... remove cache file and return */
@@ -198,18 +192,12 @@ u*/
 		case MTIME_DIFFER:
 			debug(DEB, "No original or mtime with original differ");
 			remove_cache_file(cache_file_path);
-			free(cache_file_path);
 			return 0;
 	}
 
 	/* serve */
-	debug(DEB,"Serving from cache file: '%s'", cache_file_path);
-	
-	ret = serve_from_file(cache_file_path, mime_type);
-
-	free(cache_file_path);
-
-	return ret;
+	debug(DEB,"Serving from cache");
+	return serve_from_file(cache_file_path, mime_type);
 }
 
 void remove_cache_file(char *cache_file_path) {
@@ -222,9 +210,7 @@ void remove_cache_file(char *cache_file_path) {
 void serve_error() {
 	char *file_path;
 
-	file_path = malloc(strlen(MEDIA_PATH) + strlen(ERROR_FILE_PATH) + 1);
-	strcpy(file_path, MEDIA_PATH);
-	strcat(file_path, ERROR_FILE_PATH);
+	file_path = create_media_file_path(ERROR_FILE_PATH);
 
 	debug(DEB,"Serving error image: '%s'", file_path);
 	if (!serve_from_file(file_path, ERROR_FILE_MIME_TYPE))

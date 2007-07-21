@@ -6,7 +6,7 @@ INCLUDES = $(all_includes)
 cgiscalerdir = /var/www/localhost/cgi-bin/scaler
 cgiscaler_PROGRAMS = cgiscaler
 noinst_HEADERS = cache.h cgiscaler.h commandline.h debug.h file_utils.h \
-	geometry_math.h query_string.h serve.h
+	geometry_math.h query_string.h runtime_config.h serve.h
 cgiscaler_SOURCES = cache.c cgiscaler.c commandline.c debug.c file_utils.c \
-	geometry_math.c main.c query_string.c serve.c
+	geometry_math.c main.c query_string.c runtime_config.c serve.c
 AM_CFLAGS = -Wall -lMagick -lWand

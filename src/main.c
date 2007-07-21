@@ -23,82 +23,99 @@
 #include "commandline.h"
 #include "serve.h"
 #include "cache.h"
+#include "file_utils.h"
 #include "config.h"
 #include "debug.h"
 
 /* this is main function, for simplicity we don't want exits at any other point (expect [m|rw]alloc related) */
 int main(int argc, char *argv[])
 {
-	struct query_params *params;
-	MagickWand *magick_wand;
+	struct runtime_config *config;
+	char *cache_file_path;
+	char *media_file_path;
+	MagickWand *image;
 	unsigned char *blob;
 	size_t blob_len;
-	int quality;
 
 	debug_start(DEBUG_FILE);
 	/* stop debugging on exit */
 	atexit(debug_stop);
 	
-	params = get_query_params(getenv("PATH_INFO"), getenv("QUERY_STRING"));
-	if (!params) {
-		params = get_query_params_from_commandline(argc, argv);
-		if (!params) {
-			serve_error();
-			exit(70);
-		}
+	config = alloc_default_runtime_config();
+
+	apply_commandline_config(config, argc, argv);
+	apply_query_string_config(config, getenv("PATH_INFO"), getenv("QUERY_STRING"));
+
+	if (!config->file_name) {
+		serve_error();
+		exit(70);
 	}
-	
+
+	media_file_path = create_media_file_path(config->file_name);
+	cache_file_path = create_cache_file_path(config->file_name, OUT_FORMAT_EXTENSION, config->size.w, config->size.h, config->strict, config->quality);
+
 	/* if we have served from cache OK... cleanup and exit success */
-	if (serve_from_cache(params, OUT_FORMAT_MIME_TYPE)) {
-		free_query_params(params);
+	if (serve_from_cache_file(media_file_path, cache_file_path, OUT_FORMAT_MIME_TYPE)) {
+		free(cache_file_path);
+		free(media_file_path);
+		free_runtime_config(config);
 		exit(0);
 	}
+
 
 	/* now we need ImageMagick after this we should terminate ImgeMagick afterwards */
 	MagickWandGenesis();
 
 	/* loading image... if it fails wand will be 0 */
-	magick_wand = load_image(params->file_name);
-	if (!magick_wand) {
-		free_query_params(params);
+	image = load_image(media_file_path);
+	if (!image) {
 		serve_error();
+		free(cache_file_path);
+		free(media_file_path);
+		free_runtime_config(config);
 		MagickWandTerminus();
 		exit(71);
 	}
 
 	/* according to strict value we are resizing or cropresizing... if fails wand == 0 */
-	if (params->strict)
-		magick_wand = strict_resize(magick_wand, params->size);
+	if (config->strict)
+		image = strict_resize(image, config->size);
 	else
-		magick_wand = fit_resize(magick_wand, params->size);
-	if (!magick_wand) {
-		free_query_params(params);
+		image = fit_resize(image, config->size);
+	if (!image) {
 		serve_error();
+		free(cache_file_path);
+		free(media_file_path);
+		free_runtime_config(config);
 		MagickWandTerminus();
 		exit(72);
 	}
 
-	if (params->lowq)
-		quality = LOWQ_QUALITY;
-	else
-		quality = NORMAL_QUALITY;
-
-	blob = prepare_blob(magick_wand, quality, &blob_len, OUT_FORMAT);
+	blob = prepare_blob(image, config->quality, &blob_len, OUT_FORMAT);
 	if (!blob) {
-		free_query_params(params);
 		serve_error();
+		free(cache_file_path);
+		free(media_file_path);
+		free_runtime_config(config);
+		free_image(image);
 		MagickWandTerminus();
 		exit(73);
 	}
 
+	/* image processing is done */
+
 	serve_from_blob(blob, blob_len, OUT_FORMAT_MIME_TYPE);
 
-	write_blob_to_cache(blob, blob_len, params);
+	/* as we are served it is time for cache file write and clean up */
+	free_image(image);
+	MagickWandTerminus();
+
+	write_blob_to_cache(blob, blob_len, media_file_path, cache_file_path);
 
 	free_blob(blob);
-	free_image(magick_wand);
-	free_query_params(params);
-	MagickWandTerminus();
+	free(media_file_path);
+	free(cache_file_path);
+	free_runtime_config(config);
 
 	return EXIT_SUCCESS;
 }

@@ -18,9 +18,57 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include "runtime_config.h"
+#include <string.h>
+#include <stdlib.h>
 
-void apply_query_string_config(struct runtime_config *config, char *file_name, char *query_string);
+#include "commandline.h"
+#include "file_utils.h"
+#include "config.h"
+#include "debug.h"
 
-/* private - exported for tests */
-char *get_query_string_param(char *query_string, char *param_name);
+void apply_commandline_config(struct runtime_config *config, int argc, char *argv[]) {
+	int i;
+	char *file_name;
+
+	if (argc <= 1)
+		return;
+
+	for (i = 1; i < argc; i++) {
+		if (argv[i][0] == '-') {
+			if (!strcmp(argv[i] + 1, COMMANDLINE_WIDTH_SWITCH)) {
+				if (argc - i <= 1) {
+					debug(ERR, "Expected integer for width parameter");
+					return;
+				}
+
+				config->size.w = atoi(argv[i+1]);
+
+				i++;
+				continue;
+			}
+
+			if (!strcmp(argv[i] + 1, COMMANDLINE_HEIGHT_SWITCH)) {
+				if (argc - i <= 1) {
+					debug(ERR, "Expected integer for heigth parameter");
+					return;
+				}
+
+				config->size.h = atoi(argv[i+1]);
+
+				i++;
+				continue;
+			}
+		}
+
+		if (config->file_name) {
+			debug(ERR, "Non-switch parameter where file name already defined");
+			return;
+		}
+
+		file_name = sanitize_file_path(argv[i]);
+		if (file_name)
+			config->file_name = file_name;
+	}
+
+	debug(DEB, "Run-time config after command line: file: file: '%s', size w: %d h: %d, strict: %d quality: %d", config->file_name, config->size.w, config->size.h, config->strict, config->quality);
+}

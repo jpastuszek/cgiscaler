@@ -41,29 +41,18 @@ Returns bit-mask:
 or
 	CACHE_OK original file mtime is same as cache file mtime
 */
-int check_if_cached(struct query_params *params) {
-	char *cache_file_path;
-	char *orginal_file_path;
+int check_if_cached(char *media_file_path, char *cache_file_path) {
 	int orginal_mtime, cache_mtime;
 
 	debug(DEB, "Checking cache");
-
-	orginal_file_path = malloc(strlen(MEDIA_PATH) + strlen(params->file_name) + 1);
-	strcpy(orginal_file_path, MEDIA_PATH);
-	strcat(orginal_file_path, params->file_name);
-
-	cache_file_path = create_cache_file_path(params);
 	
-	debug(DEB, "Original file path: '%s' cache file path: '%s'", orginal_file_path, cache_file_path);
+	debug(DEB, "Original media file path: '%s' cache file path: '%s'", media_file_path, cache_file_path);
 
 
-	orginal_mtime = get_file_mtime(orginal_file_path);
+	orginal_mtime = get_file_mtime(media_file_path);
 	cache_mtime = get_file_mtime(cache_file_path);
 
-	free(orginal_file_path);
-	free(cache_file_path);
-
-	debug(DEB,"Original mtime: %d, Cache mtime: %d", orginal_mtime, cache_mtime);
+	debug(DEB,"Original media mtime: %d, Cache mtime: %d", media_file_path, cache_mtime);
 
 	if (!cache_mtime && !orginal_mtime)
 		return NO_ORIG | NO_CACHE;
@@ -80,45 +69,32 @@ int check_if_cached(struct query_params *params) {
 	return CACHE_OK;
 }
 
-int write_blob_to_cache(unsigned char *blob, int blob_len, struct query_params *params) {
-	char *file_path;
-	char *orginal_file_path;
+int write_blob_to_cache(unsigned char *blob, int blob_len, char *media_file_path, char *cache_file_path) {
 	time_t orginal_mtime;
 	struct utimbuf time_buf;
 
-	debug(DEB, "Writing cache file for image  '%s'", params->file_name);
+	debug(DEB, "Writing cache file for media file '%s'", media_file_path);
 
-	/* getting orginal file mtime */
-	orginal_file_path = malloc(strlen(MEDIA_PATH) + strlen(params->file_name) + 1);
-	strcpy(orginal_file_path, MEDIA_PATH);
-	strcat(orginal_file_path, params->file_name);
-
-	orginal_mtime = get_file_mtime(orginal_file_path);
+	orginal_mtime = get_file_mtime(media_file_path);
 	if (!orginal_mtime) {
 		debug(WARN, "No original file while writing BLOB to cache file!");
-		free(orginal_file_path);
 		return 0;
 	}
-
-	free(orginal_file_path);
 
 	/* writting cache file */
-	if (!create_cache_dir_struct(params->file_name)) {
-		debug(ERR, "Cannot create path structure for path: '%s'", params->file_name);
+	if (!create_cache_dir_struct(cache_file_path)) {
+		debug(ERR, "Cannot create path structure cache file: '%s'", cache_file_path);
 		return 0;
 	}
 
-	file_path = create_cache_file_path(params);
-	if (!write_blob_to_file(blob, blob_len, file_path)) {
-		debug(ERR, "Writing blob to file '%s' failed", file_path);
-		free(file_path);
+	if (!write_blob_to_file(blob, blob_len, cache_file_path)) {
+		debug(ERR, "Writing blob to file '%s' failed", cache_file_path);
 		return 0;
 	}
 	
 	/* setting mod time to */
 	time_buf.actime = time_buf.modtime = orginal_mtime;
-	utime(file_path, &time_buf);
+	utime(cache_file_path, &time_buf);
 
-	free(file_path);
 	return 1;
 }

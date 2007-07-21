@@ -50,7 +50,7 @@ PROGRAMS = $(cgiscaler_PROGRAMS)
 am_cgiscaler_OBJECTS = cache.$(OBJEXT) cgiscaler.$(OBJEXT) \
 	commandline.$(OBJEXT) debug.$(OBJEXT) file_utils.$(OBJEXT) \
 	geometry_math.$(OBJEXT) main.$(OBJEXT) query_string.$(OBJEXT) \
-	serve.$(OBJEXT)
+	runtime_config.$(OBJEXT) serve.$(OBJEXT)
 cgiscaler_OBJECTS = $(am_cgiscaler_OBJECTS)
 cgiscaler_LDADD = $(LDADD)
 DEFAULT_INCLUDES = -I. -I$(top_builddir)@am__isrc@
@@ -183,10 +183,10 @@ INCLUDES = $(all_includes)
 # the library search path.
 cgiscalerdir = /var/www/localhost/cgi-bin/scaler
 noinst_HEADERS = cache.h cgiscaler.h commandline.h debug.h file_utils.h \
-	geometry_math.h query_string.h serve.h
+	geometry_math.h query_string.h runtime_config.h serve.h
 
 cgiscaler_SOURCES = cache.c cgiscaler.c commandline.c debug.c file_utils.c \
-	geometry_math.c main.c query_string.c serve.c
+	geometry_math.c main.c query_string.c runtime_config.c serve.c
 
 AM_CFLAGS = -Wall -lMagick -lWand
 all: all-am
@@ -268,6 +268,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/geometry_math.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/main.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/query_string.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/runtime_config.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/serve.Po@am__quote@
 
 .c.o:
