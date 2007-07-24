@@ -28,7 +28,7 @@
 
 void apply_commandline_config(struct runtime_config *config, int argc, char *argv[]) {
 	int i;
-	char *file_name;
+	char *file_name = 0;
 
 	if (argc <= 1)
 		return;
@@ -58,17 +58,96 @@ void apply_commandline_config(struct runtime_config *config, int argc, char *arg
 				i++;
 				continue;
 			}
+
+			if (!strcmp(argv[i] + 1, COMMANDLINE_STRICT_SWITCH)) {
+				if (argc - i <= 1) {
+					debug(ERR, "Expected boolean parameter for strict");
+					return;
+				}
+
+				if (!strcmp(argv[i+1], COMMANDLINE_TRUE_VAL))
+					config->strict = 1;
+				else
+					config->strict = 0;
+
+				i++;
+				continue;
+			}
+
+			if (!strcmp(argv[i] + 1, COMMANDLINE_LOWQ_SWITCH)) {
+				if (argc - i <= 1) {
+					debug(ERR, "Expected boolean parameter for lowq");
+					return;
+				}
+
+				if (!strcmp(argv[i+1], COMMANDLINE_TRUE_VAL))
+					config->quality = LOWQ_QUALITY;
+				else
+					config->quality = DEFAULT_QUALITY;
+
+				i++;
+				continue;
+			}
+
+			if (!strcmp(argv[i] + 1, COMMANDLINE_NO_CACHE_SWITCH)) {
+				if (argc - i <= 1) {
+					debug(ERR, "Expected boolean parameter for no_cache");
+					return;
+				}
+
+				if (!strcmp(argv[i+1], COMMANDLINE_TRUE_VAL))
+					config->no_cache = 1;
+				else
+					config->no_cache = 0;
+
+				i++;
+				continue;
+			}
+
+			if (!strcmp(argv[i] + 1, COMMANDLINE_NO_SERVE_SWITCH)) {
+				if (argc - i <= 1) {
+					debug(ERR, "Expected boolean parameter for no_serve");
+					return;
+				}
+
+				if (!strcmp(argv[i+1], COMMANDLINE_TRUE_VAL))
+					config->no_serve = 1;
+				else
+					config->no_serve = 0;
+
+				i++;
+				continue;
+			}
+
+			if (!strcmp(argv[i] + 1, COMMANDLINE_NO_HEADERS_SWITCH)) {
+				if (argc - i <= 1) {
+					debug(ERR, "Expected boolean parameter for no_headers");
+					return;
+				}
+
+				if (!strcmp(argv[i+1], COMMANDLINE_TRUE_VAL))
+					config->no_headers = 1;
+				else
+					config->no_headers = 0;
+
+				i++;
+				continue;
+			}
+
 		}
 
-		if (config->file_name) {
+		if (file_name) {
 			debug(ERR, "Non-switch parameter where file name already defined");
 			return;
 		}
 
 		file_name = sanitize_file_path(argv[i]);
-		if (file_name)
+		if (file_name) {
+			if (config->file_name)
+				free(config->file_name);
 			config->file_name = file_name;
+		}
 	}
 
-	debug(DEB, "Run-time config after command line: file: file: '%s', size w: %d h: %d, strict: %d quality: %d", config->file_name, config->size.w, config->size.h, config->strict, config->quality);
+	debug(DEB, "Run-time config after command line: file: file: '%s', size w: %d h: %d, strict: %d quality: %d no cache: %d, no serve: %d, no headers: %d", config->file_name, config->size.w, config->size.h, config->strict, config->quality, config->no_cache, config->no_serve, config->no_headers);
 }

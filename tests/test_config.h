@@ -30,6 +30,7 @@
 #define DEFAULT_QUALITY 80
 #define DEFAULT_NO_CACHE 0
 #define DEFAULT_NO_SERVE 0
+#define DEFAULT_NO_HEADERS 0
 
 
 /* Command-line configuration */
@@ -37,6 +38,9 @@
 #define COMMANDLINE_HEIGHT_SWITCH "h"
 #define COMMANDLINE_STRICT_SWITCH "s"
 #define COMMANDLINE_LOWQ_SWITCH "wap"
+#define COMMANDLINE_NO_CACHE_SWITCH "nc"
+#define COMMANDLINE_NO_SERVE_SWITCH "ns"
+#define COMMANDLINE_NO_HEADERS_SWITCH "nh"
 
 #define COMMANDLINE_TRUE_VAL "true"
 

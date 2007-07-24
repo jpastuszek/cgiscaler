@@ -41,8 +41,11 @@ void apply_query_string_config(struct runtime_config *config, char *file_name, c
 	debug(DEB, "Processing query file name: '%s'", file_name);
 
 	file_name = sanitize_file_path(file_name);
-	if (file_name)
+	if (file_name) {
+		if (config->file_name)
+			free(config->file_name);
 		config->file_name = file_name;
+	}
 
 	debug(DEB, "Processing query string: '%s' target name: '%s'", query_string, file_name);
 
@@ -72,6 +75,9 @@ void apply_query_string_config(struct runtime_config *config, char *file_name, c
 	if (lowq) {
 		if (!strcmp(lowq, QUERY_TRUE_VAL))
 			config->quality = LOWQ_QUALITY;
+		else
+			config->quality = DEFAULT_QUALITY;
+
 		free(lowq);
 	}
 

@@ -64,8 +64,6 @@ char *create_cache_file_path(char *file_name, char *file_extension, int w, int h
 			cache_file_name_buff_len = cache_file_name_len + 1;
 		else
 			cache_file_name_buff_len *= 2;
-	
-		debug(DEB, "## reallocing to: %d", cache_file_name_buff_len);
 
 		/* re-size to add more space */
 		cache_file_name = realloc(cache_file_name, cache_file_name_buff_len);

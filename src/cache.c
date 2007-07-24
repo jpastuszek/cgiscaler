@@ -52,7 +52,7 @@ int check_if_cached(char *media_file_path, char *cache_file_path) {
 	orginal_mtime = get_file_mtime(media_file_path);
 	cache_mtime = get_file_mtime(cache_file_path);
 
-	debug(DEB,"Original media mtime: %d, Cache mtime: %d", media_file_path, cache_mtime);
+	debug(DEB,"Original media mtime: %d, Cache mtime: %d", orginal_mtime, cache_mtime);
 
 	if (!cache_mtime && !orginal_mtime)
 		return NO_ORIG | NO_CACHE;

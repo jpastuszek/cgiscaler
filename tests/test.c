@@ -36,6 +36,8 @@
 #include "cgiscaler.h"
 #include "cache.h"
 #include "serve.h"
+#include "runtime_config.h"
+#include "commandline.h"
 #include "test_config.h"
 
 #include "debug.h"
@@ -288,87 +290,6 @@ static void test_write_blob_to_file() {
 	assert_not_equal(unlink(file_path), -1);
 	
 	free(test_blob);
-}
-
-/* query_string.c tests */
-static void test_query_string_param() {
-	char *prog;
-	char *name;
-	char *year;
-	char *null;
-
-	prog = get_query_string_param("name=kaz&prog=cgiscaler&year=2007","prog");
-	assert_string_equal(prog, "cgiscaler");
-	free(prog);
-
-	name = get_query_string_param("name=kaz&prog=cgiscaler&year=2007","name");
-	assert_string_equal(name, "kaz");
-	free(name);
-
-	year = get_query_string_param("name=kaz&prog=cgiscaler&year=2007","year");
-	assert_string_equal(year, "2007");
-	free(year);
-
-	null = get_query_string_param("name=kaz&prog=cgiscaler&year=2007","null");
-	assert_equal(null, 0);
-}
-
-static void test_get_query_string_config() {
-	struct runtime_config *config;
-	char test_query_string[256];
-
-	config = alloc_default_runtime_config();
-
-	/* testing defaults */
-	apply_query_string_config(config, "", "");
-
-	assert_not_equal(config, 0);
-	assert_equal(config->file_name, 0);
-	assert_equal(config->size.w, DEFAULT_WIDTH);
-	assert_equal(config->size.h, DEFAULT_HEIGHT);
-	assert_equal(config->strict, DEFAULT_STRICT);
-	assert_equal(config->quality, DEFAULT_QUALITY);
-
-	apply_query_string_config(config, "/some/path/funny.jpeg", "");
-	assert_not_equal(config, 0);
-	assert_string_equal(config->file_name, "some/path/funny.jpeg");
-	assert_equal(config->size.w, DEFAULT_WIDTH);
-	assert_equal(config->size.h, DEFAULT_HEIGHT);
-	assert_equal(config->strict, DEFAULT_STRICT);
-	assert_equal(config->quality, DEFAULT_QUALITY);
-
-
-	snprintf(test_query_string, 256, "%s=123&%s=213&beer=czech_lager&%s=%s&%s=%s", QUERY_WIDTH_PARAM, QUERY_HEIGHT_PARAM, QUERY_STRICT_PARAM, QUERY_TRUE_VAL, QUERY_LOWQ_PARAM, QUERY_TRUE_VAL);
-
-	apply_query_string_config(config, "/some/path/funny.jpeg", test_query_string);
-	assert_string_equal(config->file_name, "some/path/funny.jpeg");
-	assert_equal(config->size.w, 123);
-	assert_equal(config->size.h, 213);
-	assert_equal(config->strict, 1);
-	assert_equal(config->quality, LOWQ_QUALITY);
-
-	free_runtime_config(config);
-	config = alloc_default_runtime_config();
-
-	snprintf(test_query_string, 256, "beer=czech_lager&%s=%s&%s=%s", QUERY_STRICT_PARAM, "xbrna", QUERY_LOWQ_PARAM, "false");
-
-	apply_query_string_config(config, "/some/path/funny.jpeg", test_query_string);
-	assert_string_equal(config->file_name, "some/path/funny.jpeg");
-	assert_equal(config->size.w, DEFAULT_WIDTH);
-	assert_equal(config->size.h, DEFAULT_HEIGHT);
-	assert_equal(config->strict, 0);
-	assert_equal(config->quality, DEFAULT_QUALITY);
-
-	snprintf(test_query_string, 256, "beer=czech_lager&%s=%s&%s=%s", QUERY_STRICT_PARAM, "xbrna", QUERY_LOWQ_PARAM, QUERY_TRUE_VAL);
-
-	apply_query_string_config(config, "///some/path/funn/y2.jpeg", test_query_string);
-	assert_string_equal(config->file_name, "some/path/funn/y2.jpeg");
-	assert_equal(config->size.w, DEFAULT_WIDTH);
-	assert_equal(config->size.h, DEFAULT_HEIGHT);
-	assert_equal(config->strict, 0);
-	assert_equal(config->quality, LOWQ_QUALITY);
-
-	free_runtime_config(config);
 }
 
 /* geometry_math.c tests */
@@ -631,26 +552,26 @@ static void test_if_cached() {
 	media_file_path = create_media_file_path(IMAGE_TEST_FILE);
 	cache_file_path = create_cache_file_path(IMAGE_TEST_FILE, OUT_FORMAT_EXTENSION, 0, 0, 0, 0);
 
-//	assert_equal(check_if_cached(media_file_path, cache_file_path), NO_CACHE);
+	assert_equal(check_if_cached(media_file_path, cache_file_path), NO_CACHE);
 
 	/* creating test file */
-//	test_fd = open(cache_file_path, O_CREAT|O_WRONLY|O_TRUNC);
-//	assert_not_equal(test_fd, -1);
-//	close(test_fd);
+	test_fd = open(cache_file_path, O_CREAT|O_WRONLY|O_TRUNC);
+	assert_not_equal(test_fd, -1);
+	close(test_fd);
 
-//	assert_equal(check_if_cached(media_file_path, cache_file_path), MTIME_DIFFER);
+	assert_equal(check_if_cached(media_file_path, cache_file_path), MTIME_DIFFER);
 
 	/* now we will set mtime to match original file */
-//	time_buf.actime = time_buf.modtime = get_file_mtime(media_file_path);
-//	assert_not_equal(utime(cache_file_path, &time_buf), -1);
+	time_buf.actime = time_buf.modtime = get_file_mtime(media_file_path);
+	assert_not_equal(utime(cache_file_path, &time_buf), -1);
 
-//	assert_equal(check_if_cached(media_file_path, cache_file_path), CACHE_OK);
+	assert_equal(check_if_cached(media_file_path, cache_file_path), CACHE_OK);
 
 	/* cleaning up test file */
-//	assert_not_equal(unlink(cache_file_path), -1);
+	assert_not_equal(unlink(cache_file_path), -1);
 	
-//	free(media_file_path);
-//	free(cache_file_path);
+	free(media_file_path);
+	free(cache_file_path);
 }
 
 static void test_write_blob_to_cache() {
@@ -923,6 +844,164 @@ static void test_serve_error_message() {
 	finish_fork(stdout_fd);
 }
 
+/* runtime_config.c tests */
+static void test_alloc_default_runtime_config() {
+	struct runtime_config *config;
+
+	config = alloc_default_runtime_config();
+
+	assert_not_equal(config, 0);
+	assert_equal(config->file_name, 0);
+	assert_equal(config->size.w, DEFAULT_WIDTH);
+	assert_equal(config->size.h, DEFAULT_HEIGHT);
+	assert_equal(config->strict, DEFAULT_STRICT);
+	assert_equal(config->quality, DEFAULT_QUALITY);
+	assert_equal(config->no_cache, DEFAULT_NO_CACHE);
+	assert_equal(config->no_serve, DEFAULT_NO_SERVE);
+	assert_equal(config->no_headers, DEFAULT_NO_HEADERS);
+
+	free_runtime_config(config);
+
+	config = alloc_default_runtime_config();
+	config->file_name = malloc(6);
+	assert_not_equal(config->file_name, 0);
+
+	/* for memory leak test (valgrind) - file name should be freed */
+	free_runtime_config(config);
+}
+
+/* commandline.c tests */
+static void test_apply_commandline_config() {
+	struct runtime_config *config;
+	char *args1[] = { "test", "-w", "100", "-h", "200" };
+	char *args2[] = { "test", "-w", "100", "-s", "true", "-nc", "false", "-ns", "true", "-nh", "dsfa", "abc/e/f.jpg" };
+	char *args3[] = { "test", "file.gif", "-h", "300", "-h", "100" };
+
+
+	config = alloc_default_runtime_config();
+
+	apply_commandline_config(config, 5, args1);
+
+	assert_equal(config->file_name, 0);
+	assert_equal(config->size.w, 100);
+	assert_equal(config->size.h, 200);
+	assert_equal(config->strict, DEFAULT_STRICT);
+	assert_equal(config->quality, DEFAULT_QUALITY);
+	assert_equal(config->no_cache, DEFAULT_NO_CACHE);
+	assert_equal(config->no_serve, DEFAULT_NO_SERVE);
+	assert_equal(config->no_headers, DEFAULT_NO_HEADERS);
+
+	free_runtime_config(config);
+
+	config = alloc_default_runtime_config();
+
+	apply_commandline_config(config, 12, args2);
+
+	assert_string_equal(config->file_name, "abc/e/f.jpg");
+	assert_equal(config->size.w, 100);
+	assert_equal(config->size.h, DEFAULT_HEIGHT);
+	assert_equal(config->strict, 1);
+	assert_equal(config->quality, DEFAULT_QUALITY);
+	assert_equal(config->no_cache, 0);
+	assert_equal(config->no_serve, 1);
+	assert_equal(config->no_headers, 0);
+
+	apply_commandline_config(config, 6, args3);
+
+	assert_string_equal(config->file_name, "file.gif");
+	assert_equal(config->size.w, 100);
+	assert_equal(config->size.h, 100);
+	assert_equal(config->strict, 1);
+	assert_equal(config->quality, DEFAULT_QUALITY);
+	assert_equal(config->no_cache, 0);
+	assert_equal(config->no_serve, 1);
+	assert_equal(config->no_headers, 0);
+
+	free_runtime_config(config);
+}
+
+/* query_string.c tests */
+static void test_query_string_param() {
+	char *prog;
+	char *name;
+	char *year;
+	char *null;
+
+	prog = get_query_string_param("name=kaz&prog=cgiscaler&year=2007","prog");
+	assert_string_equal(prog, "cgiscaler");
+	free(prog);
+
+	name = get_query_string_param("name=kaz&prog=cgiscaler&year=2007","name");
+	assert_string_equal(name, "kaz");
+	free(name);
+
+	year = get_query_string_param("name=kaz&prog=cgiscaler&year=2007","year");
+	assert_string_equal(year, "2007");
+	free(year);
+
+	null = get_query_string_param("name=kaz&prog=cgiscaler&year=2007","null");
+	assert_equal(null, 0);
+}
+
+static void test_get_query_string_config() {
+	struct runtime_config *config;
+	char test_query_string[256];
+
+	config = alloc_default_runtime_config();
+
+	/* testing defaults */
+	apply_query_string_config(config, "", "");
+
+	assert_not_equal(config, 0);
+	assert_equal(config->file_name, 0);
+	assert_equal(config->size.w, DEFAULT_WIDTH);
+	assert_equal(config->size.h, DEFAULT_HEIGHT);
+	assert_equal(config->strict, DEFAULT_STRICT);
+	assert_equal(config->quality, DEFAULT_QUALITY);
+
+	apply_query_string_config(config, "/some/path/funny.jpeg", "");
+	assert_not_equal(config, 0);
+	assert_string_equal(config->file_name, "some/path/funny.jpeg");
+	assert_equal(config->size.w, DEFAULT_WIDTH);
+	assert_equal(config->size.h, DEFAULT_HEIGHT);
+	assert_equal(config->strict, DEFAULT_STRICT);
+	assert_equal(config->quality, DEFAULT_QUALITY);
+
+
+	snprintf(test_query_string, 256, "%s=123&%s=213&beer=czech_lager&%s=%s&%s=%s", QUERY_WIDTH_PARAM, QUERY_HEIGHT_PARAM, QUERY_STRICT_PARAM, QUERY_TRUE_VAL, QUERY_LOWQ_PARAM, QUERY_TRUE_VAL);
+
+	apply_query_string_config(config, "/some/path/funny.jpeg", test_query_string);
+	assert_string_equal(config->file_name, "some/path/funny.jpeg");
+	assert_equal(config->size.w, 123);
+	assert_equal(config->size.h, 213);
+	assert_equal(config->strict, 1);
+	assert_equal(config->quality, LOWQ_QUALITY);
+
+	free_runtime_config(config);
+	config = alloc_default_runtime_config();
+
+	snprintf(test_query_string, 256, "beer=czech_lager&%s=%s&%s=%s", QUERY_STRICT_PARAM, "xbrna", QUERY_LOWQ_PARAM, "false");
+
+	apply_query_string_config(config, "/some/path/funny.jpeg", test_query_string);
+	assert_string_equal(config->file_name, "some/path/funny.jpeg");
+	assert_equal(config->size.w, DEFAULT_WIDTH);
+	assert_equal(config->size.h, DEFAULT_HEIGHT);
+	assert_equal(config->strict, 0);
+	assert_equal(config->quality, DEFAULT_QUALITY);
+
+	snprintf(test_query_string, 256, "beer=czech_lager&%s=%s&%s=%s", QUERY_STRICT_PARAM, "xbrna", QUERY_LOWQ_PARAM, QUERY_TRUE_VAL);
+
+	apply_query_string_config(config, "///some/path/funn/y2.jpeg", test_query_string);
+	assert_string_equal(config->file_name, "some/path/funn/y2.jpeg");
+	assert_equal(config->size.w, DEFAULT_WIDTH);
+	assert_equal(config->size.h, DEFAULT_HEIGHT);
+	assert_equal(config->strict, 0);
+	assert_equal(config->quality, LOWQ_QUALITY);
+
+	free_runtime_config(config);
+}
+
+
 /* setup and teardown */
 static void test_setup() {
 	debug_start(DEBUG_FILE);
@@ -936,11 +1015,13 @@ int main(int argc, char **argv) {
 	TestSuite *suite = create_test_suite();
 
 	TestSuite *file_utils_suite = create_test_suite();
-	TestSuite *query_string_suite = create_test_suite();
 	TestSuite *geometry_math_suite = create_test_suite();
 	TestSuite *cgiscaler_suite = create_test_suite();
 	TestSuite *cache_suite = create_test_suite();
 	TestSuite *serve_suite = create_test_suite();
+	TestSuite *runtime_config_suite = create_test_suite();
+	TestSuite *commandline_suite = create_test_suite();
+	TestSuite *query_string_suite = create_test_suite();
 
 	add_test(file_utils_suite, test_create_media_file_path);
 	add_test(file_utils_suite, test_create_cache_file_path);
@@ -951,14 +1032,9 @@ int main(int argc, char **argv) {
 	add_test(file_utils_suite, test_write_blob_to_file);
 	add_suite(suite, file_utils_suite);
 	
-	add_test(query_string_suite, test_query_string_param);
-	add_test(query_string_suite, test_get_query_string_config);
-	add_suite(suite, query_string_suite);
-
 	add_test(geometry_math_suite, test_resize_to_fit_in);
 	add_test(geometry_math_suite, test_reduce_filed);
 	add_suite(suite, geometry_math_suite);
-
 
 	add_test(cgiscaler_suite, test_load_image);
 	add_test(cgiscaler_suite, test_fit_resize);
@@ -978,6 +1054,16 @@ int main(int argc, char **argv) {
 	add_test(serve_suite, test_serve_error);
 	add_test(serve_suite, test_serve_error_message);
 	add_suite(suite, serve_suite);
+
+	add_test(runtime_config_suite, test_alloc_default_runtime_config);
+	add_suite(suite, runtime_config_suite);
+
+	add_test(commandline_suite, test_apply_commandline_config);
+	add_suite(suite, commandline_suite);
+
+	add_test(query_string_suite, test_query_string_param);
+	add_test(query_string_suite, test_get_query_string_config);
+	add_suite(suite, query_string_suite);
 
 	setup(suite, test_setup);
 	teardown(suite, test_teardown);

@@ -26,10 +26,11 @@
 struct runtime_config {
 	char *file_name;
 	struct dimensions size;
-	int strict;
-	int quality;
-	int no_cache;
-	int no_serve;
+	unsigned short int strict;
+	unsigned short int quality;
+	unsigned short int no_cache;
+	unsigned short int no_serve;
+	unsigned short int no_headers;
 };
 
 struct runtime_config *alloc_default_runtime_config();

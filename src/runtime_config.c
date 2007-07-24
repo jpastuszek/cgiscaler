@@ -35,6 +35,7 @@ struct runtime_config *alloc_default_runtime_config() {
 	config->quality = DEFAULT_QUALITY;
 	config->no_cache = DEFAULT_NO_CACHE;
 	config->no_serve = DEFAULT_NO_SERVE;
+	config->no_headers = DEFAULT_NO_HEADERS;
 
 	return config;
 }
