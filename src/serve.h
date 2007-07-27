@@ -21,8 +21,8 @@
 #include <unistd.h>
 #include "query_string.h"
 
-int serve_from_file(char *file_path, char *mime_type);
-void serve_from_blob(unsigned char *blob, size_t blob_len, char *mime_type);
-int serve_from_cache_file(char *media_file_path, char *cache_file_path, char *mime_type);
-void serve_error();
-void serve_error_message();
+int serve_from_file(char *file_path, char *mime_type, short int no_headers);
+void serve_from_blob(unsigned char *blob, size_t blob_len, char *mime_type, short int no_headers);
+int serve_from_cache_file(char *media_file_path, char *cache_file_path, char *mime_type, short int no_headers);
+void serve_error(short int no_headers);
+void serve_error_message(short int no_headers);

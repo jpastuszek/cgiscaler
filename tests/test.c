@@ -674,7 +674,7 @@ static void test_serve_from_file() {
 	media_file_path = create_media_file_path(IMAGE_TEST_FILE);
 
 	if (!fork_with_stdout_capture(&stdout_fd)) {
-		status = serve_from_file(media_file_path, OUT_FORMAT_MIME_TYPE);
+		status = serve_from_file(media_file_path, OUT_FORMAT_MIME_TYPE, 0);
 		if (!status) {
 			restore_stdout();
 			assert_true_with_message(0, "serve_from_file failed");
@@ -688,9 +688,26 @@ static void test_serve_from_file() {
 	finish_fork(stdout_fd);
 	free(media_file_path);
 
+	/* real file, no headers*/
+	media_file_path = create_media_file_path(IMAGE_TEST_FILE);
+
+	if (!fork_with_stdout_capture(&stdout_fd)) {
+		status = serve_from_file(media_file_path, OUT_FORMAT_MIME_TYPE, 1);
+		if (!status) {
+			restore_stdout();
+			assert_true_with_message(0, "serve_from_file failed");
+		}
+		exit(0);
+	}
+
+	assert_byte_read(stdout_fd, get_file_size(media_file_path));
+
+	finish_fork(stdout_fd);
+	free(media_file_path);
+
 	/* bogus file */
 	if (!fork_with_stdout_capture(&stdout_fd)) {
-		status = serve_from_file("bogo_file_name.jpg", OUT_FORMAT_MIME_TYPE);
+		status = serve_from_file("bogo_file_name.jpg", OUT_FORMAT_MIME_TYPE, 0);
 		if (status) {
 			restore_stdout();
 			assert_true_with_message(0, "serve_from_file failed");
@@ -709,7 +726,7 @@ static void test_serve_from_blob() {
 	assert_not_equal(blob, 0);
 
 	if (!fork_with_stdout_capture(&stdout_fd)) {
-		serve_from_blob(blob, 31666, OUT_FORMAT_MIME_TYPE);
+		serve_from_blob(blob, 31666, OUT_FORMAT_MIME_TYPE, 0);
 		exit(0);
 	}
 
@@ -717,6 +734,16 @@ static void test_serve_from_blob() {
 	assert_byte_read(stdout_fd, 31666);
 
 	finish_fork(stdout_fd);
+
+	if (!fork_with_stdout_capture(&stdout_fd)) {
+		serve_from_blob(blob, 31666, OUT_FORMAT_MIME_TYPE, 1);
+		exit(0);
+	}
+
+	assert_byte_read(stdout_fd, 31666);
+
+	finish_fork(stdout_fd);
+
 	free(blob);
 }
 
@@ -736,7 +763,7 @@ static void test_serve_from_cache_file() {
 	assert_equal(write_blob_to_cache(blob, 3000, media_file_path, cache_file_path), 1);
 
 	if (!fork_with_stdout_capture(&stdout_fd)) {
-		status = serve_from_cache_file(media_file_path, cache_file_path, OUT_FORMAT_MIME_TYPE);
+		status = serve_from_cache_file(media_file_path, cache_file_path, OUT_FORMAT_MIME_TYPE, 0);
 		if (!status) {
 			restore_stdout();
 			assert_true_with_message(0, "serve_from_cache failed");
@@ -752,12 +779,31 @@ static void test_serve_from_cache_file() {
 	/* cleaning up test file */
 	assert_not_equal(-1, unlink(cache_file_path));
 
+	/* create test cache file - mtime should be set properly */
+	assert_equal(write_blob_to_cache(blob, 3000, media_file_path, cache_file_path), 1);
+
+	if (!fork_with_stdout_capture(&stdout_fd)) {
+		status = serve_from_cache_file(media_file_path, cache_file_path, OUT_FORMAT_MIME_TYPE, 1);
+		if (!status) {
+			restore_stdout();
+			assert_true_with_message(0, "serve_from_cache failed");
+		}
+		exit(0);
+	}
+
+	assert_byte_read(stdout_fd, 3000);
+
+	finish_fork(stdout_fd);
+
+	/* cleaning up test file */
+	assert_not_equal(-1, unlink(cache_file_path));
+
 	/* test with wrong mtime */
 	/* create test file - mtime should be set to current time */
 	assert_equal(write_blob_to_file(blob, 3000, cache_file_path), 1);
 
 	if (!fork_with_stdout_capture(&stdout_fd)) {
-		status = serve_from_cache_file(media_file_path, cache_file_path, OUT_FORMAT_MIME_TYPE);
+		status = serve_from_cache_file(media_file_path, cache_file_path, OUT_FORMAT_MIME_TYPE, 1);
 		if (status) {
 			restore_stdout();
 			assert_true_with_message(0, "serve_from_cache failed");
@@ -772,7 +818,7 @@ static void test_serve_from_cache_file() {
 
 	/* test with no cache */
 	if (!fork_with_stdout_capture(&stdout_fd)) {
-		status = serve_from_cache_file(media_file_path, cache_file_path, OUT_FORMAT_MIME_TYPE);
+		status = serve_from_cache_file(media_file_path, cache_file_path, OUT_FORMAT_MIME_TYPE, 1);
 		if (status) {
 			restore_stdout();
 			assert_true_with_message(0, "serve_from_cache failed");
@@ -793,7 +839,7 @@ static void test_serve_from_cache_file() {
 	assert_equal(write_blob_to_file(blob, 3000, cache_file_path), 1);
 
 	if (!fork_with_stdout_capture(&stdout_fd)) {
-		status = serve_from_cache_file(media_file_path, cache_file_path, OUT_FORMAT_MIME_TYPE);
+		status = serve_from_cache_file(media_file_path, cache_file_path, OUT_FORMAT_MIME_TYPE, 1);
 		if (status) {
 			restore_stdout();
 			assert_true_with_message(0, "serve_from_cache failed");
@@ -818,7 +864,7 @@ static void test_serve_error() {
 	media_file_path = create_media_file_path(ERROR_FILE_PATH);
 
 	if (!fork_with_stdout_capture(&stdout_fd)) {
-		serve_error();
+		serve_error(0);
 		exit(0);
 	}
 
@@ -826,6 +872,17 @@ static void test_serve_error() {
 	assert_byte_read(stdout_fd, get_file_size(media_file_path));
 
 	finish_fork(stdout_fd);
+
+	if (!fork_with_stdout_capture(&stdout_fd)) {
+		serve_error(1);
+		exit(0);
+	}
+
+	assert_byte_read(stdout_fd, get_file_size(media_file_path));
+
+	finish_fork(stdout_fd);
+
+
 	free(media_file_path);
 
 }
@@ -834,7 +891,7 @@ static void test_serve_error_message() {
 	int stdout_fd;
 
 	if (!fork_with_stdout_capture(&stdout_fd)) {
-		serve_error_message();
+		serve_error_message(0);
 		exit(0);
 	}
 
@@ -842,6 +899,17 @@ static void test_serve_error_message() {
 	assert_byte_read(stdout_fd, strlen(ERROR_FAILBACK_MESSAGE));
 
 	finish_fork(stdout_fd);
+
+	if (!fork_with_stdout_capture(&stdout_fd)) {
+		serve_error_message(1);
+		exit(0);
+	}
+
+
+	assert_byte_read(stdout_fd, strlen(ERROR_FAILBACK_MESSAGE));
+
+	finish_fork(stdout_fd);
+
 }
 
 /* runtime_config.c tests */

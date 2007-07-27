@@ -35,7 +35,16 @@
 
 void remove_cache_file(char *cache_file_path);
 
-int serve_from_file(char *file_path, char *mime_type) {
+void sent_headers(unsigned int length, char *mime_type) {
+	printf("Content-Type: %s\n", mime_type);
+	printf("Content-Length: %u\n", length);
+	printf("\n");
+
+	/* Fflush is necessary to avoid overwriting buffered headers by direct fd writes */
+	fflush(stdout);
+}
+
+int serve_from_file(char *file_path, char *mime_type,short int no_headers) {
 	unsigned char *buffer;
 	int file;
 	size_t bytes_read, bytes_written, total_bytes_read, total_bytes_written;
@@ -64,12 +73,8 @@ int serve_from_file(char *file_path, char *mime_type) {
 	}
 
 	/* Sending headers */
-	printf("Content-Type: %s\n", mime_type);
-	printf("Content-Length: %u\n", (unsigned int) file_size);
-	printf("\n");
-
-	/* Fflush is necessary to avoid overwriting buffered headers by direct fd writes */
-	fflush(stdout);
+	if (!no_headers)
+		sent_headers((unsigned int) file_size, mime_type);
 
 	/* After we have sent headers we don't return 0 */
 
@@ -127,18 +132,14 @@ int serve_from_file(char *file_path, char *mime_type) {
 }
 
 /* serving from blob */
-void serve_from_blob(unsigned char *blob, size_t blob_len, char *mime_type) {
+void serve_from_blob(unsigned char *blob, size_t blob_len, char *mime_type, short int no_headers) {
 	size_t bytes_written;
 	size_t total_blob_written;
 
 	debug(DEB,"Serving from BLOB: size: %d", blob_len);
 
-	printf("Content-Type: %s\n", mime_type);
-	printf("Content-Length: %u\n", (unsigned int) blob_len);
-
-	printf("\n");
-	/* flushing buffers before we do direct fd write */
-	fflush(stdout);
+	if (!no_headers)
+		sent_headers((unsigned int) blob_len, mime_type);
 
 	/* using stdout (FILE *) write instead of fd 1 is safer as printf also is using stdout */
 /*	fwrite(blob, blob_len, 1, stdout); */
@@ -166,7 +167,7 @@ void serve_from_blob(unsigned char *blob, size_t blob_len, char *mime_type) {
 Serves image from cache file
 Returns: 1 on success 0 when no proper cache file or read failure 
 */
-int serve_from_cache_file(char *media_file_path, char *cache_file_path, char *mime_type) {
+int serve_from_cache_file(char *media_file_path, char *cache_file_path, char *mime_type, short int no_headers) {
 	debug(DEB,"Trying cache file: '%s'", cache_file_path);
 /*
 Logick:
@@ -197,7 +198,7 @@ O C M
 
 	/* serve */
 	debug(DEB,"Serving from cache");
-	return serve_from_file(cache_file_path, mime_type);
+	return serve_from_file(cache_file_path, mime_type, no_headers);
 }
 
 void remove_cache_file(char *cache_file_path) {
@@ -207,22 +208,24 @@ void remove_cache_file(char *cache_file_path) {
 }
 
 /* we will try error image but if it does not exist we will fail back to error message */
-void serve_error() {
+void serve_error(short int no_headers) {
 	char *file_path;
 
 	file_path = create_media_file_path(ERROR_FILE_PATH);
 
 	debug(DEB,"Serving error image: '%s'", file_path);
-	if (!serve_from_file(file_path, ERROR_FILE_MIME_TYPE))
-		serve_error_message();
+	if (!serve_from_file(file_path, ERROR_FILE_MIME_TYPE, no_headers))
+		serve_error_message(no_headers);
 
 	free(file_path);
 }
 
 /* serving plain text message as an absolute fail-back */
-void serve_error_message() {
-	printf("Content-Type: text/plain\n");
-	printf("\n");
+void serve_error_message(short int no_headers) {
+	if (!no_headers) {
+		printf("Content-Type: text/plain\n");
+		printf("\n");
+	}
 
 	printf(ERROR_FAILBACK_MESSAGE);
 	fflush(stdout);

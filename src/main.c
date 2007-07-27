@@ -48,7 +48,7 @@ int main(int argc, char *argv[])
 
 	if (!config->file_name) {
 		if (!config->no_serve)
-			serve_error();
+			serve_error(config->no_headers);
 		exit(70);
 	}
 
@@ -59,7 +59,7 @@ int main(int argc, char *argv[])
 	if (!config->no_cache) {
 		 if (!config->no_serve) {
 			/* if we have served from cache OK... cleanup and exit success */
-			if (serve_from_cache_file(media_file_path, cache_file_path, OUT_FORMAT_MIME_TYPE)) {
+			if (serve_from_cache_file(media_file_path, cache_file_path, OUT_FORMAT_MIME_TYPE, config->no_headers)) {
 				if (!config->no_cache)
 					free(cache_file_path);
 				free(media_file_path);
@@ -85,7 +85,7 @@ int main(int argc, char *argv[])
 	image = load_image(media_file_path);
 	if (!image) {
 		if (!config->no_serve)
-			serve_error();
+			serve_error(config->no_headers);
 		if (!config->no_cache)
 			free(cache_file_path);
 		free(media_file_path);
@@ -101,7 +101,7 @@ int main(int argc, char *argv[])
 		image = fit_resize(image, config->size);
 	if (!image) {
 		if (!config->no_serve)
-			serve_error();
+			serve_error(config->no_headers);
 		if (!config->no_cache)
 			free(cache_file_path);
 		free(media_file_path);
@@ -113,7 +113,7 @@ int main(int argc, char *argv[])
 	blob = prepare_blob(image, config->quality, &blob_len, OUT_FORMAT);
 	if (!blob) {
 		if (!config->no_serve)
-			serve_error();
+			serve_error(config->no_headers);
 		if (!config->no_cache)
 			free(cache_file_path);
 		free(media_file_path);
@@ -125,7 +125,7 @@ int main(int argc, char *argv[])
 
 	/* image processing is done */
 	if (!config->no_serve)
-		serve_from_blob(blob, blob_len, OUT_FORMAT_MIME_TYPE);
+		serve_from_blob(blob, blob_len, OUT_FORMAT_MIME_TYPE, config->no_headers);
 
 	/* as we are served it is time for cache file write and clean up */
 	free_image(image);
