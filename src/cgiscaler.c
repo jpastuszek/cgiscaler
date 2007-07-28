@@ -204,6 +204,13 @@ void free_blob(unsigned char *blob) {
 
 /* TODO: implement non aspect ratio keeping re-size */
 
+int apply_pre_resize_factor(int orginal, int target, float factor) {
+	if (target * factor > orginal)
+		return orginal;
+
+	return target * factor;
+}
+
 /* Re-size the image to to_size dimensions keeping aspect ration and fitting into to_size dimensions effectively using to_size width and height as the limits */
 MagickWand *fit_resize(MagickWand *image, struct dimensions to_size) {
 	struct dimensions image_size;
@@ -219,6 +226,12 @@ MagickWand *fit_resize(MagickWand *image, struct dimensions to_size) {
 	to_size = reduce_filed(to_size, MAX_PIXEL_NO);
 
 	timer_start(&timeing);
+
+	status = MagickAdaptiveResizeImage(image, apply_pre_resize_factor(image_size.w, to_size.w, 5), apply_pre_resize_factor(image_size.h, to_size.h, 5)); 	
+	if (status == MagickFalse) {
+		DestroyMagickWand(image);
+		return 0;
+	}
 
 	status = MagickResizeImage(image, to_size.w, to_size.h, RESIZE_FILTER, RESIZE_SMOOTH_FACTOR);
 	if (status == MagickFalse) {
