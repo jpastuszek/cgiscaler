@@ -339,16 +339,20 @@ static void test_reduce_filed() {
 static void test_load_image() {
 	MagickWand *magick_wand;
 	char *media_file_path;
+	struct dimensions size;
+
+	size.w = 100;
+	size.h = 100;
 
 	media_file_path = create_media_file_path("non_existing_file.jpg");
 
-	magick_wand = load_image("non_existing_file.jpg");
+	magick_wand = load_image("non_existing_file.jpg", size);
 	assert_equal(magick_wand, 0);
 
 	free(media_file_path);
 	media_file_path = create_media_file_path(IMAGE_TEST_FILE);
 
-	magick_wand = load_image(media_file_path);
+	magick_wand = load_image(media_file_path, size);
 	assert_not_equal(magick_wand, 0);
 		
 	assert_equal(MagickGetImageWidth(magick_wand), IMAGE_TEST_FILE_WIDTH);
@@ -366,60 +370,71 @@ static void test_load_image() {
 
 static void test_fit_resize() {
 	char *media_file_path;
-	MagickWand *magick_wand;
+	MagickWand *image_ping;
+	MagickWand *image;
 	struct dimensions a, img, b;
+	struct dimensions size;
+
+	size.w = 0;
+	size.h = 0;
 
 	a.w = 100;
 	a.h = 200;
 
 	media_file_path = create_media_file_path(IMAGE_TEST_FILE);
 
-	magick_wand = load_image(media_file_path);
-	assert_not_equal(magick_wand, 0);
+	image_ping = ping_image(media_file_path);
+	assert_not_equal(image_ping, 0);
 
-	img.w = MagickGetImageWidth(magick_wand);
-	img.h = MagickGetImageHeight(magick_wand);
+	img = get_image_size(image_ping);
 
-	magick_wand = fit_resize(magick_wand, a);
-	assert_not_equal(magick_wand, 0);
+	free_image(image_ping);
+
+	image = fit_resize(media_file_path, a);
+	assert_not_equal(image, 0);
 
 	/* as we know this works from previous tests we can calculate image size to see if it works */
 	b = resize_to_fit_in(img, a);
+	img = get_image_size(image);
 
-	assert_equal(MagickGetImageWidth(magick_wand), b.w);
-	assert_equal(MagickGetImageHeight(magick_wand), b.h);
+	assert_equal(img.w, b.w);
+	assert_equal(img.h, b.h);
 
-	free_image(magick_wand);
+	free_image(image);
 	free(media_file_path);
 }
 
 static void test_strict_resize() {
 	char *media_file_path;
-	MagickWand *magick_wand;
+	MagickWand *image;
 	struct dimensions a;
+	struct dimensions size;
+
+	size.w = 0;
+	size.h = 0;
 
 	a.w = 100;
 	a.h = 200;
 
 	media_file_path = create_media_file_path(IMAGE_TEST_FILE);
 
-	magick_wand = load_image(media_file_path);
-	assert_not_equal(magick_wand, 0);
+	image = strict_resize(media_file_path, a);
+	assert_not_equal(image, 0);
 
-	magick_wand = strict_resize(magick_wand, a);
-	assert_not_equal(magick_wand, 0);
+	size = get_image_size(image);
+	
+	assert_equal(size.w, a.w);
+	assert_equal(size.h, a.h);
 
-	assert_equal(MagickGetImageWidth(magick_wand), 100);
-	assert_equal(MagickGetImageHeight(magick_wand), 200);
-
-	free_image(magick_wand);
+	free_image(image);
 	free(media_file_path);
 }
 
 static void test_resize_field_limiting() {
 	char *media_file_path;
-	MagickWand *magick_wand;
+	MagickWand *image;
 	struct dimensions a;
+	struct dimensions img;
 
 	/* we will re-size a little bit so resizing will take effect */
 	a.w = IMAGE_TEST_FILE_WIDTH - 10;
@@ -434,36 +449,34 @@ static void test_resize_field_limiting() {
 	media_file_path = create_media_file_path(IMAGE_TEST_FILE);
 
 	/* fit_resize */
-	magick_wand = load_image(media_file_path);
-	assert_not_equal(magick_wand, 0);
+	image = fit_resize(media_file_path, reduce_filed(a, MAX_PIXEL_NO));
+	assert_not_equal(image, 0);
 
-	magick_wand = fit_resize(magick_wand, a);
-	assert_not_equal(magick_wand, 0);
+	img = get_image_size(image);
 
-	assert_not_equal(MagickGetImageWidth(magick_wand), a.w);
-	assert_not_equal(MagickGetImageHeight(magick_wand), a.h);
-	assert_equal_low_precision(MagickGetImageWidth(magick_wand) * MagickGetImageHeight(magick_wand), MAX_PIXEL_NO, 0.1);
+	assert_not_equal(img.w, a.w);
+	assert_not_equal(img.h, a.h);
+	assert_equal_low_precision(img.w * img.h, MAX_PIXEL_NO, 0.1);
 
-	free_image(magick_wand);
+	free_image(image);
 
 	/* strict_resize */
-	magick_wand = load_image(media_file_path);
-	assert_not_equal(magick_wand, 0);
+	image = strict_resize(media_file_path, reduce_filed(a, MAX_PIXEL_NO));
+	assert_not_equal(image, 0);
 
-	magick_wand = strict_resize(magick_wand, a);
-	assert_not_equal(magick_wand, 0);
+	img = get_image_size(image);
 
-	assert_not_equal(MagickGetImageWidth(magick_wand), a.w);
-	assert_not_equal(MagickGetImageHeight(magick_wand), a.h);
-	assert_equal_low_precision(MagickGetImageWidth(magick_wand) * MagickGetImageHeight(magick_wand), MAX_PIXEL_NO, 0.1);
+	assert_not_equal(img.w, a.w);
+	assert_not_equal(img.h, a.h);
+	assert_equal_low_precision(img.w * img.h, MAX_PIXEL_NO, 0.1);
 
-	free_image(magick_wand);
+	free_image(image);
 	free(media_file_path);
 }
 
 static void test_remove_transparentcy() {
 	char *media_file_path;
-	MagickWand *magick_wand;
+	MagickWand *image;
 	struct dimensions a;
 
 	/* we re-size just 1 pixel so we don't loose our transparent region at (10,10) */
@@ -472,28 +485,24 @@ static void test_remove_transparentcy() {
 
 	media_file_path = create_media_file_path(IMAGE_TEST_FILE);
 
-	magick_wand = load_image(media_file_path);
-	assert_not_equal(magick_wand, 0);
+	image = load_image(media_file_path, a);
+	assert_not_equal(image, 0);
 
 	/* assert we have our test image loaded OK */
-	assert_image_pixel_color(magick_wand, IMAGE_TEST_FILE_WIDTH - 1, IMAGE_TEST_FILE_HEIGHT - 1, "rgb240,0,255");
+	assert_image_pixel_color(image, IMAGE_TEST_FILE_WIDTH - 1, IMAGE_TEST_FILE_HEIGHT - 1, "rgb240,0,255");
 
 	/* we assert that we don't have transparent pixel */
-	assert_image_pixel_alpha(magick_wand, 10, 10, 1.0);
+	assert_image_pixel_alpha(image, 10, 10, 1.0);
 	/* and color is DEFAULT_BACKGROUND_COLOR_MAGICK_STR */
-	assert_image_pixel_color(magick_wand, 10, 10, DEFAULT_BACKGROUND_COLOR_MAGICK_STR);
+	assert_image_pixel_color(image, 10, 10, DEFAULT_BACKGROUND_COLOR_MAGICK_STR);
 
-	magick_wand = strict_resize(magick_wand, a);
-	assert_not_equal(magick_wand, 0);
-
-
-	free_image(magick_wand);
+	free_image(image);
 	free(media_file_path);
 }
 
 static void test_prepare_blob() {
 	char *media_file_path;
-	MagickWand *magick_wand;
+	MagickWand *image;
 	struct dimensions a;
 	size_t blob_len;
 	unsigned char *blob;
@@ -503,14 +512,11 @@ static void test_prepare_blob() {
 
 	media_file_path = create_media_file_path(IMAGE_TEST_FILE);
 
-	magick_wand = load_image(media_file_path);
-	assert_not_equal(magick_wand, 0);
-
-	magick_wand = strict_resize(magick_wand, a);
-	assert_not_equal(magick_wand, 0);
+	image = strict_resize(media_file_path, a);
+	assert_not_equal(image, 0);
 
 	/* we are preparing JPEG data */
-	blob = prepare_blob(magick_wand, 70, &blob_len, "JPG");
+	blob = prepare_blob(image, 70, &blob_len, "JPG");
 	assert_not_equal(blob, 0);
 	assert_not_equal(blob_len, 0);
 
@@ -519,6 +525,7 @@ static void test_prepare_blob() {
 	assert_equal(blob[1], 0xd8);
 
 	free_blob(blob);
+	free_image(image);
 	free(media_file_path);
 }
 

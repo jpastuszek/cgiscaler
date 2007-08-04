@@ -23,6 +23,8 @@
 #include <config.h>
 #endif
 
+#include <string.h>
+
 #include "cgiscaler.h"
 #include "config.h"
 #include "file_utils.h"
@@ -56,14 +58,18 @@ MagickWand *remove_transparency(MagickWand *image);
 /* TODO: Performance tests... profiler? :D */
 
 /* Loads image, strips meta-data and sets it's default bg color */
-MagickWand *load_image(char *file_path) {
+MagickWand *load_image(const char *file_path, struct dimensions to_size) {
 	MagickWand *image;
 	MagickBooleanType status;
 	struct timer timeing;	
+	Image *_image;
+	ImageInfo *image_info;
+	ExceptionInfo *exception;
+	char size[24];
 
 	debug(DEB,"Loading image: '%s'", file_path);
 	timer_start(&timeing);
-
+/*
 	image = NewMagickWand();
 	if (!image) {
 		debug(ERR, "Creating new magick wand failed!");
@@ -76,6 +82,31 @@ MagickWand *load_image(char *file_path) {
 		DestroyMagickWand(image);
 		return 0;
 	}
+*/
+
+	image_info = CloneImageInfo((ImageInfo *) NULL);
+	strncpy(image_info->filename, file_path, MaxTextExtent);
+
+	if (to_size.w != 0 && to_size.h != 0) {
+		snprintf(size, 24, "%ux%u", to_size.w, to_size.h);
+		image_info->size = size;
+	}
+
+	exception = AcquireExceptionInfo();
+
+	_image = ReadImage(image_info, exception);
+	if (_image == (Image *) NULL) {
+		debug(WARN,"Loading image '%s' failed", image_info->filename);
+		return 0;
+	}
+
+	image = NewMagickWandFromImage(_image);
+	if (!image) {
+		debug(ERR, "Creating new magick wand failed!");
+		return 0;
+	}
+
+// EOH
 
 	debug(PROF, "Loading took %.3f s",  timer_stop(&timeing));
 
@@ -204,86 +235,190 @@ void free_blob(unsigned char *blob) {
 
 /* TODO: implement non aspect ratio keeping re-size */
 
-int apply_pre_resize_factor(int orginal, int target, float factor) {
-	if (target * factor > orginal)
-		return orginal;
-
-	return target * factor;
-}
-
-/* Re-size the image to to_size dimensions keeping aspect ration and fitting into to_size dimensions effectively using to_size width and height as the limits */
-MagickWand *fit_resize(MagickWand *image, struct dimensions to_size) {
+/* Re-size the image to resize_to dimensions keeping aspect ration and fitting into resize_to dimensions effectively using resize_to width and height as the limits */
+MagickWand *fit_resize(const char *file_path, struct dimensions resize_to) {
+	MagickWand *image_ping;
+	MagickWand *image;
 	struct dimensions image_size;
-	MagickBooleanType status;
-	struct timer timeing;	
+	struct dimensions load_size;
 
-	image_size.w = MagickGetImageWidth(image);
-	image_size.h = MagickGetImageHeight(image);
+	/* this will ping the image to get it's size */
+	image_ping = ping_image(file_path);
+	if (!image_ping)
+		return 0;
 
-	to_size = resize_to_fit_in(image_size, to_size);
+	image_size = get_image_size(image_ping);
 
-	/* we are reducing requested thumbnail resolution to MAX_PIXEL_NO */
-	to_size = reduce_filed(to_size, MAX_PIXEL_NO);
+	/* this will calculate target size for aspect ratio keeping resize method */
+	resize_to = resize_to_fit_in(image_size, resize_to);
 
-	timer_start(&timeing);
+	load_size = resize_to;
+	load_size.w *= 2;
+	load_size.h *= 2;
 
-	status = MagickAdaptiveResizeImage(image, apply_pre_resize_factor(image_size.w, to_size.w, 5), apply_pre_resize_factor(image_size.h, to_size.h, 5)); 	
-	if (status == MagickFalse) {
-		DestroyMagickWand(image);
+	/* loading image... if it fails wand will be 0 */
+	image = load_image(file_path, load_size);
+	if (!image) {
+		free_image(image_ping);
 		return 0;
 	}
 
-	status = MagickResizeImage(image, to_size.w, to_size.h, RESIZE_FILTER, RESIZE_SMOOTH_FACTOR);
-	if (status == MagickFalse) {
-		DestroyMagickWand(image);
-		return 0;
-	}
+	/* we don't need our ping any more */
+	free_image(image_ping);
 
-	debug(PROF, "Fit resize took %.3f s",  timer_stop(&timeing));
+	image = resize(image, resize_to, image_size);
+	if (!image)
+		return 0;
 
 	return image;
 }
 
-/* This will do so called strict scaling. It will re-size the image to to_size dimensions cutting off image regions to keep constant aspect ratio */
-MagickWand *strict_resize(MagickWand *image, struct dimensions to_size) {
-	struct dimensions image_size, crop_size;
-	int x, y;
-	MagickBooleanType status;
-	struct timer timeing;	
+unsigned char *fit_resize_to_blob(const char *file_path, struct dimensions resize_to, int quality, size_t *blob_len, const char *format) {
+	MagickWand *image;
+	unsigned char *blob;
+
+	image = fit_resize(file_path, resize_to);
+	if (!image)
+		return 0;
+
+	blob = prepare_blob(image, quality, blob_len, format);
+	if (!blob) {
+		free_image(image);
+		return 0;
+	}
+
+	free_image(image);
+
+	return blob;
+}
+
+/* This will do so called strict scaling. It will re-size the image to resize_to dimensions cutting off image regions to keep constant aspect ratio */
+MagickWand *strict_resize(const char *file_path, struct dimensions resize_to) {
+	MagickWand *image;
+	struct dimensions image_size;
+	struct dimensions load_size;
+	struct dimensions crop_to;
+
+	load_size = resize_to;
+	load_size.w *= 2;
+	load_size.h *= 2;
+
+	/* loading image... if it fails wand will be 0 */
+	image = load_image(file_path, load_size);
+	if (!image)
+		return 0;
+
+	image_size = get_image_size(image);
+	debug(DEB, "Doing CropResize: original: %d x %d to: %d x %d", image_size.w, image_size.h, resize_to.w, resize_to.h);
+
+	/* fit to_size into image_size */
+	crop_to = resize_to_fit_in(resize_to, image_size);
+	debug(DEB, "Crop to: %d x %d", crop_to.w, crop_to.h);
+
+	image = crop(image, crop_to, (image_size.w - crop_to.w) / 2, (image_size.h - crop_to.h) / 2);
+	if (!image)
+		return 0;
+
+	image = resize(image, resize_to, image_size);
+	if (!image)
+		return 0;
+
+	return image;
+}
+
+unsigned char *strict_resize_to_blob(const char *file_path, struct dimensions resize_to, int quality, size_t *blob_len, const char *format) {
+	MagickWand *image;
+	unsigned char *blob;
+
+	image = strict_resize(file_path, resize_to);
+	if (!image)
+		return 0;
+
+	blob = prepare_blob(image, quality, blob_len, format);
+	if (!blob) {
+		free_image(image);
+		return 0;
+	}
+
+	free_image(image);
+
+	return blob;
+}
+
+
+struct dimensions get_image_size(MagickWand *image) {
+	struct dimensions image_size;
 
 	image_size.w = MagickGetImageWidth(image);
 	image_size.h = MagickGetImageHeight(image);
 
-	debug(DEB, "Doing CropResize: original: %d x %d to: %d x %d", image_size.w, image_size.h, to_size.w, to_size.h);
+	return image_size;
+}
 
-	/* fit to_size into image_size */
-	crop_size = resize_to_fit_in(to_size, image_size);
-	debug(DEB, "Crop size: %d x %d", crop_size.w, crop_size.h);
+MagickWand *ping_image(const char *file_path) {
+	MagickBooleanType status;
+	MagickWand *image;
 
-	/* calculate to centre crop */
-	x = (image_size.w - crop_size.w) / 2;
-	y = (image_size.h - crop_size.h) / 2;
-	debug(DEB, "Crop centre: %d x %d", x, y);
+	image = NewMagickWand();
+	if (!image) {
+		debug(ERR, "Creating new magick wand failed!");
+		return 0;
+	}
+
+	status = MagickPingImage(image, file_path);
+	if (status == MagickFalse) {
+		debug(ERR, "Pinging image (obtaining size and format) failed!");
+		DestroyMagickWand(image);
+		return 0;
+	}
+
+	return image;
+}
+
+/* TODO: implement something better... */
+int apply_pre_resize_factor(int orginal, int target) {
+	if (target * 5 > orginal)
+		return orginal;
+
+	return target * 5;
+}
+
+MagickWand *resize(MagickWand *image, struct dimensions to_size, struct dimensions image_size) {
+	MagickBooleanType status;
+	struct timer timeing;
 
 	timer_start(&timeing);
 
-	status = MagickCropImage(image, crop_size.w, crop_size.h, x, y);
+	status = MagickAdaptiveResizeImage(image, apply_pre_resize_factor(image_size.w, to_size.w), apply_pre_resize_factor(image_size.h, to_size.h));
 	if (status == MagickFalse) {
 		DestroyMagickWand(image);
 		return 0;
 	}
 
-	/* we are reducing requested thumbnail resolution to MAX_PIXEL_NO */
-	to_size = reduce_filed(to_size, MAX_PIXEL_NO);
-
-	/* now it is time to re-size to to_size */
 	status = MagickResizeImage(image, to_size.w, to_size.h, RESIZE_FILTER, RESIZE_SMOOTH_FACTOR);
 	if (status == MagickFalse) {
 		DestroyMagickWand(image);
 		return 0;
 	}
 
-	debug(PROF, "Fit resize took %.3f s",  timer_stop(&timeing));
+	debug(PROF, "Resize took %.3f s",  timer_stop(&timeing));
+
+	return image;
+}
+
+MagickWand *crop(MagickWand *image, struct dimensions to_size, int x, int y) {
+	MagickBooleanType status;
+	struct timer timeing;
+
+	timer_start(&timeing);
+
+	status = MagickCropImage(image, to_size.w, to_size.h, x, y);
+	if (status == MagickFalse) {
+		DestroyMagickWand(image);
+		return 0;
+	}
+
+	debug(PROF, "Crop took %.3f s",  timer_stop(&timeing));
 
 	return image;
 }

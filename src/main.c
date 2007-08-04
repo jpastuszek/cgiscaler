@@ -33,7 +33,6 @@ int main(int argc, char *argv[])
 	struct runtime_config *config;
 	char *cache_file_path;
 	char *media_file_path;
-	MagickWand *image;
 	unsigned char *blob;
 	size_t blob_len;
 
@@ -81,36 +80,14 @@ int main(int argc, char *argv[])
 	/* now we need ImageMagick after this we should terminate ImgeMagick afterwards */
 	MagickWandGenesis();
 
-	/* loading image... if it fails wand will be 0 */
-	image = load_image(media_file_path);
-	if (!image) {
-		if (!config->no_serve)
-			serve_error(config->no_headers);
-		if (!config->no_cache)
-			free(cache_file_path);
-		free(media_file_path);
-		free_runtime_config(config);
-		MagickWandTerminus();
-		exit(71);
-	}
+	/* we are reducing requested thumbnail resolution to MAX_PIXEL_NO */
+	config->size = reduce_filed(config->size, MAX_PIXEL_NO);
 
-	/* according to strict value we are resizing or cropresizing... if fails wand == 0 */
 	if (config->strict)
-		image = strict_resize(image, config->size);
+		blob = strict_resize_to_blob(media_file_path, config->size, config->quality, &blob_len, OUT_FORMAT);
 	else
-		image = fit_resize(image, config->size);
-	if (!image) {
-		if (!config->no_serve)
-			serve_error(config->no_headers);
-		if (!config->no_cache)
-			free(cache_file_path);
-		free(media_file_path);
-		free_runtime_config(config);
-		MagickWandTerminus();
-		exit(72);
-	}
+		blob = fit_resize_to_blob(media_file_path, config->size, config->quality, &blob_len, OUT_FORMAT);
 
-	blob = prepare_blob(image, config->quality, &blob_len, OUT_FORMAT);
 	if (!blob) {
 		if (!config->no_serve)
 			serve_error(config->no_headers);
@@ -118,9 +95,8 @@ int main(int argc, char *argv[])
 			free(cache_file_path);
 		free(media_file_path);
 		free_runtime_config(config);
-		free_image(image);
 		MagickWandTerminus();
-		exit(73);
+		exit(80);
 	}
 
 	/* image processing is done */
@@ -128,7 +104,6 @@ int main(int argc, char *argv[])
 		serve_from_blob(blob, blob_len, OUT_FORMAT_MIME_TYPE, config->no_headers);
 
 	/* as we are served it is time for cache file write and clean up */
-	free_image(image);
 	MagickWandTerminus();
 
 	if (!config->no_cache)
