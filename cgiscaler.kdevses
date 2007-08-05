@@ -1,34 +1,46 @@
 <?xml version = '1.0' encoding = 'UTF-8'?>
 <!DOCTYPE KDevPrjSession>
 <KDevPrjSession>
- <DocsAndViews NumberOfDocuments="9" >
+ <DocsAndViews NumberOfDocuments="13" >
   <Doc0 NumberOfViews="1" URL="file:///home/kazuya/Projects/CGIScaler/src/query_string.c" >
-   <View0 Encoding="" Type="Source" />
+   <View0 Encoding="" line="0" Type="Source" />
   </Doc0>
   <Doc1 NumberOfViews="1" URL="file:///home/kazuya/Projects/CGIScaler/src/main.c" >
-   <View0 Encoding="" Type="Source" />
+   <View0 Encoding="" line="88" Type="Source" />
   </Doc1>
   <Doc2 NumberOfViews="1" URL="file:///home/kazuya/Projects/CGIScaler/src/query_string.h" >
    <View0 Encoding="" Type="Source" />
   </Doc2>
   <Doc3 NumberOfViews="1" URL="file:///home/kazuya/Projects/CGIScaler/src/commandline.c" >
-   <View0 Encoding="" Type="Source" />
+   <View0 Encoding="" line="0" Type="Source" />
   </Doc3>
   <Doc4 NumberOfViews="1" URL="file:///home/kazuya/Projects/CGIScaler/src/debug.h" >
    <View0 Encoding="" Type="Source" />
   </Doc4>
   <Doc5 NumberOfViews="1" URL="file:///home/kazuya/Projects/CGIScaler/src/cgiscaler.c" >
-   <View0 Encoding="" line="224" Type="Source" />
+   <View0 Encoding="" line="243" Type="Source" />
   </Doc5>
   <Doc6 NumberOfViews="1" URL="file:///home/kazuya/Projects/CGIScaler/src/config.h" >
-   <View0 Encoding="" line="25" Type="Source" />
+   <View0 Encoding="" Type="Source" />
   </Doc6>
   <Doc7 NumberOfViews="1" URL="file:///home/kazuya/Projects/CGIScaler/src/debug.c" >
-   <View0 Encoding="" line="127" Type="Source" />
+   <View0 Encoding="" Type="Source" />
   </Doc7>
   <Doc8 NumberOfViews="1" URL="file:///home/kazuya/Projects/CGIScaler/src/commandline.h" >
    <View0 Encoding="" line="23" Type="Source" />
   </Doc8>
+  <Doc9 NumberOfViews="1" URL="file:///home/kazuya/Projects/CGIScaler/src/file_utils.c" >
+   <View0 Encoding="" line="0" Type="Source" />
+  </Doc9>
+  <Doc10 NumberOfViews="1" URL="file:///home/kazuya/Projects/CGIScaler/src/geometry_math.c" >
+   <View0 Encoding="" line="63" Type="Source" />
+  </Doc10>
+  <Doc11 NumberOfViews="1" URL="file:///home/kazuya/Projects/CGIScaler/src/cgiscaler.h" >
+   <View0 Encoding="" line="38" Type="Source" />
+  </Doc11>
+  <Doc12 NumberOfViews="1" URL="file:///home/kazuya/Projects/CGIScaler/tests/test.c" >
+   <View0 Encoding="" line="463" Type="Source" />
+  </Doc12>
  </DocsAndViews>
  <pluginList>
   <kdevdebugger>
@@ -53,15 +65,15 @@
     <file line="30" url="src/query_string.c" col="0" encoding="" />
    </projectview>
    <projectview name="coding" >
-    <file line="0" url="src/debug.h" col="0" encoding="" />
-    <file line="83" url="src/cgiscaler.c" col="0" encoding="" />
-    <file line="21" url="src/config.h" col="0" encoding="" />
-    <file line="127" url="src/debug.c" col="27" encoding="" />
-    <file line="8" url="src/query_string.h" col="33" encoding="" />
-    <file line="2" url="src/commandline.h" col="29" encoding="" />
-    <file line="28" url="src/commandline.c" col="10" encoding="" />
-    <file line="32" url="src/query_string.c" col="10" encoding="" />
-    <file line="45" url="src/main.c" col="6" encoding="" />
+    <file line="0" url="src/query_string.c" col="0" encoding="" />
+    <file line="88" url="src/main.c" col="8" encoding="" />
+    <file line="0" url="src/commandline.c" col="0" encoding="" />
+    <file line="243" url="src/cgiscaler.c" col="0" encoding="" />
+    <file line="23" url="src/commandline.h" col="0" encoding="" />
+    <file line="0" url="src/file_utils.c" col="0" encoding="" />
+    <file line="63" url="src/geometry_math.c" col="1" encoding="" />
+    <file line="38" url="src/cgiscaler.h" col="32" encoding="" />
+    <file line="463" url="tests/test.c" col="0" encoding="" />
    </projectview>
    <projectview name="valgrind" >
     <file line="0" url="src/cache.c" col="0" encoding="" />
@@ -85,8 +97,8 @@
   <kdevbookmarks>
    <bookmarks>
     <bookmark url="/home/kazuya/Projects/CGIScaler/tests/test.c" >
-     <mark line="805" />
-     <mark line="606" />
+     <mark line="599" />
+     <mark line="798" />
     </bookmark>
    </bookmarks>
   </kdevbookmarks>

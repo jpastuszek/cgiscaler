@@ -29,7 +29,6 @@
 #include <sys/time.h>
 
 #include "debug.h"
-#include "config.h"
 
 int debug_file_fd;
 int debug_on;
