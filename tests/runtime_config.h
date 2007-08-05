@@ -1,1 +1,1 @@
-/home/kazuya/Projects/CGIScaler/src/runtime_config.h
+../src/runtime_config.h
