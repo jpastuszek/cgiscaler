@@ -31,8 +31,7 @@
 int main(int argc, char *argv[])
 {
 	struct runtime_config *config;
-	char *cache_file_path;
-	char *media_file_path;
+	cache_fpath *cache_file_path;
 	unsigned char *blob;
 	size_t blob_len;
 
@@ -51,7 +50,6 @@ int main(int argc, char *argv[])
 		exit(70);
 	}
 
-	media_file_path = create_media_file_path(config->file_name);
 	if (!config->no_cache)
 		cache_file_path = create_cache_file_path(config->file_name, OUT_FORMAT_EXTENSION, config->size.w, config->size.h, config->strict, config->quality);
 

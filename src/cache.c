@@ -41,7 +41,7 @@ Returns bit-mask:
 or
 	CACHE_OK original file mtime is same as cache file mtime
 */
-int check_if_cached(char *media_file_path, char *cache_file_path) {
+int check_if_cached(media_fpath *media_file_path, media_fpath *cache_file_path) {
 	int orginal_mtime, cache_mtime;
 
 	debug(DEB, "Checking cache");
@@ -49,8 +49,8 @@ int check_if_cached(char *media_file_path, char *cache_file_path) {
 	debug(DEB, "Original media file path: '%s' cache file path: '%s'", media_file_path, cache_file_path);
 
 
-	orginal_mtime = get_file_mtime(media_file_path);
-	cache_mtime = get_file_mtime(cache_file_path);
+	orginal_mtime = get_media_file_mtime(media_file_path);
+	cache_mtime = get_cache_file_mtime(cache_file_path);
 
 	debug(DEB,"Original media mtime: %d, Cache mtime: %d", orginal_mtime, cache_mtime);
 
@@ -69,13 +69,14 @@ int check_if_cached(char *media_file_path, char *cache_file_path) {
 	return CACHE_OK;
 }
 
-int write_blob_to_cache(unsigned char *blob, int blob_len, char *media_file_path, char *cache_file_path) {
+int write_blob_to_cache(unsigned char *blob, int blob_len, media_fpath *media_file_path, cache_fpath *cache_file_path) {
 	time_t orginal_mtime;
 	struct utimbuf time_buf;
+	abs_fpath *absolute_cache_file_path;
 
 	debug(DEB, "Writing cache file for media file '%s'", media_file_path);
 
-	orginal_mtime = get_file_mtime(media_file_path);
+	orginal_mtime = get_media_file_mtime(media_file_path);
 	if (!orginal_mtime) {
 		debug(WARN, "No original file while writing BLOB to cache file!");
 		return 0;
@@ -87,14 +88,19 @@ int write_blob_to_cache(unsigned char *blob, int blob_len, char *media_file_path
 		return 0;
 	}
 
-	if (!write_blob_to_file(blob, blob_len, cache_file_path)) {
-		debug(ERR, "Writing blob to file '%s' failed", cache_file_path);
+	absolute_cache_file_path = create_absolute_cache_file_path(cache_file_path);
+	
+	if (!write_blob_to_file(blob, blob_len, absolute_cache_file_path)) {
+		debug(ERR, "Writing blob to file '%s' failed", absolute_cache_file_path);
+		free_fpath(absolute_cache_file_path);
 		return 0;
 	}
 	
 	/* setting mod time to */
 	time_buf.actime = time_buf.modtime = orginal_mtime;
-	utime(cache_file_path, &time_buf);
+	utime(absolute_cache_file_path, &time_buf);
+
+	free_fpath(absolute_cache_file_path);
 
 	return 1;
 }

@@ -181,7 +181,7 @@ top_srcdir = @top_srcdir@
 # not a GNU package. You can remove this line, if
 # have all needed files, that a GNU package needs
 AUTOMAKE_OPTIONS = foreign 1.4
-SUBDIRS = cgreen src tests
+SUBDIRS = cgreen src test tests
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
 

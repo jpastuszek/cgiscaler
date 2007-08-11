@@ -1,0 +1,121 @@
+/***************************************************************************
+ *   Copyright (C) 2007 by Jakub Pastuszek   *
+ *   jpastuszek@gmail.com   *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ *   This program is distributed in the hope that it will be useful,       *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+ *   GNU General Public License for more details.                          *
+ *                                                                         *
+ *   You should have received a copy of the GNU General Public License     *
+ *   along with this program; if not, write to the                         *
+ *   Free Software Foundation, Inc.,                                       *
+ *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
+ ***************************************************************************/
+
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <sys/types.h>
+#include <unistd.h>
+
+#include "asserts.h"
+#include "../cgreen/cgreen.h"
+
+
+/* Returns file size in bytes or -1 */
+ssize_t get_file_size(char *file_path) {
+	int fd;
+	off_t pos;
+
+	assert_file_exists(file_path);
+
+	fd = open(file_path, O_RDONLY);
+	pos = lseek(fd, 0, SEEK_END);
+	assert_not_equal(pos, -1);
+
+	if (fd != -1)
+		close(fd);
+
+	return pos;
+}
+
+
+void assert_dir_exists(char *dir_path) {
+	struct stat s;
+	assert_not_equal_with_message(stat(dir_path, &s), -1, "directory [%s] does not exist", dir_path);
+	assert_true_with_message(S_ISDIR(s.st_mode), "directory [%s] is not a directory", dir_path);
+}
+
+void assert_file_exists(char *file_path) {
+        struct stat s;
+        assert_not_equal_with_message(stat(file_path, &s), -1, "file [%s] does not exist", file_path);
+}
+
+void assert_file_not_exists(char *file_path) {
+	struct stat s;
+        assert_equal_with_message(stat(file_path, &s), -1, "file [%s] exist", file_path);
+}
+
+void assert_file_size(char *file_path, off_t size) {
+	ssize_t fs;
+	fs = get_file_size(file_path);
+
+	assert_equal_with_message(fs, size, "file [%s] size is [%d] while should be [%d]", file_path, fs, size);
+}
+
+/* This function will read from fd until EOF and check if it read bytes number of bytes */
+void assert_byte_read(int fd, ssize_t bytes) {
+	int bread;
+	int btotal;
+	char buf[256];
+
+	btotal = 0;
+
+	do {
+		bread = read(fd, buf, 256);
+		if (bread == -1)
+			assert_true_with_message(0, "read from fd [%d] failed", fd);
+		btotal += bread;
+
+		/* debug(DEB, "Test: Bytes read %d", bread); */
+	} while(bread > 0);
+
+	assert_equal_with_message(btotal, bytes, "byte read [%d] from fd [%d] not equal [%d]", btotal, fd, bytes);
+}
+
+/* This function will look for \n\n in first 1000 bytes */
+void assert_headers_read(int fd) {
+	int bread;
+	int btotal;
+	char buf[1];
+	int has_end_line;
+
+	btotal = 0;
+	has_end_line = 0;
+
+	do {
+		bread = read(fd, buf, 1);
+		if (bread == -1)
+			assert_true_with_message(0, "read from fd [%d] failed", fd);
+		btotal += bread;
+
+		if (buf[0] == '\n')
+			has_end_line++;
+		else
+			has_end_line = 0;
+
+		if (has_end_line == 2)
+			break;
+		/* debug(DEB, "Test: Bytes read %d", bread); */
+	} while(bread > 0);
+
+	if (btotal > 1000)
+		assert_true_with_message(0, "headers not in first 1000 bytes");
+	assert_equal_with_message(has_end_line, 2, "no double end line found while reading from fd [%d]", fd);
+}
+

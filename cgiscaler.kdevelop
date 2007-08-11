@@ -20,7 +20,7 @@
   </general>
   <kdevautoproject>
     <general>
-      <activetarget>tests/test</activetarget>
+      <activetarget>test/serve</activetarget>
       <useconfiguration>debug</useconfiguration>
       <useactivetarget>true</useactivetarget>
     </general>
@@ -30,14 +30,20 @@
       <runarguments>
         <cgiscaler/>
         <test/>
+        <file_utils/>
+        <serve/>
       </runarguments>
       <debugarguments>
         <cgiscaler/>
         <test/>
+        <file_utils/>
+        <serve/>
       </debugarguments>
       <cwd>
         <cgiscaler>/home/kazuya/Projects/CGIScaler</cgiscaler>
-        <test>/home/kazuya/Projects/CGIScaler</test>
+        <test>/home/kazuya/Projects/cgiscaler/CGIScaler</test>
+        <file_utils>/home/kazuya/Projects/cgiscaler/CGIScaler</file_utils>
+        <serve>/home/kazuya/Projects/cgiscaler/CGIScaler</serve>
       </cwd>
       <programargs/>
       <globaldebugarguments/>

@@ -18,13 +18,8 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include "query_string.h"
-#include "file_utils.h"
+void assert_dir_exists(char *dir_path);
+void assert_file_exists(char *file_path);
+void assert_file_not_exists(char *file_path);
+void assert_file_size(char *file_path, off_t size);
 
-#define NO_ORIG 1
-#define NO_CACHE 2
-#define MTIME_DIFFER 4
-#define CACHE_OK 0
-
-int check_if_cached(media_fpath *media_file_path, media_fpath *cache_file_path);
-int write_blob_to_cache(unsigned char *blob, int blob_len, media_fpath *media_file_path, cache_fpath *cache_file_path);

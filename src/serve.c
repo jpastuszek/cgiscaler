@@ -33,7 +33,7 @@
 #include "config.h"
 #include "debug.h"
 
-void remove_cache_file(char *cache_file_path);
+void remove_cache_file(cache_fpath *cache_file_path);
 
 void sent_headers(unsigned int length, char *mime_type) {
 	printf("Content-Type: %s\n", mime_type);
@@ -44,17 +44,17 @@ void sent_headers(unsigned int length, char *mime_type) {
 	fflush(stdout);
 }
 
-int serve_from_file(char *file_path, char *mime_type,short int no_headers) {
+int serve_from_file(abs_fpath *absolute_file_path, char *mime_type, short int no_headers) {
 	unsigned char *buffer;
 	int file;
 	size_t bytes_read, bytes_written, total_bytes_read, total_bytes_written;
 	off_t file_size;
 
-	debug(DEB,"Serving from file: '%s' mime-type: '%s'", file_path, mime_type);
+	debug(DEB,"Serving from file: '%s' mime-type: '%s'", absolute_file_path, mime_type);
 
-	file = open(file_path, O_RDONLY);
+	file = open(absolute_file_path, O_RDONLY);
 	if (file == -1) {
-		debug(WARN,"Failed to open file '%s': %s", file_path, strerror(errno));
+		debug(WARN,"Failed to open file '%s': %s", absolute_file_path, strerror(errno));
 		return 0;
 	}
 
@@ -167,7 +167,10 @@ void serve_from_blob(unsigned char *blob, size_t blob_len, char *mime_type, shor
 Serves image from cache file
 Returns: 1 on success 0 when no proper cache file or read failure 
 */
-int serve_from_cache_file(char *media_file_path, char *cache_file_path, char *mime_type, short int no_headers) {
+int serve_from_cache_file(media_fpath *media_file_path, cache_fpath *cache_file_path, char *mime_type, short int no_headers) {
+	abs_fpath *absolute_cache_file_path;
+	int ret;
+
 	debug(DEB,"Trying cache file: '%s'", cache_file_path);
 /*
 Logick:
@@ -196,28 +199,38 @@ O C M
 			return 0;
 	}
 
+	absolute_cache_file_path = create_absolute_cache_file_path(cache_file_path);
+
 	/* serve */
 	debug(DEB,"Serving from cache");
-	return serve_from_file(cache_file_path, mime_type, no_headers);
+	ret = serve_from_file(absolute_cache_file_path, mime_type, no_headers);
+
+	free_fpath(absolute_cache_file_path);
+	return ret;
 }
 
-void remove_cache_file(char *cache_file_path) {
+void remove_cache_file(cache_fpath *cache_file_path) {
+	abs_fpath *absolute_cache_file_path;
 	debug(DEB, "Removing old cache file '%s'", cache_file_path);
-	if (unlink(cache_file_path) == -1)
-		debug(WARN, "Removing old cache file '%s' failed: %s", cache_file_path, strerror(errno));
+	absolute_cache_file_path = create_absolute_cache_file_path(cache_file_path);
+
+	if (unlink(absolute_cache_file_path) == -1)
+		debug(WARN, "Removing old cache file '%s' failed: %s", absolute_cache_file_path, strerror(errno));
+
+	free_fpath(absolute_cache_file_path);
 }
 
 /* we will try error image but if it does not exist we will fail back to error message */
 void serve_error(short int no_headers) {
-	char *file_path;
+	abs_fpath *absolute_media_file_path;
 
-	file_path = create_media_file_path(ERROR_FILE_PATH);
+	absolute_media_file_path = create_absolute_media_file_path(ERROR_FILE_PATH);
 
-	debug(DEB,"Serving error image: '%s'", file_path);
-	if (!serve_from_file(file_path, ERROR_FILE_MIME_TYPE, no_headers))
+	debug(DEB,"Serving error image: '%s'", absolute_media_file_path);
+	if (!serve_from_file(absolute_media_file_path, ERROR_FILE_MIME_TYPE, no_headers))
 		serve_error_message(no_headers);
 
-	free(file_path);
+	free_fpath(absolute_media_file_path);
 }
 
 /* serving plain text message as an absolute fail-back */
