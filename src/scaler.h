@@ -21,23 +21,24 @@
 #include <wand/MagickWand.h>
 #include <stdlib.h>
 
+#include "file_utils.h"
 #include "query_string.h"
 
-unsigned char *fit_resize_to_blob(const char *file_path, struct dimensions resize_to, int quality, size_t *blob_len, const char *format);
-unsigned char *strict_resize_to_blob(const char *file_path, struct dimensions resize_to, int quality, size_t *blob_len, const char *format) ;
+unsigned char *fit_resize_to_blob(media_fpath *media_file_path, struct dimensions resize_to, int quality, size_t *blob_len, const char *format);
+unsigned char *strict_resize_to_blob(media_fpath *media_file_path, struct dimensions resize_to, int quality, size_t *blob_len, const char *format) ;
 
 void free_blob(unsigned char *blob);
 
 /* private - exported just for tests */
-MagickWand *fit_resize(const char *file_path, struct dimensions resize_to);
-MagickWand *strict_resize(const char *file_path, struct dimensions resize_to);
+MagickWand *fit_resize(media_fpath *media_file_path, struct dimensions resize_to);
+MagickWand *strict_resize(media_fpath *media_file_path, struct dimensions resize_to);
 
-MagickWand *load_image(const char *file_name, struct dimensions to_size);
+MagickWand *load_image(media_fpath *media_file_path, struct dimensions to_size);
 void free_image(MagickWand *image);
 unsigned char *prepare_blob(MagickWand *image, int quality, size_t *blob_len,const char *format);
 
 struct dimensions get_image_size(MagickWand *image);
-MagickWand *ping_image(const char *file_path);
+MagickWand *ping_image(media_fpath *media_file_path);
 MagickWand *resize(MagickWand *image, struct dimensions to_size, struct dimensions image_size);
 MagickWand *crop(MagickWand *image, struct dimensions to_size, int x, int y);
 

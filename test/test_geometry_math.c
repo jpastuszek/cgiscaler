@@ -20,7 +20,9 @@
 
 #include <math.h>
 #include "../cgreen/cgreen.h"
+#include "asserts.h"
 #include "test_config.h"
+#include "debug.h"
 #include "geometry_math.h"
 
 /* geometry_math.c tests */

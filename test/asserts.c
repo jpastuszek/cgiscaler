@@ -143,3 +143,37 @@ void assert_equal_precision(double value, double expected, double precision_erro
 
 	assert_true_with_message(ret, "value [%F] not in precision range of [%F] and [%F] (%F)", value, expected - (range_delta / 2), expected + (range_delta / 2), precision_error);
 }
+
+/* TODO: Different quantum and different versions of IM returns different strings */
+void assert_image_pixel_color(MagickWand *magick_wand, int x, int y, const char *color) {
+	PixelWand *pixel_wand;
+	MagickBooleanType status;
+
+	pixel_wand = NewPixelWand();
+	status = MagickGetImagePixelColor(magick_wand, x, y, pixel_wand);
+	assert_not_equal(status, MagickFalse);
+
+	assert_string_equal(PixelGetColorAsString(pixel_wand), color);
+
+	DestroyPixelWand(pixel_wand);
+}
+
+void assert_image_pixel_alpha(MagickWand *magick_wand, int x, int y, float alpha) {
+	PixelWand *pixel_wand;
+	MagickBooleanType status;
+	int true;
+	float tested_alpha;
+
+	pixel_wand = NewPixelWand();
+	status = MagickGetImagePixelColor(magick_wand, x, y, pixel_wand);
+	assert_not_equal(status, MagickFalse);
+
+	true = 0;
+	tested_alpha = PixelGetAlpha(pixel_wand);
+	if (tested_alpha == alpha)
+		true = 1;
+
+	assert_true_with_message(true, "pixel alpha should be [%f] but is [%f]", alpha, tested_alpha);
+
+	DestroyPixelWand(pixel_wand);
+}

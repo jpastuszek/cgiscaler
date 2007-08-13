@@ -28,6 +28,7 @@
 #include "asserts.h"
 #include "file_utils.h"
 #include "test_config.h"
+#include "debug.h"
 #include "cache.h"
 #include "serve.h"
 

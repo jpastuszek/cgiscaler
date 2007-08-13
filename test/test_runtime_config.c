@@ -20,6 +20,7 @@
 
 #include "../cgreen/cgreen.h"
 #include "test_config.h"
+#include "debug.h"
 #include "runtime_config.h"
 
 

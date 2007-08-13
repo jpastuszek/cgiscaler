@@ -47,6 +47,7 @@ fpath *sanitize_file_path(fpath *file_path);
 int write_blob_to_file(unsigned char *blob, int blob_len,abs_fpath *absolute_file_path);
 
 /* private - exported for tests */
+time_t get_file_mtime(abs_fpath *absolute_file_path);
 fpath *make_file_name_relative(fpath *file_path);
 int check_for_double_dot(fpath *file_path);
 

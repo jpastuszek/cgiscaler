@@ -1,0 +1,1 @@
+/home/kazuya/Projects/cgiscaler/CGIScaler/src/scaler.h

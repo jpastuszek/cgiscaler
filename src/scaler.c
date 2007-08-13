@@ -19,13 +19,9 @@
  ***************************************************************************/
 
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
-
 #include <string.h>
 
-#include "cgiscaler.h"
+#include "scaler.h"
 #include "config.h"
 #include "file_utils.h"
 #include "geometry_math.h"
@@ -58,8 +54,9 @@ MagickWand *remove_transparency(MagickWand *image);
 /* TODO: Performance tests... profiler? :D */
 
 /* Loads image, strips meta-data and sets it's default bg color */
-MagickWand *load_image(const char *file_path, struct dimensions to_size) {
+MagickWand *load_image(media_fpath *media_file_path, struct dimensions to_size) {
 	MagickWand *image;
+	abs_fpath *absolute_media_file_path;
 	MagickBooleanType status;
 	struct timer timeing;	
 	Image *_image;
@@ -67,7 +64,7 @@ MagickWand *load_image(const char *file_path, struct dimensions to_size) {
 	ExceptionInfo *exception;
 	char size[24];
 
-	debug(DEB,"Loading image: '%s'", file_path);
+	debug(DEB,"Loading image: '%s'", media_file_path);
 	timer_start(&timeing);
 /*
 	image = NewMagickWand();
@@ -84,8 +81,12 @@ MagickWand *load_image(const char *file_path, struct dimensions to_size) {
 	}
 */
 
+	absolute_media_file_path = create_absolute_media_file_path(media_file_path);
+
 	image_info = CloneImageInfo((ImageInfo *) NULL);
-	strncpy(image_info->filename, file_path, MaxTextExtent);
+	strncpy(image_info->filename, absolute_media_file_path, MaxTextExtent);
+
+	free_fpath(absolute_media_file_path);
 
 	if (to_size.w != 0 && to_size.h != 0) {
 		snprintf(size, 24, "%ux%u", to_size.w, to_size.h);
@@ -236,14 +237,14 @@ void free_blob(unsigned char *blob) {
 /* TODO: implement non aspect ratio keeping re-size */
 
 /* Re-size the image to resize_to dimensions keeping aspect ration and fitting into resize_to dimensions effectively using resize_to width and height as the limits */
-MagickWand *fit_resize(const char *file_path, struct dimensions resize_to) {
+MagickWand *fit_resize(media_fpath *media_file_path, struct dimensions resize_to) {
 	MagickWand *image_ping;
 	MagickWand *image;
 	struct dimensions image_size;
 	struct dimensions load_size;
 
 	/* this will ping the image to get it's size */
-	image_ping = ping_image(file_path);
+	image_ping = ping_image(media_file_path);
 	if (!image_ping)
 		return 0;
 
@@ -257,7 +258,7 @@ MagickWand *fit_resize(const char *file_path, struct dimensions resize_to) {
 	load_size.h *= 2;
 
 	/* loading image... if it fails wand will be 0 */
-	image = load_image(file_path, load_size);
+	image = load_image(media_file_path, load_size);
 	if (!image) {
 		free_image(image_ping);
 		return 0;
@@ -273,11 +274,11 @@ MagickWand *fit_resize(const char *file_path, struct dimensions resize_to) {
 	return image;
 }
 
-unsigned char *fit_resize_to_blob(const char *file_path, struct dimensions resize_to, int quality, size_t *blob_len, const char *format) {
+unsigned char *fit_resize_to_blob(media_fpath *media_file_path, struct dimensions resize_to, int quality, size_t *blob_len, const char *format) {
 	MagickWand *image;
 	unsigned char *blob;
 
-	image = fit_resize(file_path, resize_to);
+	image = fit_resize(media_file_path, resize_to);
 	if (!image)
 		return 0;
 
@@ -293,7 +294,7 @@ unsigned char *fit_resize_to_blob(const char *file_path, struct dimensions resiz
 }
 
 /* This will do so called strict scaling. It will re-size the image to resize_to dimensions cutting off image regions to keep constant aspect ratio */
-MagickWand *strict_resize(const char *file_path, struct dimensions resize_to) {
+MagickWand *strict_resize(media_fpath *media_file_path, struct dimensions resize_to) {
 	MagickWand *image;
 	struct dimensions image_size;
 	struct dimensions load_size;
@@ -304,7 +305,7 @@ MagickWand *strict_resize(const char *file_path, struct dimensions resize_to) {
 	load_size.h *= 2;
 
 	/* loading image... if it fails wand will be 0 */
-	image = load_image(file_path, load_size);
+	image = load_image(media_file_path, load_size);
 	if (!image)
 		return 0;
 
@@ -326,11 +327,11 @@ MagickWand *strict_resize(const char *file_path, struct dimensions resize_to) {
 	return image;
 }
 
-unsigned char *strict_resize_to_blob(const char *file_path, struct dimensions resize_to, int quality, size_t *blob_len, const char *format) {
+unsigned char *strict_resize_to_blob(media_fpath *media_file_path, struct dimensions resize_to, int quality, size_t *blob_len, const char *format) {
 	MagickWand *image;
 	unsigned char *blob;
 
-	image = strict_resize(file_path, resize_to);
+	image = strict_resize(media_file_path, resize_to);
 	if (!image)
 		return 0;
 
@@ -355,7 +356,8 @@ struct dimensions get_image_size(MagickWand *image) {
 	return image_size;
 }
 
-MagickWand *ping_image(const char *file_path) {
+MagickWand *ping_image(media_fpath *media_file_path) {
+	abs_fpath *absolute_media_file_path;
 	MagickBooleanType status;
 	MagickWand *image;
 
@@ -365,13 +367,17 @@ MagickWand *ping_image(const char *file_path) {
 		return 0;
 	}
 
-	status = MagickPingImage(image, file_path);
+	absolute_media_file_path = create_absolute_media_file_path(media_file_path);
+
+	status = MagickPingImage(image, absolute_media_file_path);
 	if (status == MagickFalse) {
 		debug(ERR, "Pinging image (obtaining size and format) failed!");
+		free_fpath(absolute_media_file_path);
 		DestroyMagickWand(image);
 		return 0;
 	}
 
+	free_fpath(absolute_media_file_path);
 	return image;
 }
 

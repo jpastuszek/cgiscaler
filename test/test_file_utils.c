@@ -23,11 +23,13 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <unistd.h>
 
 #include "../cgreen/cgreen.h"
 #include "asserts.h"
 #include "file_utils.h"
 #include "test_config.h"
+#include "debug.h"
 
 static void test_create_cache_file_path() {
 	char compare_file_path[255];

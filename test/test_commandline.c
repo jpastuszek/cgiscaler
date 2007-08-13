@@ -21,6 +21,7 @@
 #include "../cgreen/cgreen.h"
 #include "test_config.h"
 #include "runtime_config.h"
+#include "debug.h"
 #include "commandline.h"
 
 /* commandline.c tests */

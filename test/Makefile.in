@@ -34,7 +34,8 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 bin_PROGRAMS = cache$(EXEEXT) commandline$(EXEEXT) file_utils$(EXEEXT) \
-	geometry_math$(EXEEXT) runtime_config$(EXEEXT) serve$(EXEEXT)
+	geometry_math$(EXEEXT) runtime_config$(EXEEXT) scaler$(EXEEXT) \
+	serve$(EXEEXT)
 subdir = test
 DIST_COMMON = $(noinst_HEADERS) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in
@@ -73,6 +74,11 @@ am_runtime_config_OBJECTS = debug.$(OBJEXT) runtime_config.$(OBJEXT) \
 	test_runtime_config.$(OBJEXT)
 runtime_config_OBJECTS = $(am_runtime_config_OBJECTS)
 runtime_config_DEPENDENCIES = $(top_builddir)/cgreen/libcgreen.a
+am_scaler_OBJECTS = asserts.$(OBJEXT) debug.$(OBJEXT) \
+	file_utils.$(OBJEXT) geometry_math.$(OBJEXT) scaler.$(OBJEXT) \
+	test_scaler.$(OBJEXT)
+scaler_OBJECTS = $(am_scaler_OBJECTS)
+scaler_DEPENDENCIES = $(top_builddir)/cgreen/libcgreen.a
 am_serve_OBJECTS = asserts.$(OBJEXT) cache.$(OBJEXT) debug.$(OBJEXT) \
 	file_utils.$(OBJEXT) serve.$(OBJEXT) stdio_capture.$(OBJEXT) \
 	test_serve.$(OBJEXT)
@@ -92,10 +98,10 @@ LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	$(LDFLAGS) -o $@
 SOURCES = $(cache_SOURCES) $(commandline_SOURCES) \
 	$(file_utils_SOURCES) $(geometry_math_SOURCES) \
-	$(runtime_config_SOURCES) $(serve_SOURCES)
+	$(runtime_config_SOURCES) $(scaler_SOURCES) $(serve_SOURCES)
 DIST_SOURCES = $(cache_SOURCES) $(commandline_SOURCES) \
 	$(file_utils_SOURCES) $(geometry_math_SOURCES) \
-	$(runtime_config_SOURCES) $(serve_SOURCES)
+	$(runtime_config_SOURCES) $(scaler_SOURCES) $(serve_SOURCES)
 HEADERS = $(noinst_HEADERS)
 ETAGS = etags
 CTAGS = ctags
@@ -206,12 +212,11 @@ sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-INCLUDES = 
 METASOURCES = AUTO
 file_utils_LDADD = $(top_builddir)/cgreen/libcgreen.a
 file_utils_SOURCES = asserts.c debug.c file_utils.c test_file_utils.c
-noinst_HEADERS = asserts.h cache.h cgiscaler.h commandline.h config.h debug.h \
-	file_utils.h geometry_math.h query_string.h runtime_config.h serve.h stdio_capture.h \
+noinst_HEADERS = asserts.h cache.h commandline.h config.h debug.h file_utils.h \
+	geometry_math.h query_string.h runtime_config.h scaler.h serve.h stdio_capture.h \
 	test_config.h
 
 serve_LDADD = $(top_builddir)/cgreen/libcgreen.a
@@ -231,6 +236,11 @@ commandline_SOURCES = asserts.c commandline.c debug.c file_utils.c \
 	runtime_config.c test_commandline.c
 
 commandline_LDADD = $(top_builddir)/cgreen/libcgreen.a
+scaler_SOURCES = asserts.c debug.c file_utils.c geometry_math.c scaler.c \
+	test_scaler.c
+
+AM_CFLAGS = -Wall -lMagick -lWand
+scaler_LDADD = $(top_builddir)/cgreen/libcgreen.a
 all: all-am
 
 .SUFFIXES:
@@ -307,6 +317,9 @@ geometry_math$(EXEEXT): $(geometry_math_OBJECTS) $(geometry_math_DEPENDENCIES)
 runtime_config$(EXEEXT): $(runtime_config_OBJECTS) $(runtime_config_DEPENDENCIES) 
 	@rm -f runtime_config$(EXEEXT)
 	$(LINK) $(runtime_config_OBJECTS) $(runtime_config_LDADD) $(LIBS)
+scaler$(EXEEXT): $(scaler_OBJECTS) $(scaler_DEPENDENCIES) 
+	@rm -f scaler$(EXEEXT)
+	$(LINK) $(scaler_OBJECTS) $(scaler_LDADD) $(LIBS)
 serve$(EXEEXT): $(serve_OBJECTS) $(serve_DEPENDENCIES) 
 	@rm -f serve$(EXEEXT)
 	$(LINK) $(serve_OBJECTS) $(serve_LDADD) $(LIBS)
@@ -324,6 +337,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/file_utils.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/geometry_math.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/runtime_config.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/scaler.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/serve.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/stdio_capture.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_cache.Po@am__quote@
@@ -331,6 +345,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_file_utils.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_geometry_math.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_runtime_config.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_scaler.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_serve.Po@am__quote@
 
 .c.o:

@@ -33,6 +33,9 @@
 #include "config.h"
 #include "debug.h"
 
+void remove_cache_file(cache_fpath *cache_file_path);
+
+
 /* this function will check if cache file exists and if corresponding original file mtime differs with cached version
 Returns bit-mask:
 	NO_ORIG original file does not exist
@@ -151,3 +154,13 @@ O C M
 	return ret;
 }
 
+void remove_cache_file(cache_fpath *cache_file_path) {
+	abs_fpath *absolute_cache_file_path;
+	debug(DEB, "Removing old cache file '%s'", cache_file_path);
+	absolute_cache_file_path = create_absolute_cache_file_path(cache_file_path);
+
+	if (unlink(absolute_cache_file_path) == -1)
+		debug(WARN, "Removing old cache file '%s' failed: %s", absolute_cache_file_path, strerror(errno));
+
+	free_fpath(absolute_cache_file_path);
+}

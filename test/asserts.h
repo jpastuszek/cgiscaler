@@ -19,11 +19,18 @@
  ***************************************************************************/
 
 #include <sys/types.h>
+#include <wand/MagickWand.h>
 
 void assert_dir_exists(char *dir_path);
 void assert_file_exists(char *file_path);
 void assert_file_not_exists(char *file_path);
 void assert_file_size(char *file_path, off_t size);
 
+void assert_byte_read(int fd, ssize_t bytes) ;
+void assert_headers_read(int fd);
+
 void assert_equal_low_precision(double value, double expected, double low_precision_error);
 void assert_equal_precision(double value, double expected, double precision_error) ;
+
+void assert_image_pixel_color(MagickWand *magick_wand, int x, int y, const char *color);
+void assert_image_pixel_alpha(MagickWand *magick_wand, int x, int y, float alpha) ;

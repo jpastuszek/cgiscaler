@@ -33,8 +33,6 @@
 #include "config.h"
 #include "debug.h"
 
-void remove_cache_file(cache_fpath *cache_file_path);
-
 void sent_headers(unsigned int length, char *mime_type) {
 	printf("Content-Type: %s\n", mime_type);
 	printf("Content-Length: %u\n", length);
@@ -161,17 +159,6 @@ void serve_from_blob(unsigned char *blob, size_t blob_len, char *mime_type, shor
 			break;
 		/* fsync(1); - this will only work on fs files not stdout */
 	}
-}
-
-void remove_cache_file(cache_fpath *cache_file_path) {
-	abs_fpath *absolute_cache_file_path;
-	debug(DEB, "Removing old cache file '%s'", cache_file_path);
-	absolute_cache_file_path = create_absolute_cache_file_path(cache_file_path);
-
-	if (unlink(absolute_cache_file_path) == -1)
-		debug(WARN, "Removing old cache file '%s' failed: %s", absolute_cache_file_path, strerror(errno));
-
-	free_fpath(absolute_cache_file_path);
 }
 
 /* we will try error image but if it does not exist we will fail back to error message */

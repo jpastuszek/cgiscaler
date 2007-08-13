@@ -18,6 +18,10 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+
 #include "stdio_capture.h"
 #include "../cgreen/cgreen.h"
 #include "asserts.h"
