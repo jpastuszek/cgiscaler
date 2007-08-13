@@ -58,14 +58,27 @@ MagickWand *load_image(media_fpath *media_file_path, struct dimensions to_size) 
 	MagickWand *image;
 	abs_fpath *absolute_media_file_path;
 	MagickBooleanType status;
-	struct timer timeing;	
+	struct timer timing;
 	Image *_image;
 	ImageInfo *image_info;
 	ExceptionInfo *exception;
 	char size[24];
 
+	absolute_media_file_path = create_absolute_media_file_path(media_file_path);
+
+	image_info = CloneImageInfo((ImageInfo *) NULL);
+	strncpy(image_info->filename, absolute_media_file_path, MaxTextExtent);
+
+	free_fpath(absolute_media_file_path);
+
+	if (to_size.w != 0 && to_size.h != 0) {
+		snprintf(size, 24, "%ux%u", to_size.w, to_size.h);
+		image_info->size = size;
+		debug(DEB, "Trying image size: %ux%u", to_size.w, to_size.h);
+	}
+
 	debug(DEB,"Loading image: '%s'", media_file_path);
-	timer_start(&timeing);
+	timer_start(&timing);
 /*
 	image = NewMagickWand();
 	if (!image) {
@@ -81,18 +94,6 @@ MagickWand *load_image(media_fpath *media_file_path, struct dimensions to_size) 
 	}
 */
 
-	absolute_media_file_path = create_absolute_media_file_path(media_file_path);
-
-	image_info = CloneImageInfo((ImageInfo *) NULL);
-	strncpy(image_info->filename, absolute_media_file_path, MaxTextExtent);
-
-	free_fpath(absolute_media_file_path);
-
-	if (to_size.w != 0 && to_size.h != 0) {
-		snprintf(size, 24, "%ux%u", to_size.w, to_size.h);
-		image_info->size = size;
-	}
-
 	exception = AcquireExceptionInfo();
 
 	_image = ReadImage(image_info, exception);
@@ -107,9 +108,13 @@ MagickWand *load_image(media_fpath *media_file_path, struct dimensions to_size) 
 		return 0;
 	}
 
-// EOH
+	debug(PROF, "Loading took %.3f s",  timer_stop(&timing));
 
-	debug(PROF, "Loading took %.3f s",  timer_stop(&timeing));
+	#ifdef DEBUG
+		to_size = get_image_size(image);
+		debug(DEB, "Resoulting image size: %ux%u", to_size.w, to_size.h);
+	#endif
+	
 
 	/* this will remove meta data - this is very important as photos have loads of it */
 	status = MagickStripImage(image);

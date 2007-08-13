@@ -222,7 +222,7 @@ top_srcdir = @top_srcdir@
 METASOURCES = AUTO
 file_utils_LDADD = $(top_builddir)/cgreen/libcgreen.a
 file_utils_SOURCES = asserts.c debug.c file_utils.c test_file_utils.c
-noinst_HEADERS = asserts.h cache.h commandline.h config.h debug.h file_utils.h \
+noinst_HEADERS = asserts.h cache.h commandline.h debug.h file_utils.h \
 	geometry_math.h query_string.h runtime_config.h scaler.h serve.h stdio_capture.h \
 	test_config.h
 
@@ -265,9 +265,9 @@ $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign  test/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu  test/Makefile'; \
 	cd $(top_srcdir) && \
-	  $(AUTOMAKE) --foreign  test/Makefile
+	  $(AUTOMAKE) --gnu  test/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \

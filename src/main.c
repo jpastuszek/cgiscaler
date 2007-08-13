@@ -34,10 +34,15 @@ int main(int argc, char *argv[])
 	cache_fpath *cache_file_path;
 	unsigned char *blob;
 	size_t blob_len;
+	struct timer run_timing;
+	struct timer serve_timing;
 
 	debug_start(DEBUG_FILE);
 	/* stop debugging on exit */
 	atexit(debug_stop);
+
+	timer_start(&run_timing);
+	timer_start(&serve_timing);
 	
 	config = alloc_default_runtime_config();
 
@@ -47,6 +52,9 @@ int main(int argc, char *argv[])
 	if (!config->file_name) {
 		if (!config->no_serve)
 			serve_error(config->no_headers);
+
+		debug(PROF, "Finished with error after %.3f s",  timer_stop(&run_timing));
+
 		exit(70);
 	}
 
@@ -60,6 +68,7 @@ int main(int argc, char *argv[])
 				if (!config->no_cache)
 					free_fpath(cache_file_path);
 				free_runtime_config(config);
+				debug(PROF, "Served from cache after %.3f s",  timer_stop(&run_timing));
 				exit(0);
 			}
 		} else {
@@ -68,6 +77,7 @@ int main(int argc, char *argv[])
 				if (!config->no_cache)
 					free_fpath(cache_file_path);
 				free_runtime_config(config);
+				debug(PROF, "Finished crom cache after %.3f s",  timer_stop(&run_timing));
 				exit(0);
 			}
 		}
@@ -95,9 +105,11 @@ int main(int argc, char *argv[])
 	}
 
 	/* image processing is done */
-	if (!config->no_serve)
+	if (!config->no_serve) {
 		serve_from_blob(blob, blob_len, OUT_FORMAT_MIME_TYPE, config->no_headers);
+		debug(PROF, "Served after %.3f s",  timer_stop(&serve_timing));
 
+	}
 	/* as we are served it is time for cache file write and clean up */
 	MagickWandTerminus();
 
@@ -108,6 +120,8 @@ int main(int argc, char *argv[])
 	if (!config->no_cache)
 		free_fpath(cache_file_path);
 	free_runtime_config(config);
+
+	debug(PROF, "Total run time %.3f s",  timer_stop(&run_timing));
 
 	return EXIT_SUCCESS;
 }
