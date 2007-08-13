@@ -104,3 +104,50 @@ int write_blob_to_cache(unsigned char *blob, int blob_len, media_fpath *media_fi
 
 	return 1;
 }
+
+/* 
+Serves image from cache file
+Returns: 1 on success 0 when no proper cache file or read failure 
+*/
+int serve_from_cache_file(media_fpath *media_file_path, cache_fpath *cache_file_path, char *mime_type, short int no_headers) {
+	abs_fpath *absolute_cache_file_path;
+	int ret;
+
+	debug(DEB,"Trying cache file: '%s'", cache_file_path);
+/*
+Logick:
+_ _
+O C M
+
+1 1 0 - exit
+0 1 0 - exit
+1 0 0 - rm, exit
+0 0 1 - rm, exit
+0 0 0 - serve
+*/
+
+	switch (check_if_cached(media_file_path, cache_file_path)) {
+		/* we don't have cache file or both... returning */
+		case NO_CACHE:
+		case NO_CACHE | NO_ORIG:
+			debug(DEB, "No cache file");
+			return 0;
+
+		/* we don't have orig or cache file old... remove cache file and return */
+		case NO_ORIG:
+		case MTIME_DIFFER:
+			debug(DEB, "No original or mtime with original differ");
+			remove_cache_file(cache_file_path);
+			return 0;
+	}
+
+	absolute_cache_file_path = create_absolute_cache_file_path(cache_file_path);
+
+	/* serve */
+	debug(DEB,"Serving from cache");
+	ret = serve_from_file(absolute_cache_file_path, mime_type, no_headers);
+
+	free_fpath(absolute_cache_file_path);
+	return ret;
+}
+

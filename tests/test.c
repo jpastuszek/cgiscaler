@@ -438,89 +438,6 @@ static void test_prepare_blob() {
 	free(media_file_path);
 }
 
-/* cache.c tests */
-static void test_if_cached() {
-	char *cache_file_path;
-	char *media_file_path;
-	int test_fd;
-	struct utimbuf time_buf;
-
-	/* tests with bogo file */
-	media_file_path = create_media_file_path("bogo.jpg");
-	cache_file_path = create_cache_file_path("bogo.jpg", OUT_FORMAT_EXTENSION, 0, 0, 0, 0);
-
-	assert_equal(check_if_cached(media_file_path, cache_file_path), NO_ORIG | NO_CACHE);
-
-	/* creating test file */
-	test_fd = open(cache_file_path, O_CREAT|O_WRONLY|O_TRUNC);
-	assert_not_equal(test_fd, -1);
-	close(test_fd);
-	
-	assert_equal(check_if_cached(media_file_path, cache_file_path), NO_ORIG);
-
-	/* cleaning up test file */
-	assert_not_equal(unlink(cache_file_path), -1);
-
-	free(cache_file_path);
-	free(media_file_path);
-
-	/* and now with real file */
-	media_file_path = create_media_file_path(IMAGE_TEST_FILE);
-	cache_file_path = create_cache_file_path(IMAGE_TEST_FILE, OUT_FORMAT_EXTENSION, 0, 0, 0, 0);
-
-	assert_equal(check_if_cached(media_file_path, cache_file_path), NO_CACHE);
-
-	/* creating test file */
-	test_fd = open(cache_file_path, O_CREAT|O_WRONLY|O_TRUNC);
-	assert_not_equal(test_fd, -1);
-	close(test_fd);
-
-	assert_equal(check_if_cached(media_file_path, cache_file_path), MTIME_DIFFER);
-
-	/* now we will set mtime to match original file */
-	time_buf.actime = time_buf.modtime = get_file_mtime(media_file_path);
-	assert_not_equal(utime(cache_file_path, &time_buf), -1);
-
-	assert_equal(check_if_cached(media_file_path, cache_file_path), CACHE_OK);
-
-	/* cleaning up test file */
-	assert_not_equal(unlink(cache_file_path), -1);
-	
-	free(media_file_path);
-	free(cache_file_path);
-}
-
-static void test_write_blob_to_cache() {
-	unsigned char *test_blob;
-	char *cache_file_path;
-	char *media_file_path;
-
-	test_blob = malloc(3000);
-
-	/* tests with bogo file */
-	media_file_path = create_media_file_path("blob.test");
-	cache_file_path = create_cache_file_path("blob.test", OUT_FORMAT_EXTENSION, 0, 0, 0, 0);
-
-	assert_equal(write_blob_to_cache(test_blob, 3000, media_file_path, cache_file_path), 0);
-
-	free(media_file_path);
-	free(cache_file_path);
-
-	/* now we will try existing original file */
-	media_file_path = create_media_file_path(IMAGE_TEST_FILE);
-	cache_file_path = create_cache_file_path(IMAGE_TEST_FILE, OUT_FORMAT_EXTENSION, 0, 0, 0, 0);
-
-	assert_not_equal(write_blob_to_cache(test_blob, 3000, media_file_path, cache_file_path), 0);
-	assert_file_size(cache_file_path, 3000);
-
-	/* cleaning up test file */
-	assert_not_equal(unlink(cache_file_path), -1);
-
-	free(media_file_path);
-	free(cache_file_path);
-	free(test_blob);
-}
-
 
 /* runtime_config.c tests */
 static void test_alloc_default_runtime_config() {
@@ -694,7 +611,6 @@ int main(int argc, char **argv) {
 
 	TestSuite *geometry_math_suite = create_test_suite();
 	TestSuite *cgiscaler_suite = create_test_suite();
-	TestSuite *cache_suite = create_test_suite();
 	TestSuite *runtime_config_suite = create_test_suite();
 	TestSuite *commandline_suite = create_test_suite();
 	TestSuite *query_string_suite = create_test_suite();
@@ -710,10 +626,6 @@ int main(int argc, char **argv) {
 	add_test(cgiscaler_suite, test_remove_transparentcy);
 	add_test(cgiscaler_suite, test_prepare_blob);
 	add_suite(suite, cgiscaler_suite);
-
-	add_test(cache_suite, test_if_cached);
-	add_test(cache_suite, test_write_blob_to_cache);
-	add_suite(suite, cache_suite);
 
 	add_test(runtime_config_suite, test_alloc_default_runtime_config);
 	add_suite(suite, runtime_config_suite);

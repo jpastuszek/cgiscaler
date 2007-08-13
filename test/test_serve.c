@@ -25,70 +25,13 @@
 #include <string.h>
 
 #include "../cgreen/cgreen.h"
+#include "stdio_capture.h"
 #include "asserts.h"
 #include "file_utils.h"
 #include "test_config.h"
 #include "serve.h"
 
 /* serve.c tests */
-
-/* some serving specific helpers */
-
-int orginal_stdout = 0;
-
-/* Returns stdout associated with file descriptor */
-int capture_stdout() {
-	int p[2];
-	
-	/* saving original stdout */
-	if (!orginal_stdout)
-		orginal_stdout = dup(1);
-
-	assert_not_equal(orginal_stdout, 0);
-
-	assert_not_equal(pipe(p), -1);
-
-	assert_not_equal(close(1), -1);
-	/* use write pipe end as stdout */
-	assert_not_equal(dup2(p[1], 1), -1);
-
-	/* closing original write pipe end as we have it duplicated */
-	assert_not_equal(close(p[1]), -1);
-
-	/* return read pipe end */
-	return p[0];
-}
-
-/* Brings back normal stdout */
-void restore_stdout() {
-	/* close write pipe end */
-	assert_not_equal(close(1), -1);
-
-	/* and restore form saved */
-	if (orginal_stdout)
-		assert_not_equal(dup2(orginal_stdout, 1), -1);
-}
-
-/* this function will fork and redirect child stdout to stdout_fd pipe end; stdout_ft needs to be freed with finish_fork witch will also wait until child exists */
-static int fork_with_stdout_capture(int *stdout_fd) {
-	*stdout_fd = capture_stdout();
-	if(!fork())
-		return 0;
-
-	/* We restore our local stdout */
-	restore_stdout();
-	return 1;
-}
-
-/* make sure you finish_fork after doing fork_with_stdout_capture, between this two calls things will happen simultaneously */
-static void finish_fork(int stdout_fd) {
-	int status;
-	/* we will wait for child to finish */
-	wait(&status);
-
-	/* and close stdout redirect pipe */
-	close(stdout_fd);
-}
 
 static void test_serve_from_file() {
 	int stdout_fd;
@@ -173,119 +116,6 @@ static void test_serve_from_blob() {
 	free(blob);
 }
 
-static void test_serve_from_cache_file() {
-	int stdout_fd;
-	int status;
-	unsigned char *blob;
-	cache_fpath *cache_file_path;
-	abs_fpath *absolute_cache_file_path;
-
-	blob = malloc(3000);
-	assert_not_equal(blob, 0);
-	memset(blob, 54, 3000);
-
-	/* tests with real file */
-	cache_file_path = create_cache_file_path(IMAGE_TEST_FILE, OUT_FORMAT_EXTENSION, 0, 0, 0, 0);
-	absolute_cache_file_path = create_absolute_cache_file_path(cache_file_path);
-
-	/* create test cache file - mtime should be set properly */
-	assert_equal(write_blob_to_cache(blob, 3000, IMAGE_TEST_FILE, cache_file_path), 1);
-
-	if (!fork_with_stdout_capture(&stdout_fd)) {
-		status = serve_from_cache_file(IMAGE_TEST_FILE, cache_file_path, OUT_FORMAT_MIME_TYPE, 0);
-		if (!status) {
-			restore_stdout();
-			assert_true_with_message(0, "serve_from_cache failed");
-		}
-		exit(0);
-	}
-
-	assert_headers_read(stdout_fd);
-	assert_byte_read(stdout_fd, 3000);
-
-	finish_fork(stdout_fd);
-
-	/* cleaning up test file */
-	assert_not_equal(-1, unlink(absolute_cache_file_path));
-
-	/* create test cache file - mtime should be set properly */
-	assert_equal(write_blob_to_cache(blob, 3000, IMAGE_TEST_FILE, cache_file_path), 1);
-
-	if (!fork_with_stdout_capture(&stdout_fd)) {
-		status = serve_from_cache_file(IMAGE_TEST_FILE, cache_file_path, OUT_FORMAT_MIME_TYPE, 1);
-		if (!status) {
-			restore_stdout();
-			assert_true_with_message(0, "serve_from_cache failed");
-		}
-		exit(0);
-	}
-
-	assert_byte_read(stdout_fd, 3000);
-
-	finish_fork(stdout_fd);
-
-	/* cleaning up test file */
-	assert_not_equal(-1, unlink(absolute_cache_file_path));
-
-	/* test with wrong mtime */
-	/* create test file - mtime should be set to current time */
-	assert_equal(write_blob_to_file(blob, 3000, absolute_cache_file_path), 1);
-
-	if (!fork_with_stdout_capture(&stdout_fd)) {
-		status = serve_from_cache_file(IMAGE_TEST_FILE, cache_file_path, OUT_FORMAT_MIME_TYPE, 1);
-		if (status) {
-			restore_stdout();
-			assert_true_with_message(0, "serve_from_cache failed");
-		}
-		exit(0);
-	}
-
-	finish_fork(stdout_fd);
-
-	/* there should be no cache file as it should be removed */
-	assert_file_not_exists(absolute_cache_file_path);
-
-	/* test with no cache */
-	if (!fork_with_stdout_capture(&stdout_fd)) {
-		status = serve_from_cache_file(IMAGE_TEST_FILE, cache_file_path, OUT_FORMAT_MIME_TYPE, 1);
-		if (status) {
-			restore_stdout();
-			assert_true_with_message(0, "serve_from_cache failed");
-		}
-		exit(0);
-	}
-
-	finish_fork(stdout_fd);
-
-	free_fpath(absolute_cache_file_path);
-	free_fpath(cache_file_path);
-
-	/* test with no original file */
-	cache_file_path = create_cache_file_path("bogo.file", OUT_FORMAT_EXTENSION, 0, 0, 0, 0);
-	absolute_cache_file_path = create_absolute_cache_file_path(cache_file_path);
-
-	/* create test cache file */
-	assert_equal(write_blob_to_file(blob, 3000, absolute_cache_file_path), 1);
-
-	if (!fork_with_stdout_capture(&stdout_fd)) {
-		status = serve_from_cache_file("bogo.file", cache_file_path, OUT_FORMAT_MIME_TYPE, 1);
-		if (status) {
-			restore_stdout();
-			assert_true_with_message(0, "serve_from_cache failed");
-		}
-		exit(0);
-	}
-
-	finish_fork(stdout_fd);
-
-	/* there should be no cache file as it should be removed */
-	assert_file_not_exists(absolute_cache_file_path);
-
-	free_fpath(absolute_cache_file_path);
-	free_fpath(cache_file_path);
-
-	free(blob);
-}
 
 static void test_serve_error() {
 	int stdout_fd;
@@ -356,7 +186,6 @@ int main(int argc, char **argv) {
 
 	add_test(serve_suite, test_serve_from_file);
 	add_test(serve_suite, test_serve_from_blob);
-	add_test(serve_suite, test_serve_from_cache_file);
 	add_test(serve_suite, test_serve_error);
 	add_test(serve_suite, test_serve_error_message);
 

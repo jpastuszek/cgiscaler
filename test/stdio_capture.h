@@ -18,10 +18,5 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include <sys/types.h>
-
-void assert_dir_exists(char *dir_path);
-void assert_file_exists(char *file_path);
-void assert_file_not_exists(char *file_path);
-void assert_file_size(char *file_path, off_t size);
-
+ int fork_with_stdout_capture(int *stdout_fd);
+ void finish_fork(int stdout_fd);
