@@ -259,8 +259,8 @@ MagickWand *fit_resize(media_fpath *media_file_path, struct dimensions resize_to
 	resize_to = resize_to_fit_in(image_size, resize_to);
 
 	load_size = resize_to;
-	load_size.w *= 2;
-	load_size.h *= 2;
+//	load_size.w *= 2;
+//	load_size.h *= 2;
 
 	/* loading image... if it fails wand will be 0 */
 	image = load_image(media_file_path, load_size);
@@ -306,8 +306,8 @@ MagickWand *strict_resize(media_fpath *media_file_path, struct dimensions resize
 	struct dimensions crop_to;
 
 	load_size = resize_to;
-	load_size.w *= 2;
-	load_size.h *= 2;
+//	load_size.w *= 2;
+//	load_size.h *= 2;
 
 	/* loading image... if it fails wand will be 0 */
 	image = load_image(media_file_path, load_size);
