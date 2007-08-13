@@ -34,8 +34,8 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 bin_PROGRAMS = cache$(EXEEXT) commandline$(EXEEXT) file_utils$(EXEEXT) \
-	geometry_math$(EXEEXT) runtime_config$(EXEEXT) scaler$(EXEEXT) \
-	serve$(EXEEXT)
+	geometry_math$(EXEEXT) query_string$(EXEEXT) \
+	runtime_config$(EXEEXT) scaler$(EXEEXT) serve$(EXEEXT)
 subdir = test
 DIST_COMMON = $(noinst_HEADERS) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in
@@ -70,6 +70,11 @@ geometry_math_DEPENDENCIES = $(top_builddir)/cgreen/libcgreen.a
 geometry_math_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(geometry_math_LDFLAGS) $(LDFLAGS) -o $@
+am_query_string_OBJECTS = debug.$(OBJEXT) file_utils.$(OBJEXT) \
+	query_string.$(OBJEXT) runtime_config.$(OBJEXT) \
+	test_query_string.$(OBJEXT)
+query_string_OBJECTS = $(am_query_string_OBJECTS)
+query_string_DEPENDENCIES = $(top_builddir)/cgreen/libcgreen.a
 am_runtime_config_OBJECTS = debug.$(OBJEXT) runtime_config.$(OBJEXT) \
 	test_runtime_config.$(OBJEXT)
 runtime_config_OBJECTS = $(am_runtime_config_OBJECTS)
@@ -98,10 +103,12 @@ LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	$(LDFLAGS) -o $@
 SOURCES = $(cache_SOURCES) $(commandline_SOURCES) \
 	$(file_utils_SOURCES) $(geometry_math_SOURCES) \
-	$(runtime_config_SOURCES) $(scaler_SOURCES) $(serve_SOURCES)
+	$(query_string_SOURCES) $(runtime_config_SOURCES) \
+	$(scaler_SOURCES) $(serve_SOURCES)
 DIST_SOURCES = $(cache_SOURCES) $(commandline_SOURCES) \
 	$(file_utils_SOURCES) $(geometry_math_SOURCES) \
-	$(runtime_config_SOURCES) $(scaler_SOURCES) $(serve_SOURCES)
+	$(query_string_SOURCES) $(runtime_config_SOURCES) \
+	$(scaler_SOURCES) $(serve_SOURCES)
 HEADERS = $(noinst_HEADERS)
 ETAGS = etags
 CTAGS = ctags
@@ -241,6 +248,10 @@ scaler_SOURCES = asserts.c debug.c file_utils.c geometry_math.c scaler.c \
 
 AM_CFLAGS = -Wall -lMagick -lWand
 scaler_LDADD = $(top_builddir)/cgreen/libcgreen.a
+query_string_SOURCES = debug.c file_utils.c query_string.c runtime_config.c \
+	test_query_string.c
+
+query_string_LDADD = $(top_builddir)/cgreen/libcgreen.a
 all: all-am
 
 .SUFFIXES:
@@ -314,6 +325,9 @@ file_utils$(EXEEXT): $(file_utils_OBJECTS) $(file_utils_DEPENDENCIES)
 geometry_math$(EXEEXT): $(geometry_math_OBJECTS) $(geometry_math_DEPENDENCIES) 
 	@rm -f geometry_math$(EXEEXT)
 	$(geometry_math_LINK) $(geometry_math_OBJECTS) $(geometry_math_LDADD) $(LIBS)
+query_string$(EXEEXT): $(query_string_OBJECTS) $(query_string_DEPENDENCIES) 
+	@rm -f query_string$(EXEEXT)
+	$(LINK) $(query_string_OBJECTS) $(query_string_LDADD) $(LIBS)
 runtime_config$(EXEEXT): $(runtime_config_OBJECTS) $(runtime_config_DEPENDENCIES) 
 	@rm -f runtime_config$(EXEEXT)
 	$(LINK) $(runtime_config_OBJECTS) $(runtime_config_LDADD) $(LIBS)
@@ -336,6 +350,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/debug.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/file_utils.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/geometry_math.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/query_string.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/runtime_config.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/scaler.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/serve.Po@am__quote@
@@ -344,6 +359,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_commandline.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_file_utils.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_geometry_math.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_query_string.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_runtime_config.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_scaler.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_serve.Po@am__quote@
