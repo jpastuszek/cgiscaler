@@ -19,6 +19,9 @@
  ***************************************************************************/
 /* This is test config file */
 
+#ifndef TEST_CONFIG_H
+#define TEST_CONFIG_H
+
 #define DEBUG_FILE "/tmp/cgiscaler_test.deb"
 //#define DEBUG_SYNC
 
@@ -98,3 +101,5 @@
 #define MAX_PIXEL_NO ((IMAGE_TEST_FILE_WIDTH - 10) * (IMAGE_TEST_FILE_HEIGHT - 10) - 4000)
 
 #define WRITE_BUFFER_LEN 8192
+
+#endif

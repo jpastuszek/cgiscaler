@@ -3,7 +3,7 @@ bin_PROGRAMS = cache commandline file_utils geometry_math query_string \
 	runtime_config scaler serve
 file_utils_LDADD = $(top_builddir)/cgreen/libcgreen.a
 file_utils_SOURCES = asserts.c debug.c file_utils.c test_file_utils.c
-noinst_HEADERS = asserts.h cache.h commandline.h config.h debug.h file_utils.h \
+noinst_HEADERS = asserts.h cache.h commandline.h debug.h file_utils.h \
 	geometry_math.h query_string.h runtime_config.h scaler.h serve.h stdio_capture.h \
 	test_config.h
 serve_LDADD = $(top_builddir)/cgreen/libcgreen.a
