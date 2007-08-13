@@ -201,48 +201,6 @@ ssize_t get_file_size(char *file_path) {
 }
 
 
-/* geometry_math.c tests */
-static void test_resize_to_fit_in() {
-	struct dimensions a, b, c;
-
-	a.w = 100;
-	a.h = 200;
-
-	/* down fit */
-	b.w = 200;
-	b.h = 100;
-
-	c = resize_to_fit_in(a, b);
-	assert_equal(c.w, 50);
-	assert_equal(c.h, 100);
-
-	/* up fit */
-	b.w = 1200;
-	b.h = 1200;
-
-	c = resize_to_fit_in(a, b);
-	assert_equal(c.w, 600);
-	assert_equal(c.h, 1200);
-}
-
-static void test_reduce_filed() {
-	struct dimensions a, b;
-
-	/* field = 100*200 = 20000 */
-	a.w = 100;
-	a.h = 200;
-
-	b = reduce_filed(a, 1234);
-	/* we check if reduction worked (within 10% lower precision margin) */
-	assert_equal_low_precision(b.w * b.h, 1234.0, 0.1);
-	/* we check if aspect ratio did not changed (within 10% precision margin) */
-	assert_equal_precision((float) b.w / b.h,(float) a.w / a.h, 0.1);
-
-	/* over reduction - nothing should change */
-	b = reduce_filed(a, 999999);
-	assert_equal(a.w, 100);
-	assert_equal(a.h, 200);
-}
 
 /* cgiscaler.c tests */
 static void test_load_image() {
@@ -439,81 +397,7 @@ static void test_prepare_blob() {
 }
 
 
-/* runtime_config.c tests */
-static void test_alloc_default_runtime_config() {
-	struct runtime_config *config;
 
-	config = alloc_default_runtime_config();
-
-	assert_not_equal(config, 0);
-	assert_equal(config->file_name, 0);
-	assert_equal(config->size.w, DEFAULT_WIDTH);
-	assert_equal(config->size.h, DEFAULT_HEIGHT);
-	assert_equal(config->strict, DEFAULT_STRICT);
-	assert_equal(config->quality, DEFAULT_QUALITY);
-	assert_equal(config->no_cache, DEFAULT_NO_CACHE);
-	assert_equal(config->no_serve, DEFAULT_NO_SERVE);
-	assert_equal(config->no_headers, DEFAULT_NO_HEADERS);
-
-	free_runtime_config(config);
-
-	config = alloc_default_runtime_config();
-	config->file_name = malloc(6);
-	assert_not_equal(config->file_name, 0);
-
-	/* for memory leak test (valgrind) - file name should be freed */
-	free_runtime_config(config);
-}
-
-/* commandline.c tests */
-static void test_apply_commandline_config() {
-	struct runtime_config *config;
-	char *args1[] = { "test", "-w", "100", "-h", "200" };
-	char *args2[] = { "test", "-w", "100", "-s", "true", "-nc", "false", "-ns", "true", "-nh", "dsfa", "abc/e/f.jpg" };
-	char *args3[] = { "test", "file.gif", "-h", "300", "-h", "100" };
-
-
-	config = alloc_default_runtime_config();
-
-	apply_commandline_config(config, 5, args1);
-
-	assert_equal(config->file_name, 0);
-	assert_equal(config->size.w, 100);
-	assert_equal(config->size.h, 200);
-	assert_equal(config->strict, DEFAULT_STRICT);
-	assert_equal(config->quality, DEFAULT_QUALITY);
-	assert_equal(config->no_cache, DEFAULT_NO_CACHE);
-	assert_equal(config->no_serve, DEFAULT_NO_SERVE);
-	assert_equal(config->no_headers, DEFAULT_NO_HEADERS);
-
-	free_runtime_config(config);
-
-	config = alloc_default_runtime_config();
-
-	apply_commandline_config(config, 12, args2);
-
-	assert_string_equal(config->file_name, "abc/e/f.jpg");
-	assert_equal(config->size.w, 100);
-	assert_equal(config->size.h, DEFAULT_HEIGHT);
-	assert_equal(config->strict, 1);
-	assert_equal(config->quality, DEFAULT_QUALITY);
-	assert_equal(config->no_cache, 0);
-	assert_equal(config->no_serve, 1);
-	assert_equal(config->no_headers, 0);
-
-	apply_commandline_config(config, 6, args3);
-
-	assert_string_equal(config->file_name, "file.gif");
-	assert_equal(config->size.w, 100);
-	assert_equal(config->size.h, 100);
-	assert_equal(config->strict, 1);
-	assert_equal(config->quality, DEFAULT_QUALITY);
-	assert_equal(config->no_cache, 0);
-	assert_equal(config->no_serve, 1);
-	assert_equal(config->no_headers, 0);
-
-	free_runtime_config(config);
-}
 
 /* query_string.c tests */
 static void test_query_string_param() {
@@ -609,15 +493,8 @@ static void test_teardown() {
 int main(int argc, char **argv) {
 	TestSuite *suite = create_test_suite();
 
-	TestSuite *geometry_math_suite = create_test_suite();
 	TestSuite *cgiscaler_suite = create_test_suite();
-	TestSuite *runtime_config_suite = create_test_suite();
-	TestSuite *commandline_suite = create_test_suite();
 	TestSuite *query_string_suite = create_test_suite();
-
-	add_test(geometry_math_suite, test_resize_to_fit_in);
-	add_test(geometry_math_suite, test_reduce_filed);
-	add_suite(suite, geometry_math_suite);
 
 	add_test(cgiscaler_suite, test_load_image);
 	add_test(cgiscaler_suite, test_fit_resize);
@@ -627,11 +504,6 @@ int main(int argc, char **argv) {
 	add_test(cgiscaler_suite, test_prepare_blob);
 	add_suite(suite, cgiscaler_suite);
 
-	add_test(runtime_config_suite, test_alloc_default_runtime_config);
-	add_suite(suite, runtime_config_suite);
-
-	add_test(commandline_suite, test_apply_commandline_config);
-	add_suite(suite, commandline_suite);
 
 	add_test(query_string_suite, test_query_string_param);
 	add_test(query_string_suite, test_get_query_string_config);

@@ -119,3 +119,27 @@ void assert_headers_read(int fd) {
 	assert_equal_with_message(has_end_line, 2, "no double end line found while reading from fd [%d]", fd);
 }
 
+void assert_equal_low_precision(double value, double expected, double low_precision_error) {
+	double ret, range_min;
+
+	range_min = expected - (expected * low_precision_error);
+	if (value <= expected && value >= range_min)
+		ret = 1;
+	else
+		ret = 0;
+
+	assert_true_with_message(ret, "value [%F] not in precision range of [%F] and [%F] (%F)", value, range_min, expected, low_precision_error);
+}
+
+void assert_equal_precision(double value, double expected, double precision_error) {
+	int ret;
+	double range_delta;
+
+	range_delta = (expected * precision_error);
+	if (value <= expected + (range_delta / 2) && value >= expected - (range_delta / 2))
+		ret = 1;
+	else
+		ret = 0;
+
+	assert_true_with_message(ret, "value [%F] not in precision range of [%F] and [%F] (%F)", value, expected - (range_delta / 2), expected + (range_delta / 2), precision_error);
+}

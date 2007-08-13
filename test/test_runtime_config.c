@@ -18,48 +18,53 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include <math.h>
+#include "../cgreen/cgreen.h"
+#include "test_config.h"
+#include "runtime_config.h"
 
-#include "assert.h"
-#include "geometry_math.h"
-#include "debug.h"
 
-/* This function will return dimensions that will be result of fitting rectangle of dimensions a in to rectangle of dimensions b without loosing it's aspect ratio */
-struct dimensions resize_to_fit_in(struct dimensions a, struct dimensions b) {
-	double wf, hf, f;
-	struct dimensions out;
+/* runtime_config.c tests */
+static void test_alloc_default_runtime_config() {
+	struct runtime_config *config;
 
-	wf = (double) b.w / a.w;
-	hf = (double) b.h / a.h;
+	config = alloc_default_runtime_config();
 
-	if (wf > hf)
-		f = hf;
-	else 
-		f = wf;
+	assert_not_equal(config, 0);
+	assert_equal(config->file_name, 0);
+	assert_equal(config->size.w, DEFAULT_WIDTH);
+	assert_equal(config->size.h, DEFAULT_HEIGHT);
+	assert_equal(config->strict, DEFAULT_STRICT);
+	assert_equal(config->quality, DEFAULT_QUALITY);
+	assert_equal(config->no_cache, DEFAULT_NO_CACHE);
+	assert_equal(config->no_serve, DEFAULT_NO_SERVE);
+	assert_equal(config->no_headers, DEFAULT_NO_HEADERS);
 
-	out.w = a.w * f;
-	out.h = a.h * f;
-	
-	return out;
+	free_runtime_config(config);
+
+	config = alloc_default_runtime_config();
+	config->file_name = malloc(6);
+	assert_not_equal(config->file_name, 0);
+
+	/* for memory leak test (valgrind) - file name should be freed */
+	free_runtime_config(config);
 }
 
-/* This function will return dimension a with reduced field to value of field parameter without loosing it's aspect ratio */
-struct dimensions reduce_filed(struct dimensions a, int field) {
-	int in_field;
-	struct dimensions ret;
-	double f;
+/* setup and teardown */
+static void test_setup() {
+	debug_start(DEBUG_FILE);
+}
 
-	debug(DEB,"Reducing rectangle field %d x %d to %d pixels", a.w, a.h, field);
+static void test_teardown() {
+	debug_stop();
+}
 
-	in_field = a.w * a.h;
-	if (in_field <= field)
-		return a;
+int main(int argc, char **argv) {
+	TestSuite *runtime_config_suite = create_test_suite();
 
-	f = sqrt((double) field / in_field);
+	add_test(runtime_config_suite, test_alloc_default_runtime_config);
 
-	ret.w = a.w * f;
-	ret.h = a.h * f;
+	setup(runtime_config_suite, test_setup);
+	teardown(runtime_config_suite, test_teardown);
 
-	debug(DEB,"After reduction %d x %d", ret.w, ret.h);
-	return ret;
+	return run_test_suite(runtime_config_suite, create_text_reporter());
 }

@@ -25,3 +25,5 @@ void assert_file_exists(char *file_path);
 void assert_file_not_exists(char *file_path);
 void assert_file_size(char *file_path, off_t size);
 
+void assert_equal_low_precision(double value, double expected, double low_precision_error);
+void assert_equal_precision(double value, double expected, double precision_error) ;

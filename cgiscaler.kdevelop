@@ -20,7 +20,7 @@
   </general>
   <kdevautoproject>
     <general>
-      <activetarget>test/serve</activetarget>
+      <activetarget>test/geometry_math</activetarget>
       <useconfiguration>debug</useconfiguration>
       <useactivetarget>true</useactivetarget>
     </general>
@@ -32,18 +32,24 @@
         <test/>
         <file_utils/>
         <serve/>
+        <cache/>
+        <geometry_math></geometry_math>
       </runarguments>
       <debugarguments>
         <cgiscaler/>
         <test/>
         <file_utils/>
         <serve/>
+        <cache/>
+        <geometry_math></geometry_math>
       </debugarguments>
       <cwd>
         <cgiscaler>/home/kazuya/Projects/CGIScaler</cgiscaler>
         <test>/home/kazuya/Projects/cgiscaler/CGIScaler</test>
         <file_utils>/home/kazuya/Projects/cgiscaler/CGIScaler</file_utils>
         <serve>/home/kazuya/Projects/cgiscaler/CGIScaler</serve>
+        <cache>/home/kazuya/Projects/cgiscaler/CGIScaler</cache>
+        <geometry_math>/home/kazuya/Projects/cgiscaler/CGIScaler</geometry_math>
       </cwd>
       <programargs/>
       <globaldebugarguments/>
