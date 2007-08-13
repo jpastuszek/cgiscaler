@@ -60,7 +60,7 @@ static void test_teardown() {
 }
 
 int main(int argc, char **argv) {
-	TestSuite *runtime_config_suite = create_test_suite();
+	TestSuite *runtime_config_suite = create_named_test_suite(__FILE__);
 
 	add_test(runtime_config_suite, test_alloc_default_runtime_config);
 

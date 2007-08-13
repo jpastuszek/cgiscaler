@@ -25,7 +25,8 @@
 
 #include "asserts.h"
 #include "../cgreen/cgreen.h"
-
+#include "test_config.h"
+#include "debug.h"
 
 /* Returns file size in bytes or -1 */
 ssize_t get_file_size(char *file_path) {

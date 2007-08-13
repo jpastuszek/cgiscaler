@@ -117,7 +117,7 @@ static void test_teardown() {
 
 int main(int argc, char **argv) {
 
-	TestSuite *query_string_suite = create_test_suite();
+	TestSuite *query_string_suite = create_named_test_suite(__FILE__);;
 
 	add_test(query_string_suite, test_query_string_param);
 	add_test(query_string_suite, test_get_query_string_config);

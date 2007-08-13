@@ -78,7 +78,7 @@ static void test_teardown() {
 }
 
 int main(int argc, char **argv) {
-	TestSuite *geometry_math_suite = create_test_suite();
+	TestSuite *geometry_math_suite = create_named_test_suite(__FILE__);
 
 	add_test(geometry_math_suite, test_resize_to_fit_in);
 	add_test(geometry_math_suite, test_reduce_filed);

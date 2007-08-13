@@ -29,6 +29,7 @@
 #include "asserts.h"
 #include "file_utils.h"
 #include "test_config.h"
+#include "debug.h"
 #include "serve.h"
 
 /* serve.c tests */
@@ -182,7 +183,7 @@ static void test_teardown() {
 }
 
 int main(int argc, char **argv) {
-	TestSuite *serve_suite = create_test_suite();
+	TestSuite *serve_suite = create_named_test_suite(__FILE__);
 
 	add_test(serve_suite, test_serve_from_file);
 	add_test(serve_suite, test_serve_from_blob);

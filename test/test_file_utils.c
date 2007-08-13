@@ -27,9 +27,9 @@
 
 #include "../cgreen/cgreen.h"
 #include "asserts.h"
-#include "file_utils.h"
 #include "test_config.h"
 #include "debug.h"
+#include "file_utils.h"
 
 static void test_create_cache_file_path() {
 	char compare_file_path[255];
@@ -197,7 +197,7 @@ static void test_teardown() {
 }
 
 int main(int argc, char **argv) {
-	TestSuite *file_utils_suite = create_test_suite();
+	TestSuite *file_utils_suite = create_named_test_suite(__FILE__);
 
 	add_test(file_utils_suite, test_create_cache_file_path);
 	add_test(file_utils_suite, test_create_absolute_media_file_path);

@@ -20,8 +20,8 @@
 #include "../cgreen/cgreen.h"
 #include "asserts.h"
 #include "test_config.h"
-#include "runtime_config.h"
 #include "file_utils.h"
+#include "runtime_config.h"
 #include "debug.h"
 #include "scaler.h"
 
@@ -203,7 +203,7 @@ static void test_teardown() {
 }
 
 int main(int argc, char **argv) {
-	TestSuite *cgiscaler_suite = create_test_suite();
+	TestSuite *cgiscaler_suite = create_named_test_suite(__FILE__);
 
 	add_test(cgiscaler_suite, test_load_image);
 	add_test(cgiscaler_suite, test_fit_resize);

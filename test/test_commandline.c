@@ -84,7 +84,7 @@ static void test_teardown() {
 }
 
 int main(int argc, char **argv) {
-	TestSuite *commandline_suite = create_test_suite();
+	TestSuite *commandline_suite = create_named_test_suite(__FILE__);
 
 	add_test(commandline_suite, test_apply_commandline_config);
 

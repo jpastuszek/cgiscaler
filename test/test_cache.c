@@ -27,10 +27,10 @@
 #include "stdio_capture.h"
 #include "asserts.h"
 #include "file_utils.h"
+#include "serve.h"
 #include "test_config.h"
 #include "debug.h"
 #include "cache.h"
-#include "serve.h"
 
 
 /* cache.c tests */
@@ -242,7 +242,7 @@ static void test_teardown() {
 }
 
 int main(int argc, char **argv) {
-	TestSuite *cache_suite = create_test_suite();
+	TestSuite *cache_suite = create_named_test_suite(__FILE__);
 
 	add_test(cache_suite, test_if_cached);
 	add_test(cache_suite, test_write_blob_to_cache);
