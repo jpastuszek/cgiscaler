@@ -1,1 +1,1 @@
-/home/kazuya/Projects/cgiscaler/CGIScaler/src/commandline.c
+../src/commandline.c

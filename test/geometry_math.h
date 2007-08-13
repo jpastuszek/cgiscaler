@@ -1,1 +1,1 @@
-/home/kazuya/Projects/cgiscaler/CGIScaler/src/geometry_math.h
+../src/geometry_math.h
