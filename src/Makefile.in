@@ -183,8 +183,8 @@ INCLUDES = $(all_includes)
 
 # the library search path.
 cgiscalerdir = /var/www/localhost/cgi-bin/scaler
-noinst_HEADERS = cache.h cgiscaler.h commandline.h debug.h file_utils.h \
-	geometry_math.h query_string.h runtime_config.h serve.h
+noinst_HEADERS = cache.h commandline.h debug.h file_utils.h geometry_math.h \
+	query_string.h runtime_config.h scaler.h serve.h
 
 cgiscaler_SOURCES = cache.c commandline.c debug.c file_utils.c geometry_math.c \
 	main.c query_string.c runtime_config.c scaler.c serve.c
@@ -203,9 +203,9 @@ $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu  src/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign  src/Makefile'; \
 	cd $(top_srcdir) && \
-	  $(AUTOMAKE) --gnu  src/Makefile
+	  $(AUTOMAKE) --foreign  src/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \

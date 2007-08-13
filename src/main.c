@@ -18,7 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include "cgiscaler.h"
+#include "scaler.h"
 #include "query_string.h"
 #include "commandline.h"
 #include "serve.h"
@@ -56,19 +56,17 @@ int main(int argc, char *argv[])
 	if (!config->no_cache) {
 		 if (!config->no_serve) {
 			/* if we have served from cache OK... cleanup and exit success */
-			if (serve_from_cache_file(media_file_path, cache_file_path, OUT_FORMAT_MIME_TYPE, config->no_headers)) {
+			if (serve_from_cache_file(config->file_name, cache_file_path, OUT_FORMAT_MIME_TYPE, config->no_headers)) {
 				if (!config->no_cache)
-					free(cache_file_path);
-				free(media_file_path);
+					free_fpath(cache_file_path);
 				free_runtime_config(config);
 				exit(0);
 			}
 		} else {
 			/* check cache only */
-			if (check_if_cached(media_file_path, cache_file_path) == CACHE_OK) {
+			if (check_if_cached(config->file_name, cache_file_path) == CACHE_OK) {
 				if (!config->no_cache)
-					free(cache_file_path);
-				free(media_file_path);
+					free_fpath(cache_file_path);
 				free_runtime_config(config);
 				exit(0);
 			}
@@ -82,16 +80,15 @@ int main(int argc, char *argv[])
 	config->size = reduce_filed(config->size, MAX_PIXEL_NO);
 
 	if (config->strict)
-		blob = strict_resize_to_blob(media_file_path, config->size, config->quality, &blob_len, OUT_FORMAT);
+		blob = strict_resize_to_blob(config->file_name, config->size, config->quality, &blob_len, OUT_FORMAT);
 	else
-		blob = fit_resize_to_blob(media_file_path, config->size, config->quality, &blob_len, OUT_FORMAT);
+		blob = fit_resize_to_blob(config->file_name, config->size, config->quality, &blob_len, OUT_FORMAT);
 
 	if (!blob) {
 		if (!config->no_serve)
 			serve_error(config->no_headers);
 		if (!config->no_cache)
-			free(cache_file_path);
-		free(media_file_path);
+			free_fpath(cache_file_path);
 		free_runtime_config(config);
 		MagickWandTerminus();
 		exit(80);
@@ -105,12 +102,11 @@ int main(int argc, char *argv[])
 	MagickWandTerminus();
 
 	if (!config->no_cache)
-		write_blob_to_cache(blob, blob_len, media_file_path, cache_file_path);
+		write_blob_to_cache(blob, blob_len, config->file_name, cache_file_path);
 
 	free_blob(blob);
-	free(media_file_path);
 	if (!config->no_cache)
-		free(cache_file_path);
+		free_fpath(cache_file_path);
 	free_runtime_config(config);
 
 	return EXIT_SUCCESS;

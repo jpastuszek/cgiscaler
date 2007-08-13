@@ -104,11 +104,6 @@ char *get_query_string_param(char *query_string, char *param_name) {
 	start_query_string = query_string;
 
 	while(1) {
-		if (name)
-			free(name);
-		if (val)
-			free(val);
-
 		until_equal = index(query_string, '=');
 		if (!until_equal)
 			return 0;
@@ -123,29 +118,52 @@ char *get_query_string_param(char *query_string, char *param_name) {
 		name[name_len] = 0;
 //		debug(DEB,"Name: '%s'", name);
 
-		query_string += name_len + 1;
+		if (strcmp(param_name, name)) {
+			/* this is not what we are looking for... cleanup */
+			free(name);
 
+			/* we are at the end of string */
+			if (!(*until_equal))
+				return 0;
+
+			/* position to value token*/
+			query_string = until_equal + 1;
+
+			/* skip the value */
+			until_amp = index(query_string, '&');
+			if (!until_amp)
+				return 0;
+
+			/* position to next name token*/
+			query_string = until_amp + 1;
+
+			/* we are at the end of string */
+			if (!(*until_amp))
+				return 0;
+
+			continue;
+		}
+
+		/* now we have our param... we don't need name */
+
+		query_string = until_equal + 1;
 
 		until_amp = index(query_string, '&');
 		if (!until_amp)
 			until_amp = query_string + strlen(query_string);
 
 		val_len = until_amp - query_string;
-//		debug(DEB,"Name val: %i we are at index %d", val_len, query_string - start_query_string);
+		// debug(DEB,"Name val: %i we are at index %d", val_len, query_string - start_query_string);
+		free(name);
 
 		val = malloc(val_len + 1);
 		if (!val)
 			exit(66);
 		strncpy(val, query_string, val_len);
 		val[val_len] = 0;
-//		debug(DEB,"Value: '%s'", val);
+		// debug(DEB,"Value: '%s'", val);
 
-		query_string += val_len + 1;
-
-		if (!strcmp(param_name, name)) {
-			free(name);
-			return val;
-		}
+		return val;
 	}
 }
 
