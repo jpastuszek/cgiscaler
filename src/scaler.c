@@ -258,6 +258,9 @@ MagickWand *fit_resize(media_fpath *media_file_path, struct dimensions resize_to
 	/* this will calculate target size for aspect ratio keeping resize method */
 	resize_to = resize_to_fit_in(image_size, resize_to);
 
+	/* we are reducing requested thumbnail resolution to MAX_PIXEL_NO */
+	resize_to = reduce_filed(resize_to, MAX_PIXEL_NO);
+
 	load_size = resize_to;
 //	load_size.w *= 2;
 //	load_size.h *= 2;
@@ -304,6 +307,9 @@ MagickWand *strict_resize(media_fpath *media_file_path, struct dimensions resize
 	struct dimensions image_size;
 	struct dimensions load_size;
 	struct dimensions crop_to;
+
+	/* we are reducing requested thumbnail resolution to MAX_PIXEL_NO */
+	resize_to = reduce_filed(resize_to, MAX_PIXEL_NO);
 
 	load_size = resize_to;
 //	load_size.w *= 2;

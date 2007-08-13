@@ -86,9 +86,6 @@ int main(int argc, char *argv[])
 	/* now we need ImageMagick after this we should terminate ImgeMagick afterwards */
 	MagickWandGenesis();
 
-	/* we are reducing requested thumbnail resolution to MAX_PIXEL_NO */
-	config->size = reduce_filed(config->size, MAX_PIXEL_NO);
-
 	if (config->strict)
 		blob = strict_resize_to_blob(config->file_name, config->size, config->quality, &blob_len, OUT_FORMAT);
 	else
