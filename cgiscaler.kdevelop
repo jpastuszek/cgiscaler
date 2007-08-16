@@ -20,7 +20,7 @@
   </general>
   <kdevautoproject>
     <general>
-      <activetarget>test/geometry_math</activetarget>
+      <activetarget>src/cgiscaler</activetarget>
       <useconfiguration>debug</useconfiguration>
       <useactivetarget>true</useactivetarget>
     </general>
@@ -33,7 +33,7 @@
         <file_utils/>
         <serve/>
         <cache/>
-        <geometry_math></geometry_math>
+        <geometry_math/>
       </runarguments>
       <debugarguments>
         <cgiscaler/>
@@ -41,7 +41,7 @@
         <file_utils/>
         <serve/>
         <cache/>
-        <geometry_math></geometry_math>
+        <geometry_math/>
       </debugarguments>
       <cwd>
         <cgiscaler>/home/kazuya/Projects/CGIScaler</cgiscaler>

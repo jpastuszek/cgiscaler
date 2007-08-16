@@ -62,16 +62,18 @@ MagickWand *load_image(media_fpath *media_file_path, struct dimensions to_size) 
 	Image *_image;
 	ImageInfo *image_info;
 	ExceptionInfo *exception;
-	char size[24];
+	char *size;
 
 	absolute_media_file_path = create_absolute_media_file_path(media_file_path);
 
 	image_info = CloneImageInfo((ImageInfo *) NULL);
+
 	strncpy(image_info->filename, absolute_media_file_path, MaxTextExtent);
 
 	free_fpath(absolute_media_file_path);
 
 	if (to_size.w != 0 && to_size.h != 0) {
+		size = malloc(24); /* this will get removed on DestroyImageInfo */
 		snprintf(size, 24, "%ux%u", to_size.w, to_size.h);
 		image_info->size = size;
 		debug(DEB, "Trying image size: %ux%u", to_size.w, to_size.h);
@@ -79,20 +81,6 @@ MagickWand *load_image(media_fpath *media_file_path, struct dimensions to_size) 
 
 	debug(DEB,"Loading image: '%s'", media_file_path);
 	timer_start(&timing);
-/*
-	image = NewMagickWand();
-	if (!image) {
-		debug(ERR, "Creating new magick wand failed!");
-		return 0;
-	}
-
-	status = MagickReadImage(image, file_path);
-	if (status == MagickFalse) {
-		debug(WARN,"Loading image '%s' failed", file_path);
-		DestroyMagickWand(image);
-		return 0;
-	}
-*/
 
 	exception = AcquireExceptionInfo();
 
@@ -102,11 +90,16 @@ MagickWand *load_image(media_fpath *media_file_path, struct dimensions to_size) 
 		return 0;
 	}
 
+	DestroyExceptionInfo(exception);
+	DestroyImageInfo(image_info);
+
 	image = NewMagickWandFromImage(_image);
 	if (!image) {
 		debug(ERR, "Creating new magick wand failed!");
 		return 0;
 	}
+
+	DestroyImage(_image);
 
 	debug(PROF, "Loading took %.3f s",  timer_stop(&timing));
 
@@ -114,7 +107,6 @@ MagickWand *load_image(media_fpath *media_file_path, struct dimensions to_size) 
 		to_size = get_image_size(image);
 		debug(DEB, "Resoulting image size: %ux%u", to_size.w, to_size.h);
 	#endif
-	
 
 	/* this will remove meta data - this is very important as photos have loads of it */
 	status = MagickStripImage(image);
@@ -255,6 +247,10 @@ MagickWand *fit_resize(media_fpath *media_file_path, struct dimensions resize_to
 
 	image_size = get_image_size(image_ping);
 
+	/* we don't need our ping any more */
+	/* TODO: This is not releasing all the memory */
+	free_image(image_ping);
+
 	/* this will calculate target size for aspect ratio keeping resize method */
 	resize_to = resize_to_fit_in(image_size, resize_to);
 
@@ -268,12 +264,8 @@ MagickWand *fit_resize(media_fpath *media_file_path, struct dimensions resize_to
 	/* loading image... if it fails wand will be 0 */
 	image = load_image(media_file_path, load_size);
 	if (!image) {
-		free_image(image_ping);
 		return 0;
 	}
-
-	/* we don't need our ping any more */
-	free_image(image_ping);
 
 	image = resize(image, resize_to, image_size);
 	if (!image)

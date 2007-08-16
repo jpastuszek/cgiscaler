@@ -149,12 +149,15 @@ void assert_equal_precision(double value, double expected, double precision_erro
 void assert_image_pixel_color(MagickWand *magick_wand, int x, int y, const char *color) {
 	PixelWand *pixel_wand;
 	MagickBooleanType status;
+	char *color_string;
 
 	pixel_wand = NewPixelWand();
 	status = MagickGetImagePixelColor(magick_wand, x, y, pixel_wand);
 	assert_not_equal(status, MagickFalse);
 
-	assert_string_equal(PixelGetColorAsString(pixel_wand), color);
+	color_string = PixelGetColorAsString(pixel_wand);
+	assert_string_equal(color_string, color);
+	free(color_string);
 
 	DestroyPixelWand(pixel_wand);
 }
