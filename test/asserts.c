@@ -69,8 +69,7 @@ void assert_file_size(char *file_path, off_t size) {
 	assert_equal_with_message(fs, size, "file [%s] size is [%d] while should be [%d]", file_path, fs, size);
 }
 
-/* This function will read from fd until EOF and check if it read bytes number of bytes */
-void assert_byte_read(int fd, ssize_t bytes) {
+size_t data_read(int fd) {
 	int bread;
 	int btotal;
 	char buf[256];
@@ -85,8 +84,61 @@ void assert_byte_read(int fd, ssize_t bytes) {
 
 		/* debug(DEB, "Test: Bytes read %d", bread); */
 	} while(bread > 0);
+	
+	return btotal;
+}
 
-	assert_equal_with_message(btotal, bytes, "byte read [%d] from fd [%d] not equal [%d]", btotal, fd, bytes);
+size_t assert_jpg_data_read(int fd) {
+	int bread;
+	int btotal;
+	unsigned char buf[256];
+
+	btotal = 0;
+
+	do {
+		bread = read(fd, buf, 256);
+		if (!btotal) {
+			/* JPEG data magic number */
+			assert_equal(buf[0], 0xff);
+			assert_equal(buf[1], 0xd8);
+		}
+
+		if (bread == -1)
+			assert_true_with_message(0, "read from fd [%d] failed", fd);
+		btotal += bread;
+
+		/* debug(DEB, "Test: Bytes read %d", bread); */
+	} while(bread > 0);
+	
+	return btotal;
+}
+
+
+/* This function will read from fd until EOF and check if it read bytes number of bytes */
+void assert_byte_read(int fd, ssize_t bytes) {
+	ssize_t bytes_total = data_read(fd);
+	assert_equal_with_message(bytes_total, bytes, "byte read [%d] from fd [%d] not equal [%d]", bytes_total, fd, bytes);
+}
+
+void asser_byte_read_in_range(int fd, ssize_t min, ssize_t max) {
+	ssize_t bytes_total;
+
+	bytes_total = data_read(fd);
+	if (bytes_total > max || bytes_total < min)
+		assert_true_with_message(0,  "byte read [%d] from fd [%d] not in range [%d] and [%d]", bytes_total, fd, min, max);
+}
+
+void assert_jpg_byte_read(int fd, ssize_t bytes) {
+	ssize_t bytes_total = assert_jpg_data_read(fd);
+	assert_equal_with_message(bytes_total, bytes, "byte read [%d] from fd [%d] not equal [%d]", bytes_total, fd, bytes);
+}
+
+void assert_jpg_byte_read_in_range(int fd, ssize_t min, ssize_t max) {
+	ssize_t bytes_total;
+
+	bytes_total = assert_jpg_data_read(fd);
+	if (bytes_total > max || bytes_total < min)
+		assert_true_with_message(0,  "byte read [%d] from fd [%d] not in range [%d] and [%d]", bytes_total, fd, min, max);
 }
 
 /* This function will look for \n\n in first 1000 bytes */

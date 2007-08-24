@@ -19,7 +19,7 @@
  ***************************************************************************/
 
 /* enable debuging - not suitable for production env! */
-//#define DEBUG
+#define DEBUG
 /* sync every line written to debug file... slow */
 //#define DEBUG_SYNC
 

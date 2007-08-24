@@ -36,6 +36,7 @@ host_triplet = @host@
 bin_PROGRAMS = cache$(EXEEXT) commandline$(EXEEXT) file_utils$(EXEEXT) \
 	geometry_math$(EXEEXT) query_string$(EXEEXT) \
 	runtime_config$(EXEEXT) scaler$(EXEEXT) serve$(EXEEXT)
+noinst_PROGRAMS = main$(EXEEXT)
 subdir = test
 DIST_COMMON = $(noinst_HEADERS) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in
@@ -48,7 +49,7 @@ CONFIG_HEADER = $(top_builddir)/config.h
 CONFIG_CLEAN_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
-PROGRAMS = $(bin_PROGRAMS)
+PROGRAMS = $(bin_PROGRAMS) $(noinst_PROGRAMS)
 am_cache_OBJECTS = asserts.$(OBJEXT) cache.$(OBJEXT) debug.$(OBJEXT) \
 	file_utils.$(OBJEXT) serve.$(OBJEXT) stdio_capture.$(OBJEXT) \
 	test_cache.$(OBJEXT)
@@ -70,6 +71,13 @@ geometry_math_DEPENDENCIES = $(top_builddir)/cgreen/libcgreen.a
 geometry_math_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(geometry_math_LDFLAGS) $(LDFLAGS) -o $@
+am_main_OBJECTS = asserts.$(OBJEXT) cache.$(OBJEXT) \
+	commandline.$(OBJEXT) debug.$(OBJEXT) file_utils.$(OBJEXT) \
+	geometry_math.$(OBJEXT) main.$(OBJEXT) query_string.$(OBJEXT) \
+	runtime_config.$(OBJEXT) scaler.$(OBJEXT) serve.$(OBJEXT) \
+	stdio_capture.$(OBJEXT) test_main.$(OBJEXT)
+main_OBJECTS = $(am_main_OBJECTS)
+main_DEPENDENCIES = $(top_builddir)/cgreen/libcgreen.a
 am_query_string_OBJECTS = debug.$(OBJEXT) file_utils.$(OBJEXT) \
 	query_string.$(OBJEXT) runtime_config.$(OBJEXT) \
 	test_query_string.$(OBJEXT)
@@ -102,11 +110,11 @@ LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
 SOURCES = $(cache_SOURCES) $(commandline_SOURCES) \
-	$(file_utils_SOURCES) $(geometry_math_SOURCES) \
+	$(file_utils_SOURCES) $(geometry_math_SOURCES) $(main_SOURCES) \
 	$(query_string_SOURCES) $(runtime_config_SOURCES) \
 	$(scaler_SOURCES) $(serve_SOURCES)
 DIST_SOURCES = $(cache_SOURCES) $(commandline_SOURCES) \
-	$(file_utils_SOURCES) $(geometry_math_SOURCES) \
+	$(file_utils_SOURCES) $(geometry_math_SOURCES) $(main_SOURCES) \
 	$(query_string_SOURCES) $(runtime_config_SOURCES) \
 	$(scaler_SOURCES) $(serve_SOURCES)
 HEADERS = $(noinst_HEADERS)
@@ -223,7 +231,7 @@ METASOURCES = AUTO
 file_utils_LDADD = $(top_builddir)/cgreen/libcgreen.a
 file_utils_SOURCES = asserts.c debug.c file_utils.c test_file_utils.c
 noinst_HEADERS = asserts.h cache.h commandline.h debug.h file_utils.h \
-	geometry_math.h query_string.h runtime_config.h scaler.h serve.h stdio_capture.h \
+	geometry_math.h main.h query_string.h runtime_config.h scaler.h serve.h stdio_capture.h \
 	test_config.h
 
 serve_LDADD = $(top_builddir)/cgreen/libcgreen.a
@@ -252,6 +260,11 @@ query_string_SOURCES = debug.c file_utils.c query_string.c runtime_config.c \
 	test_query_string.c
 
 query_string_LDADD = $(top_builddir)/cgreen/libcgreen.a
+main_LDADD = $(top_builddir)/cgreen/libcgreen.a
+main_SOURCES = asserts.c cache.c commandline.c debug.c file_utils.c \
+	geometry_math.c main.c query_string.c runtime_config.c scaler.c serve.c stdio_capture.c \
+	test_main.c
+
 all: all-am
 
 .SUFFIXES:
@@ -313,6 +326,13 @@ clean-binPROGRAMS:
 	  echo " rm -f $$p $$f"; \
 	  rm -f $$p $$f ; \
 	done
+
+clean-noinstPROGRAMS:
+	@list='$(noinst_PROGRAMS)'; for p in $$list; do \
+	  f=`echo $$p|sed 's/$(EXEEXT)$$//'`; \
+	  echo " rm -f $$p $$f"; \
+	  rm -f $$p $$f ; \
+	done
 cache$(EXEEXT): $(cache_OBJECTS) $(cache_DEPENDENCIES) 
 	@rm -f cache$(EXEEXT)
 	$(LINK) $(cache_OBJECTS) $(cache_LDADD) $(LIBS)
@@ -325,6 +345,9 @@ file_utils$(EXEEXT): $(file_utils_OBJECTS) $(file_utils_DEPENDENCIES)
 geometry_math$(EXEEXT): $(geometry_math_OBJECTS) $(geometry_math_DEPENDENCIES) 
 	@rm -f geometry_math$(EXEEXT)
 	$(geometry_math_LINK) $(geometry_math_OBJECTS) $(geometry_math_LDADD) $(LIBS)
+main$(EXEEXT): $(main_OBJECTS) $(main_DEPENDENCIES) 
+	@rm -f main$(EXEEXT)
+	$(LINK) $(main_OBJECTS) $(main_LDADD) $(LIBS)
 query_string$(EXEEXT): $(query_string_OBJECTS) $(query_string_DEPENDENCIES) 
 	@rm -f query_string$(EXEEXT)
 	$(LINK) $(query_string_OBJECTS) $(query_string_LDADD) $(LIBS)
@@ -350,6 +373,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/debug.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/file_utils.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/geometry_math.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/main.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/query_string.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/runtime_config.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/scaler.Po@am__quote@
@@ -359,6 +383,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_commandline.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_file_utils.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_geometry_math.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_main.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_query_string.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_runtime_config.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_scaler.Po@am__quote@
@@ -498,7 +523,8 @@ maintainer-clean-generic:
 	@echo "it deletes files that may require special tools to rebuild."
 clean: clean-am
 
-clean-am: clean-binPROGRAMS clean-generic clean-libtool mostlyclean-am
+clean-am: clean-binPROGRAMS clean-generic clean-libtool \
+	clean-noinstPROGRAMS mostlyclean-am
 
 distclean: distclean-am
 	-rm -rf ./$(DEPDIR)
@@ -557,18 +583,18 @@ uninstall-am: uninstall-binPROGRAMS
 .MAKE: install-am install-strip
 
 .PHONY: CTAGS GTAGS all all-am check check-am clean clean-binPROGRAMS \
-	clean-generic clean-libtool ctags distclean distclean-compile \
-	distclean-generic distclean-libtool distclean-tags distdir dvi \
-	dvi-am html html-am info info-am install install-am \
-	install-binPROGRAMS install-data install-data-am install-dvi \
-	install-dvi-am install-exec install-exec-am install-html \
-	install-html-am install-info install-info-am install-man \
-	install-pdf install-pdf-am install-ps install-ps-am \
-	install-strip installcheck installcheck-am installdirs \
-	maintainer-clean maintainer-clean-generic mostlyclean \
-	mostlyclean-compile mostlyclean-generic mostlyclean-libtool \
-	pdf pdf-am ps ps-am tags uninstall uninstall-am \
-	uninstall-binPROGRAMS
+	clean-generic clean-libtool clean-noinstPROGRAMS ctags \
+	distclean distclean-compile distclean-generic \
+	distclean-libtool distclean-tags distdir dvi dvi-am html \
+	html-am info info-am install install-am install-binPROGRAMS \
+	install-data install-data-am install-dvi install-dvi-am \
+	install-exec install-exec-am install-html install-html-am \
+	install-info install-info-am install-man install-pdf \
+	install-pdf-am install-ps install-ps-am install-strip \
+	installcheck installcheck-am installdirs maintainer-clean \
+	maintainer-clean-generic mostlyclean mostlyclean-compile \
+	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
+	tags uninstall uninstall-am uninstall-binPROGRAMS
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

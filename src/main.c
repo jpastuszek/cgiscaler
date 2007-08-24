@@ -18,18 +18,19 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include "scaler.h"
-#include "query_string.h"
-#include "commandline.h"
-#include "serve.h"
-#include "cache.h"
-#include "file_utils.h"
-#include "config.h"
-#include "debug.h"
+#include "main.h"
+
+#ifndef TEST_CONFIG_H
 
 /* this is main function, for simplicity we don't want exits at any other point (expect [m|rw]alloc related) */
 int main(int argc, char *argv[])
 {
+	return _main(argc, argv);
+}
+
+#endif
+
+int _main(int argc, char *argv[]) {
 	struct runtime_config *config;
 	cache_fpath *cache_file_path;
 	unsigned char *blob;
@@ -53,6 +54,7 @@ int main(int argc, char *argv[])
 		if (!config->no_serve)
 			serve_error(config->no_headers);
 
+		debug(ERR, "No file name given");
 		debug(PROF, "Finished with error after %.3f s",  timer_stop(&run_timing));
 
 		exit(70);

@@ -30,6 +30,7 @@ static void test_apply_commandline_config() {
 	char *args1[] = { "test", "-w", "100", "-h", "200" };
 	char *args2[] = { "test", "-w", "100", "-s", "true", "-nc", "false", "-ns", "true", "-nh", "dsfa", "abc/e/f.jpg" };
 	char *args3[] = { "test", "file.gif", "-h", "300", "-h", "100" };
+	char *args4[] = { "test",  "-bogo", "true" };
 
 
 	config = alloc_default_runtime_config();
@@ -70,6 +71,8 @@ static void test_apply_commandline_config() {
 	assert_equal(config->no_cache, 0);
 	assert_equal(config->no_serve, 1);
 	assert_equal(config->no_headers, 0);
+
+	apply_commandline_config(config, 3, args4);
 
 	free_runtime_config(config);
 }

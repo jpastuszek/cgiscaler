@@ -40,6 +40,7 @@ void apply_query_string_config(struct runtime_config *config, char *file_name, c
 
 	debug(DEB, "Processing query file name: '%s'", file_name);
 
+	/* this will allocat the file name */
 	file_name = sanitize_file_path(file_name);
 	if (file_name) {
 		if (config->file_name)

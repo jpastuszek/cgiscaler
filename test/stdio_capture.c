@@ -77,6 +77,11 @@ void restore_stdout() {
 /* make sure you finish_fork after doing fork_with_stdout_capture, between this two calls things will happen simultaneously */
  void finish_fork(int stdout_fd) {
 	int status;
+	char buf[1024];
+
+	/* we read what is left to read so that test will not hung on writting to the pipe */
+	while (read(stdout_fd, buf, 1024) > 0);
+
 	/* we will wait for child to finish */
 	wait(&status);
 

@@ -134,6 +134,8 @@ void apply_commandline_config(struct runtime_config *config, int argc, char *arg
 				continue;
 			}
 
+			debug(ERR, "Unknown parameter %s", argv[i]);
+			return;
 		}
 
 		if (file_name) {
@@ -141,6 +143,7 @@ void apply_commandline_config(struct runtime_config *config, int argc, char *arg
 			return;
 		}
 
+		/* sanitize_file_path will allocate */
 		file_name = sanitize_file_path(argv[i]);
 		if (file_name) {
 			if (config->file_name)
