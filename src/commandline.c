@@ -152,5 +152,5 @@ void apply_commandline_config(struct runtime_config *config, int argc, char *arg
 		}
 	}
 
-	debug(DEB, "Run-time config after command line: file: file: '%s', size w: %d h: %d, strict: %d quality: %d no cache: %d, no serve: %d, no headers: %d", config->file_name, config->size.w, config->size.h, config->strict, config->quality, config->no_cache, config->no_serve, config->no_headers);
+	debug(DEB, "Run-time config after command line: file: file: '%s', size w: %d h: %d, strict: %d quality: %d no cache: %d, no serve: %d, no headers: %d", config->file_name ? 0 : "<null>", config->size.w, config->size.h, config->strict, config->quality, config->no_cache, config->no_serve, config->no_headers);
 }

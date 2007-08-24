@@ -19,12 +19,12 @@
  ***************************************************************************/
 
 /* enable debuging - not suitable for production env! */
-#define DEBUG
+//#define DEBUG
 /* sync every line written to debug file... slow */
 //#define DEBUG_SYNC
 
 /* debug file path if debugging enabled */
-#define DEBUG_FILE "/tmp/cgiscaler.gallery.deb"
+#define DEBUG_FILE "/tmp/cgiscaler.deb"
 
 
 /* Default Run-time configuration (0 means false, 1 true) */
