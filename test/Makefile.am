@@ -1,5 +1,5 @@
 METASOURCES = AUTO
-bin_PROGRAMS = cache commandline file_utils geometry_math query_string \
+bin_PROGRAMS = cache commandline file_utils geometry_math main query_string \
 	runtime_config scaler serve
 file_utils_LDADD = $(top_builddir)/cgreen/libcgreen.a
 file_utils_SOURCES = asserts.c debug.c file_utils.c test_file_utils.c
@@ -27,7 +27,6 @@ scaler_LDADD = $(top_builddir)/cgreen/libcgreen.a
 query_string_SOURCES = debug.c file_utils.c query_string.c runtime_config.c \
 	test_query_string.c
 query_string_LDADD = $(top_builddir)/cgreen/libcgreen.a
-noinst_PROGRAMS = main
 main_LDADD = $(top_builddir)/cgreen/libcgreen.a
 main_SOURCES = asserts.c cache.c commandline.c debug.c file_utils.c \
 	geometry_math.c main.c query_string.c runtime_config.c scaler.c serve.c stdio_capture.c \
