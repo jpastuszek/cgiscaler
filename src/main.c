@@ -51,10 +51,11 @@ int _main(int argc, char *argv[]) {
 	apply_query_string_config(config, getenv("PATH_INFO"), getenv("QUERY_STRING"));
 
 	if (!config->file_name) {
+		debug(ERR, "No file name given");
+
 		if (!config->no_serve)
 			serve_error(config->no_headers);
 
-		debug(ERR, "No file name given");
 		debug(PROF, "Finished with error after %.3f s",  timer_stop(&run_timing));
 
 		exit(70);
