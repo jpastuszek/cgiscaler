@@ -82,7 +82,7 @@ void apply_query_string_config(struct runtime_config *config, char *file_name, c
 		free(lowq);
 	}
 
-	debug(DEB, "Run-time conifg after query string: file: '%s', size w: %d h: %d, strict: %d quality: %d", config->file_name ? 0 : "<null>", config->size.w, config->size.h, config->strict, config->quality);
+	debug(DEB, "Run-time conifg after query string: file: '%s', size w: %d h: %d, strict: %d quality: %d", config->file_name ? config->file_name : "<null>", config->size.w, config->size.h, config->strict, config->quality);
 
 	/* we don't free file_name as it is used in param structure and will be freed on free_runtime_config */
 }

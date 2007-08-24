@@ -102,6 +102,16 @@ static void test_get_query_string_config() {
 	assert_equal(config->strict, 0);
 	assert_equal(config->quality, LOWQ_QUALITY);
 
+	snprintf(test_query_string, 256, "%s=104&%s=137&s=false", QUERY_WIDTH_PARAM, QUERY_HEIGHT_PARAM);
+
+	apply_query_string_config(config, "photo04/3d/03/0b64a0af1869.jpg", test_query_string);
+	assert_string_equal(config->file_name, "photo04/3d/03/0b64a0af1869.jpg");
+	assert_equal(config->size.w, 104);
+	assert_equal(config->size.h, 137);
+	assert_equal(config->strict, 0);
+	assert_equal(config->quality, LOWQ_QUALITY);
+
+
 	free_runtime_config(config);
 }
 
