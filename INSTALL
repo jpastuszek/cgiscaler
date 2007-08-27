@@ -52,7 +52,7 @@ Without sudo support:
     /etc/init.d/apache reload
 
 With sudo support:
-  To use sudo you need to add something like this to your apache config:
+  To use sudo you need to add something like this to your Apache config:
     SuexecUserGroup "kazuya" "users"
   Then add:
     ScriptAlias "/photo" "/var/www/localhost/cgi-bin/scaler/cgiscaler"
@@ -71,9 +71,23 @@ With sudo support:
   Reload Apache:
     /etc/init.d/apache reload
 
+Non standard library path (usefull with own IM builds or Solaris + 64bit build):
+  Add SetEnv to your config, e.x.:
+    SetEnv LD_LIBRARY_PATH "/usr/local/lib/64:/usr/local/lib:/usr/lib:$LD_LIBRARY_PATH"
+
 Try it!
 
 http://your.domain/photo/some_image.jpg?w=122&h=200
 
+
+Performance tips
+===================
+
+Build IM with Q8
+   ImageMagick can be built witch different quantum depth. 
+   For thumbnailing purposes there is no need to use quantum depth > 8.
+   Bigger quantym depth = higher memory usage, lower speed (more data transferred)
+
 For some performance test you can use:
   httperf --server scaler --num-conn 1000 --ra 200 --timeout 50 --uri=/photo/quick_gimp_pattern_test.png?w=222
+

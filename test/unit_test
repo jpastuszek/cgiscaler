@@ -17,12 +17,14 @@ run_test() {
 }
 
 run_all() {
+	echo "=== Running Unit tests:"
 	for TEST in ${TESTS[@]}; do
 		run_test $TEST
 		echo ""
 	done
 
-	echo "Tests passed: $PASSED failed: $FAILED"
+	echo "== Unit test summary:"
+	echo "Tests suits passed: $PASSED failed: $FAILED"
 }
 
 

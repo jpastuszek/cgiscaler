@@ -1,0 +1,56 @@
+#!/bin/bash
+
+cd "`dirname $0.`/.."
+
+TESTS=( "file_utils" "runtime_config" "commandline" "query_string" "geometry_math" "serve" "cache"  "scaler" "main" )
+
+TOTAL_ERRORS=0
+TOTAL_LEAKS=0
+
+run_test() {
+        if [ -f valgrind_test_resoult ]; then
+		rm valgrind_test_resoult
+	fi
+
+	valgrind --leak-check=full --trace-children=yes test/$1 > valgrind_test_resoult 2>&1
+
+	for ERR in `grep "ERROR SUMMARY" valgrind_test_resoult | awk '{print $4}'`; do
+		if [ $ERR != "0" ]; then
+			let ERRORS=$ERRORS+$ERR;
+		fi
+	done
+
+	for LOS in `grep "definitely" valgrind_test_resoult | awk '{print $4}'`; do
+		if [ $LOS != "0" ]; then
+			let LEAKS=$LEAKS+1;
+		fi
+	done
+}
+
+echo "=== Running Memory access/leak tests:"
+rm -f valgrind_errors_*
+
+for TEST in ${TESTS[@]}; do
+	ERRORS=0
+	LEAKS=0
+
+	echo "Testing: $TEST"
+	run_test $TEST
+	echo "Errors: $ERRORS 'Definitely lost' leaks: $LEAKS"
+
+	if [ $ERRORS != "0" -o $LEAKS != "0" ]; then
+		cp valgrind_test_resoult valgrind_errors_$TEST
+		echo "See 'valgrind_errors_$TEST'"
+		echo "Run 'valgrind --leak-check=full --trace-children=yes test/$TEST' to retest"
+	fi
+
+	rm valgrind_test_resoult
+	echo ""
+
+	let TOTAL_ERRORS=$TOTAL_ERRORS+$ERRORS
+	let TOTAL_LEAKS=$TOTAL_LEAKS+$LEAKS
+done
+
+echo "== Memory access/leak test summary:"
+echo "Total errors: $TOTAL_ERRORS Total 'Definitely lost' leaks: $TOTAL_LEAKS"
+

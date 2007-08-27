@@ -80,13 +80,13 @@ int _main(int argc, char *argv[]) {
 				if (!config->no_cache)
 					free_fpath(cache_file_path);
 				free_runtime_config(config);
-				debug(PROF, "Finished crom cache after %.3f s",  timer_stop(&run_timing));
+				debug(PROF, "Finished from cache after %.3f s",  timer_stop(&run_timing));
 				exit(0);
 			}
 		}
 	}
 
-	/* now we need ImageMagick after this we should terminate ImgeMagick afterwards */
+	/* now we need ImageMagick after this we should terminate ImgeMagick */
 	MagickWandGenesis();
 
 	if (config->strict)

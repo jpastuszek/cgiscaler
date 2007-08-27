@@ -143,10 +143,10 @@ void assert_jpg_byte_read_in_range(int fd, ssize_t min, ssize_t max) {
 
 /* This function will look for \n\n in first 1000 bytes */
 void assert_headers_read(int fd) {
-	int bread;
+	short int bread;
 	int btotal;
-	char buf[1];
-	int has_end_line;
+	unsigned char buf[1];
+	short int has_end_line;
 
 	btotal = 0;
 	has_end_line = 0;
@@ -185,7 +185,7 @@ void assert_equal_low_precision(double value, double expected, double low_precis
 }
 
 void assert_equal_precision(double value, double expected, double precision_error) {
-	int ret;
+	short int ret;
 	double range_delta;
 
 	range_delta = (expected * precision_error);
@@ -197,27 +197,65 @@ void assert_equal_precision(double value, double expected, double precision_erro
 	assert_true_with_message(ret, "value [%F] not in precision range of [%F] and [%F] (%F)", value, expected - (range_delta / 2), expected + (range_delta / 2), precision_error);
 }
 
-/* TODO: Different quantum and different versions of IM returns different strings */
-void assert_image_pixel_color(MagickWand *magick_wand, int x, int y, const char *color) {
+char *color_to_hex(unsigned int r,unsigned  int g,unsigned  int b) {
+	char *str;
+	debug(DEB, "%d,%d,%d", r, g, b);
+	
+	str = malloc(8);  /* #112233 + \0 */
+
+	snprintf(str, 8, "#%.2X%.2X%.2X", r, g, b);
+
+	return str;
+}
+
+/* TODO: Two variants of strings returned by IM... no support for IM build with Q16/Q32... may return components > 255 */
+char *im_color_string_to_hex(char *str) {
+	int r, g, b;
+	char *formats[] = {"rgb%d,%d,%d", "rgb(%d,%d,%d)", 0};
+	int i;
+
+	r = g = b = -1;
+
+	for (i = 0; formats[i]; i++) {
+		sscanf(str, formats[i],  &r, &g, &b);
+
+		if (r != -1 && g != -1 && b != -1)
+			return color_to_hex(r, g, b);
+	}
+	return 0;
+}
+
+void assert_image_pixel_color(MagickWand *magick_wand, int x, int y, const char *hex_color) {
 	PixelWand *pixel_wand;
 	MagickBooleanType status;
 	char *color_string;
+	char *hex_color_string;
 
 	pixel_wand = NewPixelWand();
+
 	status = MagickGetImagePixelColor(magick_wand, x, y, pixel_wand);
 	assert_not_equal(status, MagickFalse);
 
 	color_string = PixelGetColorAsString(pixel_wand);
-	assert_string_equal(color_string, color);
-	free(color_string);
 
+	hex_color_string = im_color_string_to_hex(color_string);
+
+	free(color_string);
 	DestroyPixelWand(pixel_wand);
+
+	assert_not_equal_with_message(hex_color_string, 0, "Cannot convert IM color string!");
+
+	if (!hex_color_string)
+		return;
+
+	assert_string_equal(hex_color_string, hex_color);
+	free(hex_color_string);
 }
 
 void assert_image_pixel_alpha(MagickWand *magick_wand, int x, int y, float alpha) {
 	PixelWand *pixel_wand;
 	MagickBooleanType status;
-	int true;
+	short int true;
 	float tested_alpha;
 
 	pixel_wand = NewPixelWand();

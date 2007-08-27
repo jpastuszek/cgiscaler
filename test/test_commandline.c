@@ -27,9 +27,14 @@
 /* commandline.c tests */
 static void test_apply_commandline_config() {
 	struct runtime_config *config;
+
+	/* if I change this to use config defines... */
 	char *args1[] = { "test", "-w", "100", "-h", "200" };
 	char *args2[] = { "test", "-w", "100", "-s", "true", "-nc", "false", "-ns", "true", "-nh", "dsfa", "abc/e/f.jpg" };
 	char *args3[] = { "test", "file.gif", "-h", "300", "-h", "100" };
+	char *all_true[] = { "test", "-w", "100", "-s", "true", "-wap", "true", "-nc", "true", "-ns", "true", "-nh", "true" };
+	char *all_bogo[] = { "test", "-w", "100", "-s", "1", "-wap", "bogo", "-nc", "xxx", "-ns", "aaa", "-nh", "0" };
+	char *all_false[] = { "test", "-w", "100", "-s", "false", "-wap", "false", "-nc", "false", "-ns", "false", "-nh", "false" };	
 	char *args4[] = { "test",  "-bogo", "true" };
 
 
@@ -70,6 +75,51 @@ static void test_apply_commandline_config() {
 	assert_equal(config->quality, DEFAULT_QUALITY);
 	assert_equal(config->no_cache, 0);
 	assert_equal(config->no_serve, 1);
+	assert_equal(config->no_headers, 0);
+
+	apply_commandline_config(config, 13, all_true);
+
+	assert_string_equal(config->file_name, "file.gif");
+	assert_equal(config->size.w, 100);
+	assert_equal(config->size.h, 100);
+	assert_equal(config->strict, 1);
+	assert_equal(config->quality, LOWQ_QUALITY);
+	assert_equal(config->no_cache, 1);
+	assert_equal(config->no_serve, 1);
+	assert_equal(config->no_headers, 1);
+
+	apply_commandline_config(config, 13, all_bogo);
+
+	assert_string_equal(config->file_name, "file.gif");
+	assert_equal(config->size.w, 100);
+	assert_equal(config->size.h, 100);
+	assert_equal(config->strict, 1);
+	assert_equal(config->quality, LOWQ_QUALITY);
+	assert_equal(config->no_cache, 1);
+	assert_equal(config->no_serve, 1);
+	assert_equal(config->no_headers, 1);
+
+
+	apply_commandline_config(config, 13, all_false);
+
+	assert_string_equal(config->file_name, "file.gif");
+	assert_equal(config->size.w, 100);
+	assert_equal(config->size.h, 100);
+	assert_equal(config->strict, 0);
+	assert_equal(config->quality, DEFAULT_QUALITY);
+	assert_equal(config->no_cache, 0);
+	assert_equal(config->no_serve, 0);
+	assert_equal(config->no_headers, 0);
+
+	apply_commandline_config(config, 13, all_bogo);
+
+	assert_string_equal(config->file_name, "file.gif");
+	assert_equal(config->size.w, 100);
+	assert_equal(config->size.h, 100);
+	assert_equal(config->strict, 0);
+	assert_equal(config->quality, DEFAULT_QUALITY);
+	assert_equal(config->no_cache, 0);
+	assert_equal(config->no_serve, 0);
 	assert_equal(config->no_headers, 0);
 
 	apply_commandline_config(config, 3, args4);

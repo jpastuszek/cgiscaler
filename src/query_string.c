@@ -26,7 +26,7 @@
 #include "debug.h"
 #include "config.h"
 
-/* TODO: %xx in query string decoding... no need for filename? */
+/* TODO: %xx in query string decoding... no need for filename (apache) */
 
 void apply_query_string_config(struct runtime_config *config, char *file_name, char *query_string) {
 	char *w;
@@ -68,16 +68,21 @@ void apply_query_string_config(struct runtime_config *config, char *file_name, c
 	if (s) {
 		if (!strcmp(s, QUERY_TRUE_VAL))
 			config->strict = 1;
-		else
+		else if (!strcmp(s, QUERY_FALSE_VAL))
 			config->strict = 0;
+		else
+			debug(ERR, "Unrecognized parameter for strict: %s", s);
+
 		free(s);
 	}
 
 	if (lowq) {
 		if (!strcmp(lowq, QUERY_TRUE_VAL))
 			config->quality = LOWQ_QUALITY;
-		else
+		else if (!strcmp(lowq, QUERY_FALSE_VAL))
 			config->quality = DEFAULT_QUALITY;
+		else
+			debug(ERR, "Unrecognized parameter for lowq: %s", lowq);
 
 		free(lowq);
 	}

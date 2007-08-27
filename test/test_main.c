@@ -150,8 +150,10 @@ static void test_from_cache() {
 	char *argv[] = {"test", IMAGE_TEST_FILE};
 
 	absolute_media_file_path = create_absolute_media_file_path(IMAGE_TEST_FILE);
+
 	cache_file_path = create_cache_file_path(IMAGE_TEST_FILE, OUT_FORMAT_EXTENSION, DEFAULT_WIDTH, DEFAULT_HEIGHT, DEFAULT_STRICT, DEFAULT_QUALITY);
 	absolute_cach_file_path = create_absolute_cache_file_path(cache_file_path);
+	free_fpath(cache_file_path);
 
 	/* real file  - no cache file yet */
 	assert_file_not_exists(absolute_cach_file_path);
@@ -187,7 +189,6 @@ static void test_from_cache() {
 	/* clean up */
 	free_fpath(absolute_media_file_path);
 	free_fpath(absolute_cach_file_path);
-	free_fpath(cache_file_path);
 }
 
 

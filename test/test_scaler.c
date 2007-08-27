@@ -158,12 +158,12 @@ static void test_remove_transparentcy() {
 	assert_not_equal(image, 0);
 
 	/* assert we have our test image loaded OK */
-	assert_image_pixel_color(image, IMAGE_TEST_FILE_WIDTH - 1, IMAGE_TEST_FILE_HEIGHT - 1, "rgb240,0,255");
+	assert_image_pixel_color(image, IMAGE_TEST_FILE_WIDTH - 1, IMAGE_TEST_FILE_HEIGHT - 1, "#F000FF");
 
 	/* we assert that we don't have transparent pixel */
 	assert_image_pixel_alpha(image, 10, 10, 1.0);
 	/* and color is DEFAULT_BACKGROUND_COLOR_MAGICK_STR */
-	assert_image_pixel_color(image, 10, 10, DEFAULT_BACKGROUND_COLOR_MAGICK_STR);
+	assert_image_pixel_color(image, 10, 10, DEFAULT_BACKGROUND_COLOR);
 
 	free_image(image);
 }

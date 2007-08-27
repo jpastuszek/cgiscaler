@@ -31,4 +31,4 @@ main_LDADD = $(top_builddir)/cgreen/libcgreen.a
 main_SOURCES = asserts.c cache.c commandline.c debug.c file_utils.c \
 	geometry_math.c main.c query_string.c runtime_config.c scaler.c serve.c stdio_capture.c \
 	test_main.c
-bin_SCRIPTS = run_tests
+bin_SCRIPTS = memory_test unit_test
