@@ -102,6 +102,46 @@ static void test_get_query_string_config() {
 	assert_equal(config->strict, 0);
 	assert_equal(config->quality, LOWQ_QUALITY);
 
+	snprintf(test_query_string, 256, "%s=104&%s=137&%s=%s", QUERY_WIDTH_PARAM, QUERY_HEIGHT_PARAM, QUERY_STRICT_PARAM, QUERY_FALSE_VAL);
+
+	apply_query_string_config(config, "photo04/3d/03/0b64a0af1869.jpg", test_query_string);
+	assert_string_equal(config->file_name, "photo04/3d/03/0b64a0af1869.jpg");
+	assert_equal(config->size.w, 104);
+	assert_equal(config->size.h, 137);
+	assert_equal(config->strict, 0);
+	assert_equal(config->quality, LOWQ_QUALITY);
+
+
+	/* set switches to true */
+	snprintf(test_query_string, 256, "%s=%s&%s=%s", QUERY_STRICT_PARAM, QUERY_TRUE_VAL, QUERY_LOWQ_PARAM, QUERY_TRUE_VAL);
+	apply_query_string_config(config, "test", test_query_string);
+
+	assert_equal(config->strict, 1);
+	assert_equal(config->quality, LOWQ_QUALITY);
+
+	/* now try some undefined valuses */
+	snprintf(test_query_string, 256, "%s=%s&%s=%s", QUERY_STRICT_PARAM, "abc", QUERY_LOWQ_PARAM, "0");
+	apply_query_string_config(config, "test", test_query_string);
+
+	/* nothing should change */
+	assert_equal(config->strict, 1);
+	assert_equal(config->quality, LOWQ_QUALITY);
+
+	/* false swiches */
+	snprintf(test_query_string, 256, "%s=%s&%s=%s", QUERY_STRICT_PARAM, QUERY_FALSE_VAL, QUERY_LOWQ_PARAM, QUERY_FALSE_VAL);
+	apply_query_string_config(config, "test", test_query_string);
+
+	assert_equal(config->strict, 0);
+	assert_equal(config->quality, DEFAULT_QUALITY);
+
+	/* try undefined again */
+	snprintf(test_query_string, 256, "%s=%s&%s=%s", QUERY_STRICT_PARAM, "abc", QUERY_LOWQ_PARAM, "0");
+	apply_query_string_config(config, "test", test_query_string);
+
+	/* all should be unchanged */
+	assert_equal(config->strict, 0);
+	assert_equal(config->quality, DEFAULT_QUALITY);
+
 	free_runtime_config(config);
 }
 

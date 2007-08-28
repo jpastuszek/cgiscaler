@@ -19,12 +19,12 @@
  ***************************************************************************/
 
 /* enable debuging - not suitable for production env! */
-#define DEBUG
+//#define DEBUG
 /* sync every line written to debug file... slow */
 //#define DEBUG_SYNC
 
 /* debug file path if debugging enabled */
-#define DEBUG_FILE "/tmp/cgiscaler.gallery.deb"
+#define DEBUG_FILE "/tmp/cgiscaler.deb"
 
 
 /* Default Run-time configuration (0 means false, 1 true) */
@@ -47,6 +47,7 @@
 #define COMMANDLINE_NO_HEADERS_SWITCH "nh"
 
 #define COMMANDLINE_TRUE_VAL "true"
+#define COMMANDLINE_FALSE_VAL "false"
 
 /* CGI Query configuration */
 /* CGI Query parameter names */
@@ -57,6 +58,7 @@
 
 /* CGI Query true value: what string will match as true */
 #define QUERY_TRUE_VAL "true"
+#define QUERY_FALSE_VAL "false"
 
 /* When LOWQ_PARAM/SWITCH=TRUE_VAL output data will use this compression parameter (0-100 best) or else DEFAULT_QUALITY will be used */
 #define LOWQ_QUALITY 20

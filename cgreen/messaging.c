@@ -22,13 +22,13 @@ void send_message(int messaging, int result) {
     Message *message = (Message *)malloc(sizeof(Message));
     message->type = queues[messaging].tag;
     message->result = result;
-    msgsnd(queues[messaging].queue, message, sizeof(Message), 0);
+    msgsnd(queues[messaging].queue, message, sizeof(message->result), 0);
     free(message);
 }
 
 int receive_message(int messaging) {
     Message *message = (Message *)malloc(sizeof(Message));
-    ssize_t received = msgrcv(queues[messaging].queue, message, sizeof(Message), queues[messaging].tag, IPC_NOWAIT);
+    ssize_t received = msgrcv(queues[messaging].queue, message, sizeof(message->result), queues[messaging].tag, IPC_NOWAIT);
     int result = (received > 0 ? message->result : 0);
     free(message);
     return result;

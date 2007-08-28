@@ -51,10 +51,11 @@ int _main(int argc, char *argv[]) {
 	apply_query_string_config(config, getenv("PATH_INFO"), getenv("QUERY_STRING"));
 
 	if (!config->file_name) {
+		debug(ERR, "No file name given");
+
 		if (!config->no_serve)
 			serve_error(config->no_headers);
 
-		debug(ERR, "No file name given");
 		debug(PROF, "Finished with error after %.3f s",  timer_stop(&run_timing));
 
 		exit(70);
@@ -79,13 +80,13 @@ int _main(int argc, char *argv[]) {
 				if (!config->no_cache)
 					free_fpath(cache_file_path);
 				free_runtime_config(config);
-				debug(PROF, "Finished crom cache after %.3f s",  timer_stop(&run_timing));
+				debug(PROF, "Finished from cache after %.3f s",  timer_stop(&run_timing));
 				exit(0);
 			}
 		}
 	}
 
-	/* now we need ImageMagick after this we should terminate ImgeMagick afterwards */
+	/* now we need ImageMagick after this we should terminate ImgeMagick */
 	MagickWandGenesis();
 
 	if (config->strict)

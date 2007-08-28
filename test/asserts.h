@@ -37,7 +37,7 @@ void assert_headers_read(int fd);
 void assert_equal_low_precision(double value, double expected, double low_precision_error);
 void assert_equal_precision(double value, double expected, double precision_error) ;
 
-void assert_image_pixel_color(MagickWand *magick_wand, int x, int y, const char *color);
+void assert_image_pixel_color(MagickWand *magick_wand, int x, int y, const char *hex_color);
 void assert_image_pixel_alpha(MagickWand *magick_wand, int x, int y, float alpha) ;
 
 ssize_t get_file_size(char *file_path);

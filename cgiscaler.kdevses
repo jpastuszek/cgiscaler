@@ -1,52 +1,22 @@
 <?xml version = '1.0' encoding = 'UTF-8'?>
 <!DOCTYPE KDevPrjSession>
 <KDevPrjSession>
- <DocsAndViews NumberOfDocuments="15" >
-  <Doc0 NumberOfViews="1" URL="file:///home/kazuya/Projects/cgiscaler/CGIScaler/src/main.c" >
-   <View0 Encoding="" line="0" Type="Source" />
+ <DocsAndViews NumberOfDocuments="5" >
+  <Doc0 NumberOfViews="1" URL="file:///home/kazuya/Projects/cgiscaler/CGIScaler/RELEASE_NOTES" >
+   <View0 Encoding="" line="18" Type="Source" />
   </Doc0>
-  <Doc1 NumberOfViews="1" URL="file:///home/kazuya/Projects/cgiscaler/CGIScaler/src/main.h" >
-   <View0 Encoding="" line="0" Type="Source" />
+  <Doc1 NumberOfViews="1" URL="file:///home/kazuya/Projects/cgiscaler/CGIScaler/README" >
+   <View0 Encoding="" line="6" Type="Source" />
   </Doc1>
-  <Doc2 NumberOfViews="1" URL="file:///home/kazuya/Projects/cgiscaler/CGIScaler/test/test_main.c" >
-   <View0 Encoding="" line="79" Type="Source" />
+  <Doc2 NumberOfViews="1" URL="file:///home/kazuya/Projects/cgiscaler/CGIScaler/INSTALL" >
+   <View0 Encoding="" line="91" Type="Source" />
   </Doc2>
-  <Doc3 NumberOfViews="1" URL="file:///home/kazuya/Projects/cgiscaler/CGIScaler/test/test_config.h" >
-   <View0 Encoding="" line="73" Type="Source" />
+  <Doc3 NumberOfViews="1" URL="file:///home/kazuya/Projects/cgiscaler/CGIScaler/NEWS" >
+   <View0 Encoding="" line="0" Type="Source" />
   </Doc3>
-  <Doc4 NumberOfViews="1" URL="file:///home/kazuya/Projects/cgiscaler/CGIScaler/test/stdio_capture.h" >
-   <View0 Encoding="" line="14" Type="Source" />
+  <Doc4 NumberOfViews="1" URL="file:///home/kazuya/Projects/cgiscaler/CGIScaler/TODO" >
+   <View0 Encoding="" line="5" Type="Source" />
   </Doc4>
-  <Doc5 NumberOfViews="1" URL="file:///home/kazuya/Projects/cgiscaler/CGIScaler/test/test_cache.c" >
-   <View0 Encoding="" line="82" Type="Source" />
-  </Doc5>
-  <Doc6 NumberOfViews="1" URL="file:///home/kazuya/Projects/cgiscaler/CGIScaler/src/file_utils.c" >
-   <View0 Encoding="" line="233" Type="Source" />
-  </Doc6>
-  <Doc7 NumberOfViews="1" URL="file:///home/kazuya/Projects/cgiscaler/CGIScaler/test/asserts.c" >
-   <View0 Encoding="" line="135" Type="Source" />
-  </Doc7>
-  <Doc8 NumberOfViews="1" URL="file:///home/kazuya/Projects/cgiscaler/CGIScaler/src/commandline.c" >
-   <View0 Encoding="" line="44" Type="Source" />
-  </Doc8>
-  <Doc9 NumberOfViews="1" URL="file:///home/kazuya/Projects/cgiscaler/CGIScaler/test/test_commandline.c" >
-   <View0 Encoding="" line="74" Type="Source" />
-  </Doc9>
-  <Doc10 NumberOfViews="1" URL="file:///home/kazuya/Projects/cgiscaler/CGIScaler/src/geometry_math.c" >
-   <View0 Encoding="" line="0" Type="Source" />
-  </Doc10>
-  <Doc11 NumberOfViews="1" URL="file:///home/kazuya/Projects/cgiscaler/CGIScaler/src/runtime_config.c" >
-   <View0 Encoding="" line="0" Type="Source" />
-  </Doc11>
-  <Doc12 NumberOfViews="1" URL="file:///home/kazuya/Projects/cgiscaler/CGIScaler/src/query_string.c" >
-   <View0 Encoding="" line="42" Type="Source" />
-  </Doc12>
-  <Doc13 NumberOfViews="1" URL="file:///home/kazuya/Projects/cgiscaler/CGIScaler/test/asserts.h" >
-   <View0 Encoding="" line="32" Type="Source" />
-  </Doc13>
-  <Doc14 NumberOfViews="1" URL="file:///home/kazuya/Projects/cgiscaler/CGIScaler/test/test_scaler.c" >
-   <View0 Encoding="" line="187" Type="Source" />
-  </Doc14>
  </DocsAndViews>
  <pluginList>
   <kdevdebugger>

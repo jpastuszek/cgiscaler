@@ -26,7 +26,7 @@
 #include "debug.h"
 #include "config.h"
 
-/* TODO: %xx in query string decoding... no need for filename? */
+/* TODO: %xx in query string decoding... no need for filename (apache) */
 
 void apply_query_string_config(struct runtime_config *config, char *file_name, char *query_string) {
 	char *w;
@@ -68,21 +68,26 @@ void apply_query_string_config(struct runtime_config *config, char *file_name, c
 	if (s) {
 		if (!strcmp(s, QUERY_TRUE_VAL))
 			config->strict = 1;
-		else
+		else if (!strcmp(s, QUERY_FALSE_VAL))
 			config->strict = 0;
+		else
+			debug(ERR, "Unrecognized parameter for strict: %s", s);
+
 		free(s);
 	}
 
 	if (lowq) {
 		if (!strcmp(lowq, QUERY_TRUE_VAL))
 			config->quality = LOWQ_QUALITY;
-		else
+		else if (!strcmp(lowq, QUERY_FALSE_VAL))
 			config->quality = DEFAULT_QUALITY;
+		else
+			debug(ERR, "Unrecognized parameter for lowq: %s", lowq);
 
 		free(lowq);
 	}
 
-	debug(DEB, "Run-time conifg after query string: file: '%s', size w: %d h: %d, strict: %d quality: %d", config->file_name, config->size.w, config->size.h, config->strict, config->quality);
+	debug(DEB, "Run-time conifg after query string: file: '%s', size w: %d h: %d, strict: %d quality: %d", config->file_name ? config->file_name : "<null>", config->size.w, config->size.h, config->strict, config->quality);
 
 	/* we don't free file_name as it is used in param structure and will be freed on free_runtime_config */
 }

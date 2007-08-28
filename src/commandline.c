@@ -67,8 +67,10 @@ void apply_commandline_config(struct runtime_config *config, int argc, char *arg
 
 				if (!strcmp(argv[i+1], COMMANDLINE_TRUE_VAL))
 					config->strict = 1;
-				else
+				else if (!strcmp(argv[i+1], COMMANDLINE_FALSE_VAL))
 					config->strict = 0;
+				else
+					debug(ERR, "Unrecognized parameter for strict: %s", argv[i+1]);
 
 				i++;
 				continue;
@@ -82,8 +84,10 @@ void apply_commandline_config(struct runtime_config *config, int argc, char *arg
 
 				if (!strcmp(argv[i+1], COMMANDLINE_TRUE_VAL))
 					config->quality = LOWQ_QUALITY;
-				else
+				else if (!strcmp(argv[i+1], COMMANDLINE_FALSE_VAL))
 					config->quality = DEFAULT_QUALITY;
+				else
+					debug(ERR, "Unrecognized parameter for lowq: %s", argv[i+1]);
 
 				i++;
 				continue;
@@ -97,8 +101,10 @@ void apply_commandline_config(struct runtime_config *config, int argc, char *arg
 
 				if (!strcmp(argv[i+1], COMMANDLINE_TRUE_VAL))
 					config->no_cache = 1;
-				else
+				else if (!strcmp(argv[i+1], COMMANDLINE_FALSE_VAL))
 					config->no_cache = 0;
+				else
+					debug(ERR, "Unrecognized parameter for no_cache: %s", argv[i+1]);
 
 				i++;
 				continue;
@@ -112,8 +118,10 @@ void apply_commandline_config(struct runtime_config *config, int argc, char *arg
 
 				if (!strcmp(argv[i+1], COMMANDLINE_TRUE_VAL))
 					config->no_serve = 1;
-				else
+				else if (!strcmp(argv[i+1], COMMANDLINE_FALSE_VAL))
 					config->no_serve = 0;
+				else
+					debug(ERR, "Unrecognized parameter for no_serve: %s", argv[i+1]);
 
 				i++;
 				continue;
@@ -127,8 +135,10 @@ void apply_commandline_config(struct runtime_config *config, int argc, char *arg
 
 				if (!strcmp(argv[i+1], COMMANDLINE_TRUE_VAL))
 					config->no_headers = 1;
-				else
+				else if (!strcmp(argv[i+1], COMMANDLINE_FALSE_VAL))
 					config->no_headers = 0;
+				else
+					debug(ERR, "Unrecognized parameter for no_headers: %s", argv[i+1]);
 
 				i++;
 				continue;
@@ -152,5 +162,5 @@ void apply_commandline_config(struct runtime_config *config, int argc, char *arg
 		}
 	}
 
-	debug(DEB, "Run-time config after command line: file: file: '%s', size w: %d h: %d, strict: %d quality: %d no cache: %d, no serve: %d, no headers: %d", config->file_name, config->size.w, config->size.h, config->strict, config->quality, config->no_cache, config->no_serve, config->no_headers);
+	debug(DEB, "Run-time config after command line: file: file: '%s', size w: %d h: %d, strict: %d quality: %d no cache: %d, no serve: %d, no headers: %d", config->file_name ? config->file_name : "<null>", config->size.w, config->size.h, config->strict, config->quality, config->no_cache, config->no_serve, config->no_headers);
 }

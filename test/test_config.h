@@ -46,6 +46,7 @@
 #define COMMANDLINE_NO_HEADERS_SWITCH "nh"
 
 #define COMMANDLINE_TRUE_VAL "true"
+#define COMMANDLINE_FALSE_VAL "false"
 
 /* CGI Query configuration */
 /* CGI Query parameter names */
@@ -56,6 +57,7 @@
 
 /* CGI Query true value: what string will match as true */
 #define QUERY_TRUE_VAL "true"
+#define QUERY_FALSE_VAL "false"
 
 /* When LOWQ_PARAM/SWITCH=TRUE_VAL output data will use this compression parameter (0-100 best) or else DEFAULT_QUALITY will be used */
 #define LOWQ_QUALITY 20
@@ -96,7 +98,6 @@
 /* color to fill transparency when conferting from transparent gifs - yellowishs*/
 /* #112233 hex -> rgb17,34,51 */
 #define DEFAULT_BACKGROUND_COLOR "#112233"
-#define DEFAULT_BACKGROUND_COLOR_MAGICK_STR "rgb17,34,51"
 
 #define MAX_PIXEL_NO ((IMAGE_TEST_FILE_WIDTH - 10) * (IMAGE_TEST_FILE_HEIGHT - 10) - 4000)
 
