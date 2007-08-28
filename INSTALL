@@ -84,7 +84,7 @@ Performance tips
 ===================
 
 Build IM with Q8
-   ImageMagick can be built witch different quantum depth. 
+   ImageMagick can be built witch different quantum depths.
    For thumbnailing purposes there is no need to use quantum depth > 8.
    Bigger quantym depth = higher memory usage, lower speed (more data transferred)
 

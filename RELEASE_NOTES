@@ -1,5 +1,24 @@
 CGIscaler release notes:
 
+- Final Release v1.0
+	Bug Fixes:
+		- fixed color comparing assert
+		- query string query parsing reading uninitialized data
+		- memory leaks
+		- loads of re-factorization
+	Additions/Improvements:
+		- much faster reading of big JPG images when scaling to small thumbnails
+		- faster scaling of big non JPG images using fast pre-scaling
+		- command line operable, on/off switches to controll serving, caching and HTTP headers
+		- additional profiling information logging
+		- split testing suits
+		- automatic memory access/leak checking suit using valgrind
+	Known Issues:
+		- building may not work properly with older autotools
+		- custom asserts does not give correct line numbers/file names on failure
+	Backward Compatibility:
+		- this release invalidates cache - cache file name format changed
+
 - Bug Fix Release v0.2
 	Bug Fixes:
 		- fixed single character directory name not recreated in caching directory
