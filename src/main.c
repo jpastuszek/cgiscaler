@@ -89,6 +89,9 @@ int _main(int argc, char *argv[]) {
 	/* now we need ImageMagick after this we should terminate ImgeMagick */
 	MagickWandGenesis();
 
+	/* we set resource limits so we won't abuse available system resources */
+ 	set_resource_limits(RESOURCE_LIMIT_DISK, RESOURCE_LIMIT_MAP, RESOURCE_LIMIT_FILE, RESOURCE_LIMIT_MEMORY, RESOURCE_LIMIT_AREA);
+
 	if (config->strict)
 		blob = strict_resize_to_blob(config->file_name, config->size, config->quality, &blob_len, OUT_FORMAT);
 	else
@@ -125,3 +128,4 @@ int _main(int argc, char *argv[]) {
 
 	return EXIT_SUCCESS;
 }
+

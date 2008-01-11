@@ -101,6 +101,18 @@
 
 #define MAX_PIXEL_NO ((IMAGE_TEST_FILE_WIDTH - 10) * (IMAGE_TEST_FILE_HEIGHT - 10) - 4000)
 
+
+/* maximum number of open pixel cache files  */
+#define RESOURCE_LIMIT_FILE 8
+/* maximum amount of disk space in bytes permitted for use by the pixel cache  in GB */
+#define RESOURCE_LIMIT_DISK 2
+/* maximum amount of memory map to allocate for the pixel cache in MB - when this limit is exceeded, the image pixels are cached to disk */
+#define RESOURCE_LIMIT_MAP 0
+/* maximum amount of memory to allocate for the pixel cache from the heap in MB - when this limit is exceeded, the image pixels are cached to memory-mapped disk */
+#define RESOURCE_LIMIT_MEMORY 256
+/* maximum amount of memory to allocate for image from in MB - images that exceed the area limit are cached to disk  */
+#define RESOURCE_LIMIT_AREA 256
+
 #define WRITE_BUFFER_LEN 8192
 
 #endif

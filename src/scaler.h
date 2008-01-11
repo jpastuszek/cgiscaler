@@ -42,3 +42,4 @@ MagickWand *ping_image(media_fpath *media_file_path);
 MagickWand *resize(MagickWand *image, struct dimensions to_size, struct dimensions image_size);
 MagickWand *crop(MagickWand *image, struct dimensions to_size, int x, int y);
 
+int set_resource_limits(int disk, int map, int file, int memory, int area);

@@ -30,6 +30,7 @@
 
 void debug_start(char *file);
 void debug_stop();
+int get_debug_file_fd();
 void debug(const char *level, const char *fmt, ...);
 
 struct timer {

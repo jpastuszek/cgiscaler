@@ -31,6 +31,9 @@
 
 #ifdef DEBUG
 #include <sys/time.h>
+#include <stdio.h>
+#include <string.h>
+#include <errno.h>
 #endif
 
 
@@ -432,4 +435,65 @@ MagickWand *crop(MagickWand *image, struct dimensions to_size, int x, int y) {
 	debug(PROF, "Crop took %.3f s",  timer_stop(&timeing));
 
 	return image;
+}
+
+/* sets ImageMagick resource limit
+*/
+int set_resource_limits(int disk, int map, int file, int memory, int area) {
+/*
+typedef enum
+{
+  UndefinedResource,
+  AreaResource,
+  DiskResource,
+  FileResource,
+  MapResource,
+  MemoryResource
+} ResourceType;
+*/
+
+	MagickBooleanType status;
+
+	debug(DEB, "Setting Magick resource limit: disk %i, map %i, file %i, memory %i", disk, map, file, memory);
+
+	status = SetMagickResourceLimit(DiskResource, disk);
+	if (status == MagickFalse) {
+		debug(ERR, "Setting Magick resource limit for disk failed!");
+		return 0;
+	}
+
+	status = SetMagickResourceLimit(MapResource, map);
+	if (status == MagickFalse) {
+		debug(ERR, "Setting Magick resource limit for map failed!");
+		return 0;
+	}
+
+	status = SetMagickResourceLimit(FileResource, file);
+	if (status == MagickFalse) {
+		debug(ERR, "Setting Magick resource limit for file failed!");
+		return 0;
+	}
+
+	status = SetMagickResourceLimit(MemoryResource, memory);
+	if (status == MagickFalse) {
+		debug(ERR, "Setting Magick resource limit for memory failed!");
+		return 0;
+	}
+
+	status = SetMagickResourceLimit(AreaResource, area);
+	if (status == MagickFalse) {
+		debug(ERR, "Setting Magick resource limit for area failed!");
+		return 0;
+	}
+
+#ifdef DEBUG
+	FILE *debug_file_file;
+	debug_file_file =  fdopen(get_debug_file_fd(), "a");
+	if (!debug_file_file)
+		debug(DEB, "Getting FILE stream for debug file fd failed: %s", strerror(errno));
+	else
+		ListMagickResourceInfo(debug_file_file, 0);
+#endif
+
+	return 1;
 }

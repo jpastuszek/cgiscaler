@@ -69,6 +69,10 @@ void debug_stop() {
 #endif
 }
 
+int get_debug_file_fd() {
+	return  debug_file_fd;
+}
+
 void debug(const char *level, const char *fmt, ...) {
 #ifdef DEBUG
 	int size = 40, msg_len, full_msg_len, full_msg_buff_len = 80;
