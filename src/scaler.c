@@ -56,7 +56,12 @@ MagickWand *remove_transparency(MagickWand *image);
 /* TODO: Zero sized image will do original size? may by configurable? :D */
 /* TODO: Performance tests... profiler? :D */
 
-/* Loads image, strips meta-data and sets it's default bg color */
+/** Loads image, strips meta-data and sets it's default background color.
+* This function will load image from file, strip meta-data and if configured it will replace transparent pixels with solid color.
+* @param media_file_path path to image file to load
+* @param to_size maximum size of image to read from file if storage format supports this - JPG does
+* @return allocated new MagickWand object representing loaded image
+*/
 MagickWand *load_image(media_fpath *media_file_path, struct dimensions to_size) {
 	MagickWand *image;
 	abs_fpath *absolute_media_file_path;
@@ -125,6 +130,7 @@ MagickWand *load_image(media_fpath *media_file_path, struct dimensions to_size) 
 	image = remove_transparency(image);
 	if (!image) {
 		debug(ERR, "Removing transparency failed!");
+		DestroyMagickWand(image);
 		return 0;
 	}
 #endif
@@ -132,7 +138,10 @@ MagickWand *load_image(media_fpath *media_file_path, struct dimensions to_size) 
 	return image;
 }
 
-/* If image has transparency/mate/alpha channel will replace transparent places with DEFAULT_BACKGROUND_COLOR */
+/** If image has transparency/mate/alpha channel this function will replace transparent places with DEFAULT_BACKGROUND_COLOR.
+* @param image image to remove transparency from
+* @return image or 0 on failure
+*/
 MagickWand *remove_transparency(MagickWand *image) {
 	MagickBooleanType status;
 	MagickWand *new_image;
@@ -151,7 +160,6 @@ MagickWand *remove_transparency(MagickWand *image) {
 	bg_color = NewPixelWand();
 	if (!bg_color) {
 		debug(ERR, "Creating new pixel wand failed!");
-		DestroyMagickWand(image);
 		return 0;
 	}
 
@@ -159,7 +167,6 @@ MagickWand *remove_transparency(MagickWand *image) {
 	if (status == MagickFalse) {
 		debug(ERR, "Failed to set Pixel Wand Color to '%s'", DEFAULT_BACKGROUND_COLOR);
 		DestroyPixelWand(bg_color);
-		DestroyMagickWand(image);
 		return 0;
 	}
 
@@ -167,7 +174,6 @@ MagickWand *remove_transparency(MagickWand *image) {
 	if (!new_image) {
 		debug(ERR, "Creating new magick wand failed!");
 		DestroyPixelWand(bg_color);
-		DestroyMagickWand(image);
 		return 0;
 	}
 
@@ -176,7 +182,6 @@ MagickWand *remove_transparency(MagickWand *image) {
 		debug(ERR, "Failed to create new image");
 		DestroyPixelWand(bg_color);
 		DestroyMagickWand(new_image);
-		DestroyMagickWand(image);
 		return 0;
 	}
 
@@ -186,21 +191,29 @@ MagickWand *remove_transparency(MagickWand *image) {
 	if (status == MagickFalse) {
 		debug(ERR, "Composite image failed");
 		DestroyMagickWand(new_image);
-		DestroyMagickWand(image);
 		return 0;
 	}
 
+	/* TODO: Use provided image to store result - now we are releasing original image... this may cause issues! */
 	DestroyMagickWand(image);
 	debug(PROF, "Removing transparency took %.3f s",  timer_stop(&timeing));
 
 	return new_image;
 }
 
+/** Release memory allocated for image object */
 void free_image(MagickWand *image) {
 	DestroyMagickWand(image);
 }
 
-/* creates blob from wand according to quality param in params and returns it's size */
+/** This function will provide image byte representation in specified format.
+* Possible formats are all formats supported by ImageMagick. For example "JPG" or "GIF" are valid values.
+* @param image image from which generate data
+* @param quality used to set quality parameter for compression method used - for JPG 100 is best 0 is worst quality
+* @param blob_len pointer to size_t variable that will store size of returned data array
+* @param format format of data that will be returned by this function
+* @return pointer to allocated data or 0 on failure
+*/
 unsigned char *prepare_blob(MagickWand *image, int quality, size_t *blob_len,const char *format) {
 	unsigned char *blob;
 	MagickBooleanType status;
@@ -232,13 +245,19 @@ unsigned char *prepare_blob(MagickWand *image, int quality, size_t *blob_len,con
 	return blob;
 }
 
+/** Releases allocated memory. */
 void free_blob(unsigned char *blob) {
 	MagickRelinquishMemory(blob);
 }
 
 /* TODO: implement non aspect ratio keeping re-size */
-
-/* Re-size the image to resize_to dimensions keeping aspect ration and fitting into resize_to dimensions effectively using resize_to width and height as the limits */
+/** Re-sizes image without loosing it's aspect ratio by fitting image in specified dimensions..
+* Re-size the image to resize_to dimensions keeping aspect ration and fitting into resize_to dimensions effectively using resize_to width and height as the limits.
+* @param media_file_path path to file that stores input image
+* @param resize_to dimensions to which image should be re-sized
+* @return allocated new MagickWand containing re-sized image or 0 on failure
+* @see fit_resize()
+*/
 MagickWand *fit_resize(media_fpath *media_file_path, struct dimensions resize_to) {
 	MagickWand *image_ping;
 	MagickWand *image;
@@ -272,13 +291,26 @@ MagickWand *fit_resize(media_fpath *media_file_path, struct dimensions resize_to
 		return 0;
 	}
 
-	image = resize(image, resize_to, image_size);
-	if (!image)
+	image = resize(image, resize_to);
+	if (!image) {
+		DestroyMagickWand(image);
 		return 0;
+	}
 
 	return image;
 }
 
+/** Re-sizes image without loosing it's aspect ratio by fitting image in dimension's and returns it's byte representation.
+* This function will re-size image using fit-re-size method and then will provide byte representation in format specified.
+* Possible formats are all formats supported by ImageMagick. For example "JPG" or "GIF" are valid values.
+* @param media_file_path path to file that stores input image
+* @param resize_to dimensions to which image should be re-sized
+* @param quality used to set quality parameter for compression method used - for JPG 100 is best 0 is worst quality
+* @param blob_len pointer to size_t variable that will store size of returned data array
+* @param format format of data that will be returned by this function
+* @return pointer to allocated data or 0 on failure
+* @see fit_resize()
+*/
 unsigned char *fit_resize_to_blob(media_fpath *media_file_path, struct dimensions resize_to, int quality, size_t *blob_len, const char *format) {
 	MagickWand *image;
 	unsigned char *blob;
@@ -298,12 +330,19 @@ unsigned char *fit_resize_to_blob(media_fpath *media_file_path, struct dimension
 	return blob;
 }
 
-/* This will do so called strict scaling. It will re-size the image to resize_to dimensions cutting off image regions to keep constant aspect ratio */
+
+/** Re-sizes image without loosing it's aspect ratio by cutting off image regions.
+* @param media_file_path path to file that stores input image
+* @param resize_to dimensions to which image should be re-sized
+* @return allocated new MagickWand containing re-sized image or 0 on failure
+* @see fit_resize()
+*/
 MagickWand *strict_resize(media_fpath *media_file_path, struct dimensions resize_to) {
 	MagickWand *image;
 	struct dimensions image_size;
 	struct dimensions load_size;
 	struct dimensions crop_to;
+	struct point position;
 
 	/* we are reducing requested thumbnail resolution to MAX_PIXEL_NO */
 	resize_to = reduce_filed(resize_to, MAX_PIXEL_NO);
@@ -324,17 +363,35 @@ MagickWand *strict_resize(media_fpath *media_file_path, struct dimensions resize
 	crop_to = resize_to_fit_in(resize_to, image_size);
 	debug(DEB, "Crop to: %d x %d", crop_to.w, crop_to.h);
 
-	image = crop(image, crop_to, (image_size.w - crop_to.w) / 2, (image_size.h - crop_to.h) / 2);
-	if (!image)
-		return 0;
+	position.x = (image_size.w - crop_to.w) / 2;
+	position.y = (image_size.h - crop_to.h) / 2;
 
-	image = resize(image, resize_to, image_size);
-	if (!image)
+	image = crop(image, crop_to, position);
+	if (!image) {
+		DestroyMagickWand(image);
 		return 0;
+	}
+
+	image = resize(image, resize_to);
+	if (!image) {
+		DestroyMagickWand(image);	
+		return 0;
+	}
 
 	return image;
 }
 
+/** Re-sizes image without loosing it's aspect ratio by cropping and returns it's byte representation.
+* This function will re-size image using strict method and then will provide byte representation in format specified.
+* Possible formats are all formats supported by ImageMagick. For example "JPG" or "GIF" are valid values.
+* @param media_file_path path to file that stores input image
+* @param resize_to dimensions to which image should be re-sized
+* @param quality used to set quality parameter for compression method used - for JPG 100 is best 0 is worst quality
+* @param blob_len pointer to size_t variable that will store size of returned data array
+* @param format format of data that will be returned by this function
+* @return pointer to allocated data or 0 on failure
+* @see strict_resize()
+*/
 unsigned char *strict_resize_to_blob(media_fpath *media_file_path, struct dimensions resize_to, int quality, size_t *blob_len, const char *format) {
 	MagickWand *image;
 	unsigned char *blob;
@@ -354,7 +411,10 @@ unsigned char *strict_resize_to_blob(media_fpath *media_file_path, struct dimens
 	return blob;
 }
 
-
+/** Get image size from MagicWand.
+* @param image image to get size from
+* @return dimmensions of image
+*/
 struct dimensions get_image_size(MagickWand *image) {
 	struct dimensions image_size;
 
@@ -364,6 +424,11 @@ struct dimensions get_image_size(MagickWand *image) {
 	return image_size;
 }
 
+/** Gets image headers form file given by path. 
+* @param media_file_path path to file containing image to ping
+* @return pointer to new MagickWand containing image information or 0 on failure
+* @see load_image()
+*/
 MagickWand *ping_image(media_fpath *media_file_path) {
 	abs_fpath *absolute_media_file_path;
 	MagickBooleanType status;
@@ -390,6 +455,7 @@ MagickWand *ping_image(media_fpath *media_file_path) {
 }
 
 /* TODO: implement something better... */
+/** Calcuates pre resize size values. */
 int apply_pre_resize_factor(int orginal, int target) {
 	if (target * 5 > orginal)
 		return orginal;
@@ -397,21 +463,33 @@ int apply_pre_resize_factor(int orginal, int target) {
 	return target * 5;
 }
 
-MagickWand *resize(MagickWand *image, struct dimensions to_size, struct dimensions image_size) {
+/** Resize image to given dimensions.
+* This function will resize image loosing it's aspect ratio to achieve required size.
+* @param image pointer to MagickWand containing image to resize
+* @param to_size dimensions of resulting image
+* @return image or 0 on failure
+* @see crop()
+*/
+MagickWand *resize(MagickWand *image, struct dimensions to_size) {
 	MagickBooleanType status;
 	struct timer timeing;
+	struct dimensions image_size;	
 
 	timer_start(&timeing);
 
+	image_size = get_image_size(image);
+
+	/* Fast pre resize */
 	status = MagickAdaptiveResizeImage(image, apply_pre_resize_factor(image_size.w, to_size.w), apply_pre_resize_factor(image_size.h, to_size.h));
 	if (status == MagickFalse) {
-		DestroyMagickWand(image);
+		debug(ERR, "Adaptive resize failed!");
 		return 0;
 	}
 
+	/* Full filtered resize */
 	status = MagickResizeImage(image, to_size.w, to_size.h, RESIZE_FILTER, RESIZE_SMOOTH_FACTOR);
 	if (status == MagickFalse) {
-		DestroyMagickWand(image);
+		debug(ERR, "Image resize failed!");
 		return 0;
 	}
 
@@ -420,15 +498,22 @@ MagickWand *resize(MagickWand *image, struct dimensions to_size, struct dimensio
 	return image;
 }
 
-MagickWand *crop(MagickWand *image, struct dimensions to_size, int x, int y) {
+/** Crops image to given dimensions starting at given position from left top corner.
+* @param image pointer to MagickWand containing image to crop
+* @param to_size dimensions to crop image to
+* @param position point from loft top corner to start crop from
+* @return image or 0
+* @see resize()
+*/
+MagickWand *crop(MagickWand *image, struct dimensions to_size, struct point position) {
 	MagickBooleanType status;
 	struct timer timeing;
 
 	timer_start(&timeing);
 
-	status = MagickCropImage(image, to_size.w, to_size.h, x, y);
+	status = MagickCropImage(image, to_size.w, to_size.h, position.x, position.y);
 	if (status == MagickFalse) {
-		DestroyMagickWand(image);
+		debug(ERR, "Image crop failed!");
 		return 0;
 	}
 
@@ -437,20 +522,15 @@ MagickWand *crop(MagickWand *image, struct dimensions to_size, int x, int y) {
 	return image;
 }
 
-/* sets ImageMagick resource limit
+/** Sets ImageMagick resource limit
+* @param file maximum number of open pixel cache files
+* @param disk maximum amount of disk space permitted for use by the pixel cache  in GB
+* @param map maximum amount of memory map to allocate for the pixel cache in MB - when this limit is exceeded, the  image pixels are cached to disk
+* @param memory maximum amount of memory to allocate for the pixel cache from the heap in MB - when this limit is exceeded, the image pixels are cached to memory-mapped disk 
+* @param area maximum amount of memory to allocate for image from in MB - images that exceed the area limit are cached to disk
+* @return 1 on success 0 on failure
 */
 int set_resource_limits(int disk, int map, int file, int memory, int area) {
-/*
-typedef enum
-{
-  UndefinedResource,
-  AreaResource,
-  DiskResource,
-  FileResource,
-  MapResource,
-  MemoryResource
-} ResourceType;
-*/
 
 	MagickBooleanType status;
 

@@ -21,16 +21,19 @@
 #ifndef GEOMETRY_MATH_H
 #define GEOMETRY_MATH_H
 
+/** Structure to hold dimensions. */
 struct dimensions {
 	int w;
 	int h;
 };
 
+/** Structure to hold position. */
 struct point {
 	int x;
 	int y;
 };
 
+/** Structure defining a rectangular box */
 struct box {
 	struct point position;
 	struct dimensions size;
