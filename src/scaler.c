@@ -251,7 +251,7 @@ void free_blob(unsigned char *blob) {
 }
 
 /* TODO: implement non aspect ratio keeping re-size */
-/** Re-sizes image without loosing it's aspect ratio by fitting image in specified dimensions..
+/** Re-sizes image without loosing it's aspect ratio by fitting image in specified dimensions.
 * Re-size the image to resize_to dimensions keeping aspect ration and fitting into resize_to dimensions effectively using resize_to width and height as the limits.
 * @param media_file_path path to file that stores input image
 * @param resize_to dimensions to which image should be re-sized

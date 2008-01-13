@@ -18,25 +18,25 @@
    <View0 Encoding="" Type="Source" />
   </Doc4>
   <Doc5 NumberOfViews="1" URL="file:///home/kazuya/Projects/cgiscaler/CGIScaler/src/main.c" >
-   <View0 Encoding="" line="91" Type="Source" />
+   <View0 Encoding="" Type="Source" />
   </Doc5>
   <Doc6 NumberOfViews="1" URL="file:///home/kazuya/Projects/cgiscaler/CGIScaler/src/config.h" >
    <View0 Encoding="" line="89" Type="Source" />
   </Doc6>
   <Doc7 NumberOfViews="1" URL="file:///home/kazuya/Projects/cgiscaler/CGIScaler/src/scaler.c" >
-   <View0 Encoding="" line="58" Type="Source" />
+   <View0 Encoding="" line="18" Type="Source" />
   </Doc7>
   <Doc8 NumberOfViews="1" URL="file:///home/kazuya/Projects/cgiscaler/CGIScaler/src/scaler.h" >
    <View0 Encoding="" line="42" Type="Source" />
   </Doc8>
   <Doc9 NumberOfViews="1" URL="file:///home/kazuya/Projects/cgiscaler/CGIScaler/src/runtime_config.h" >
-   <View0 Encoding="" Type="Source" />
+   <View0 Encoding="" line="0" Type="Source" />
   </Doc9>
   <Doc10 NumberOfViews="1" URL="file:///home/kazuya/Projects/cgiscaler/CGIScaler/test/stdio_capture.h" >
    <View0 Encoding="" Type="Source" />
   </Doc10>
   <Doc11 NumberOfViews="1" URL="file:///home/kazuya/Projects/cgiscaler/CGIScaler/test/test_config.h" >
-   <View0 Encoding="" line="114" Type="Source" />
+   <View0 Encoding="" Type="Source" />
   </Doc11>
   <Doc12 NumberOfViews="1" URL="file:///home/kazuya/Projects/cgiscaler/CGIScaler/test/test_geometry_math.c" >
    <View0 Encoding="" Type="Source" />
@@ -45,7 +45,7 @@
    <View0 Encoding="" Type="Source" />
   </Doc13>
   <Doc14 NumberOfViews="1" URL="file:///home/kazuya/Projects/cgiscaler/CGIScaler/src/debug.h" >
-   <View0 Encoding="" line="35" Type="Source" />
+   <View0 Encoding="" Type="Source" />
   </Doc14>
   <Doc15 NumberOfViews="1" URL="file:///home/kazuya/Projects/cgiscaler/CGIScaler/src/geometry_math.h" >
    <View0 Encoding="" line="23" Type="Source" />

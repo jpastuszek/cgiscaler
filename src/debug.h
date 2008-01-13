@@ -20,6 +20,11 @@
 #ifndef DEBUG_H
 #define DEBUG_H
 
+#define DEBUG
+#ifdef NDEBUG
+#undef DEBUG
+#endif
+
 #include "config.h"
 
 #define DEB "DEBUG"
