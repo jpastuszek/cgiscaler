@@ -26,7 +26,13 @@
 #include "config.h"
 #include "debug.h"
 
-void apply_commandline_config(struct runtime_config *config, int argc, char *argv[]) {
+/** Apply configuration specified as command line parameters.
+* @param runtime_config allocated runtime configuration structure to apply switches
+* @param operation_config allocated operation configuration structure to apply switched
+* @param argc argc parameter from main function
+* @param argv argv parameter from main function
+*/
+void apply_commandline_config(struct runtime_config *runtime_config, struct operation_config *operation_config, int argc, char *argv[]) {
 	int i;
 	char *file_name = 0;
 
@@ -35,13 +41,14 @@ void apply_commandline_config(struct runtime_config *config, int argc, char *arg
 
 	for (i = 1; i < argc; i++) {
 		if (argv[i][0] == '-') {
+			/* Runtime config parameters */
 			if (!strcmp(argv[i] + 1, COMMANDLINE_WIDTH_SWITCH)) {
 				if (argc - i <= 1) {
 					debug(ERR, "Expected integer for width parameter");
 					return;
 				}
 
-				config->size.w = atoi(argv[i+1]);
+				runtime_config->size.w = atoi(argv[i+1]);
 
 				i++;
 				continue;
@@ -53,7 +60,7 @@ void apply_commandline_config(struct runtime_config *config, int argc, char *arg
 					return;
 				}
 
-				config->size.h = atoi(argv[i+1]);
+				runtime_config->size.h = atoi(argv[i+1]);
 
 				i++;
 				continue;
@@ -66,9 +73,9 @@ void apply_commandline_config(struct runtime_config *config, int argc, char *arg
 				}
 
 				if (!strcmp(argv[i+1], COMMANDLINE_TRUE_VAL))
-					config->strict = 1;
+					runtime_config->strict = 1;
 				else if (!strcmp(argv[i+1], COMMANDLINE_FALSE_VAL))
-					config->strict = 0;
+					runtime_config->strict = 0;
 				else
 					debug(ERR, "Unrecognized parameter for strict: %s", argv[i+1]);
 
@@ -83,9 +90,9 @@ void apply_commandline_config(struct runtime_config *config, int argc, char *arg
 				}
 
 				if (!strcmp(argv[i+1], COMMANDLINE_TRUE_VAL))
-					config->quality = LOWQ_QUALITY;
+					runtime_config->quality = LOWQ_QUALITY;
 				else if (!strcmp(argv[i+1], COMMANDLINE_FALSE_VAL))
-					config->quality = DEFAULT_QUALITY;
+					runtime_config->quality = DEFAULT_QUALITY;
 				else
 					debug(ERR, "Unrecognized parameter for lowq: %s", argv[i+1]);
 
@@ -93,6 +100,7 @@ void apply_commandline_config(struct runtime_config *config, int argc, char *arg
 				continue;
 			}
 
+			/* Operation config parameters */
 			if (!strcmp(argv[i] + 1, COMMANDLINE_NO_CACHE_SWITCH)) {
 				if (argc - i <= 1) {
 					debug(ERR, "Expected boolean parameter for no_cache");
@@ -100,9 +108,9 @@ void apply_commandline_config(struct runtime_config *config, int argc, char *arg
 				}
 
 				if (!strcmp(argv[i+1], COMMANDLINE_TRUE_VAL))
-					config->no_cache = 1;
+					operation_config->no_cache = 1;
 				else if (!strcmp(argv[i+1], COMMANDLINE_FALSE_VAL))
-					config->no_cache = 0;
+					operation_config->no_cache = 0;
 				else
 					debug(ERR, "Unrecognized parameter for no_cache: %s", argv[i+1]);
 
@@ -117,9 +125,9 @@ void apply_commandline_config(struct runtime_config *config, int argc, char *arg
 				}
 
 				if (!strcmp(argv[i+1], COMMANDLINE_TRUE_VAL))
-					config->no_serve = 1;
+					operation_config->no_serve = 1;
 				else if (!strcmp(argv[i+1], COMMANDLINE_FALSE_VAL))
-					config->no_serve = 0;
+					operation_config->no_serve = 0;
 				else
 					debug(ERR, "Unrecognized parameter for no_serve: %s", argv[i+1]);
 
@@ -134,9 +142,9 @@ void apply_commandline_config(struct runtime_config *config, int argc, char *arg
 				}
 
 				if (!strcmp(argv[i+1], COMMANDLINE_TRUE_VAL))
-					config->no_headers = 1;
+					operation_config->no_headers = 1;
 				else if (!strcmp(argv[i+1], COMMANDLINE_FALSE_VAL))
-					config->no_headers = 0;
+					operation_config->no_headers = 0;
 				else
 					debug(ERR, "Unrecognized parameter for no_headers: %s", argv[i+1]);
 
@@ -156,11 +164,11 @@ void apply_commandline_config(struct runtime_config *config, int argc, char *arg
 		/* sanitize_file_path will allocate */
 		file_name = sanitize_file_path(argv[i]);
 		if (file_name) {
-			if (config->file_name)
-				free(config->file_name);
-			config->file_name = file_name;
+			if (runtime_config->file_name)
+				free(runtime_config->file_name);
+			runtime_config->file_name = file_name;
 		}
 	}
 
-	debug(DEB, "Run-time config after command line: file: file: '%s', size w: %d h: %d, strict: %d quality: %d no cache: %d, no serve: %d, no headers: %d", config->file_name ? config->file_name : "<null>", config->size.w, config->size.h, config->strict, config->quality, config->no_cache, config->no_serve, config->no_headers);
+	debug(DEB, "Run-time config after command line: file: file: '%s', size w: %d h: %d, strict: %d quality: %d Operation coifig: no cache: %d, no serve: %d, no headers: %d", runtime_config->file_name ? runtime_config->file_name : "<null>", runtime_config->size.w, runtime_config->size.h, runtime_config->strict, runtime_config->quality, operation_config->no_cache, operation_config->no_serve, operation_config->no_headers);
 }

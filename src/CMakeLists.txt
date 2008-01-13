@@ -9,7 +9,11 @@ add_executable(cgiscaler cache.c  commandline.c  debug.c  file_utils.c
 target_link_libraries(cgiscaler ${Magick_LIBRARY})
 target_link_libraries(cgiscaler ${Wand_LIBRARY})
 
+  
 find_package(Doxygen)
 if(Doxygen_FOUND)
-  add_custom_command(TARGET cgiscaler POST_BUILD COMMAND doxygen ${PROJECT_SOURCE_DIR}/doxygen.conf WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
+  option(MAKE_DOXYGEN_DOCUMENTATION "If set doxygen documentation will be generated to doc directory" ON)
+  if(MAKE_DOXYGEN_DOCUMENTATION)
+    add_custom_command(TARGET cgiscaler POST_BUILD COMMAND doxygen ${PROJECT_SOURCE_DIR}/doxygen.conf WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
+  endif(MAKE_DOXYGEN_DOCUMENTATION)
 endif(Doxygen_FOUND)

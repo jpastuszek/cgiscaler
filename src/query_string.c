@@ -24,18 +24,22 @@
 #include "query_string.h"
 #include "file_utils.h"
 #include "debug.h"
-#include "config.h"
 
 /* TODO: %xx in query string decoding... no need for filename (apache) */
-
-void apply_query_string_config(struct runtime_config *config, char *file_name, char *query_string) {
+/** Apply configuration changes by reading provided CGI query string and file name.
+* @param runtime_config allocated runtime configuration structure to which apply configuration
+* @param query_string_config query string configuration structure to obtain maching string from
+* @param file_name path to file to update runtime configuration with
+* @param query_string string to parse - should be in CGI format
+*/
+void apply_query_string_config(struct runtime_config *runtime_config, struct query_string_config *query_string_config, char *file_name, char *query_string) {
 	char *w;
 	char *h;
 	char *s;
 	char *lowq;
 
 	/* strange env... failing */
-	if (!config || !file_name)
+	if (!runtime_config || !file_name)
 		return;
 
 	debug(DEB, "Processing query file name: '%s'", file_name);
@@ -43,33 +47,33 @@ void apply_query_string_config(struct runtime_config *config, char *file_name, c
 	/* this will allocat the file name */
 	file_name = sanitize_file_path(file_name);
 	if (file_name) {
-		if (config->file_name)
-			free(config->file_name);
-		config->file_name = file_name;
+		if (runtime_config->file_name)
+			free(runtime_config->file_name);
+		runtime_config->file_name = file_name;
 	}
 
 	debug(DEB, "Processing query string: '%s' target name: '%s'", query_string, file_name);
 
-	w = get_query_string_param(query_string, QUERY_WIDTH_PARAM);
-	h = get_query_string_param(query_string, QUERY_HEIGHT_PARAM);
-	s = get_query_string_param(query_string, QUERY_STRICT_PARAM);
-	lowq = get_query_string_param(query_string, QUERY_LOWQ_PARAM);
+	w = get_query_string_param(query_string, query_string_config->query_width_param);
+	h = get_query_string_param(query_string, query_string_config->query_height_param);
+	s = get_query_string_param(query_string, query_string_config->query_strict_param);
+	lowq = get_query_string_param(query_string, query_string_config->query_lowq_param);
 
 	if (w) {
-		config->size.w = atoi(w);
+		runtime_config->size.w = atoi(w);
 		free(w);
 	}
 
 	if (h) {
-		config->size.h = atoi(h);
+		runtime_config->size.h = atoi(h);
 		free(h);
 	}
 
 	if (s) {
-		if (!strcmp(s, QUERY_TRUE_VAL))
-			config->strict = 1;
-		else if (!strcmp(s, QUERY_FALSE_VAL))
-			config->strict = 0;
+		if (!strcmp(s, query_string_config->query_true_param))
+			runtime_config->strict = 1;
+		else if (!strcmp(s, query_string_config->query_false_param))
+			runtime_config->strict = 0;
 		else
 			debug(ERR, "Unrecognized parameter for strict: %s", s);
 
@@ -77,22 +81,27 @@ void apply_query_string_config(struct runtime_config *config, char *file_name, c
 	}
 
 	if (lowq) {
-		if (!strcmp(lowq, QUERY_TRUE_VAL))
-			config->quality = LOWQ_QUALITY;
-		else if (!strcmp(lowq, QUERY_FALSE_VAL))
-			config->quality = DEFAULT_QUALITY;
+		if (!strcmp(lowq, query_string_config->query_true_param))
+			runtime_config->quality = query_string_config->low_quality;
+		else if (!strcmp(lowq, query_string_config->query_false_param))
+			runtime_config->quality = query_string_config->default_quality;
 		else
 			debug(ERR, "Unrecognized parameter for lowq: %s", lowq);
 
 		free(lowq);
 	}
 
-	debug(DEB, "Run-time conifg after query string: file: '%s', size w: %d h: %d, strict: %d quality: %d", config->file_name ? config->file_name : "<null>", config->size.w, config->size.h, config->strict, config->quality);
+	debug(DEB, "Run-time conifg after query string: file: '%s', size w: %d h: %d, strict: %d quality: %d", runtime_config->file_name ? runtime_config->file_name : "<null>", runtime_config->size.w, runtime_config->size.h, runtime_config->strict, runtime_config->quality);
 
 	/* we don't free file_name as it is used in param structure and will be freed on free_runtime_config */
 }
 
 /* it could be probably implemented with scanf sort of functions */
+/** Obtains parameter form CGI query string.
+* @param query_string CGI query string to parse
+* @param param_name parameter name to look fore
+* @return allocated string containing value for requested parameter_name or 0 if parameter_name not found in query_string
+*/
 char *get_query_string_param(char *query_string, char *param_name) {
 	char *start_query_string;
 	char *until_equal;

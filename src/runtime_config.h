@@ -23,17 +23,70 @@
 
 #include "geometry_math.h"
 
+/** Holds runtime request parameters. */
 struct runtime_config {
+	/** File name (relative path) received from CGI. */
 	char *file_name;
+	/** Requested thumbnail dimensions */
 	struct dimensions size;
+	/** Perform strict scaling */
 	unsigned short int strict;
+	/** Requested thumbail quality */
 	unsigned short int quality;
+};
+
+/** General operation settings */
+struct operation_config {
+	/** Do not use cache */
 	unsigned short int no_cache;
+	/** Do not serve image to STDOUT */
 	unsigned short int no_serve;
+	/** Do not produce HTTP headers to STDOUT */
 	unsigned short int no_headers;
+};
+
+/** Logging and debug related dynamic configuration */
+struct logging_config {
+	/** Path to log file */
+	char *log_file;
+
+	/** Log level to filter log entries */
+	unsigned short int log_level;
+};
+
+/** CGI query string matching patterns */
+struct query_string_config {
+	/** String to match width parameter in CGI query string */
+	char *query_width_param;
+	/** String to match height parameter in CGI query string */
+	char *query_height_param;
+	/** String to match strict enable parameter in CGI query string */
+	char *query_strict_param;
+	/** String to mach log quality enable parameter in CGI query string */
+	char *query_lowq_param;
+
+	/** String to mach true value in CGI query string */
+	char *query_true_param;
+	/** String to mach false value in CGI query string */
+	char *query_false_param;
+
+	/** Quality to use when lowq is enabled */
+	unsigned short int low_quality;
+
+	/** Quality to use when lowq is disabled */
+	unsigned short int default_quality;
 };
 
 struct runtime_config *alloc_default_runtime_config();
 void free_runtime_config(struct runtime_config *config);
+
+struct operation_config *alloc_default_operation_config();
+void free_operation_config(struct operation_config *config);
+
+struct logging_config *alloc_default_logging_config();
+void free_logging_config(struct logging_config *config);
+
+struct query_string_config* alloc_default_query_string_config();
+void free_query_string_config(struct query_string_config *config);
 
 #endif

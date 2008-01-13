@@ -105,13 +105,19 @@ add_executable(test_serve
   )
 target_link_libraries(test_serve ${Magick_LIBRARY} ${Wand_LIBRARY} cgreen)
 
-add_custom_command(TARGET test_cache test_commandline test_file_utils test_geometry_math test_main test_query_string test_runtime_config test_scaler test_serve 
-  POST_BUILD COMMAND ${PROJECT_SOURCE_DIR}/test/unit_test)
+option(RUN_UNIT_TESTS "If set unit test will be performed" ON)
+if(RUN_UNIT_TESTS)
+  add_custom_command(TARGET test_cache test_commandline test_file_utils test_geometry_math test_main test_query_string test_runtime_config test_scaler test_serve 
+    POST_BUILD COMMAND ${PROJECT_SOURCE_DIR}/test/unit_test)
+endif(RUN_UNIT_TESTS)
 
 find_package(Valgrind)
 if(Valgrind_FOUND)
-  add_custom_command(TARGET test_cache test_commandline test_file_utils test_geometry_math test_main test_query_string test_runtime_config test_scaler test_serve 
-    POST_BUILD COMMAND ${PROJECT_SOURCE_DIR}/test/memory_test)
+  option(RUN_MEMORY_TESTS "If set valgrind memory tests will be performed for each test suite - slow." OFF)
+  if(RUN_MEMORY_TESTS)
+    add_custom_command(TARGET test_cache test_commandline test_file_utils test_geometry_math test_main test_query_string test_runtime_config test_scaler test_serve 
+      POST_BUILD COMMAND ${PROJECT_SOURCE_DIR}/test/memory_test)
+  endif(RUN_MEMORY_TESTS)
 endif(Valgrind_FOUND)
 
 

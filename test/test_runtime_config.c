@@ -24,30 +24,36 @@
 #include "runtime_config.h"
 
 
+//TODO: Test remaining structures
 /* runtime_config.c tests */
 static void test_alloc_default_runtime_config() {
-	struct runtime_config *config;
+	struct runtime_config *runtime_config;
+	struct operation_config *operation_config;
 
-	config = alloc_default_runtime_config();
+	runtime_config = alloc_default_runtime_config();
 
-	assert_not_equal(config, 0);
-	assert_equal(config->file_name, 0);
-	assert_equal(config->size.w, DEFAULT_WIDTH);
-	assert_equal(config->size.h, DEFAULT_HEIGHT);
-	assert_equal(config->strict, DEFAULT_STRICT);
-	assert_equal(config->quality, DEFAULT_QUALITY);
-	assert_equal(config->no_cache, DEFAULT_NO_CACHE);
-	assert_equal(config->no_serve, DEFAULT_NO_SERVE);
-	assert_equal(config->no_headers, DEFAULT_NO_HEADERS);
+	assert_not_equal(runtime_config, 0);
+	assert_equal(runtime_config->file_name, 0);
+	assert_equal(runtime_config->size.w, DEFAULT_WIDTH);
+	assert_equal(runtime_config->size.h, DEFAULT_HEIGHT);
+	assert_equal(runtime_config->strict, DEFAULT_STRICT);
+	assert_equal(runtime_config->quality, DEFAULT_QUALITY);
 
-	free_runtime_config(config);
+	free_runtime_config(runtime_config);
 
-	config = alloc_default_runtime_config();
-	config->file_name = malloc(6);
-	assert_not_equal(config->file_name, 0);
+	runtime_config = alloc_default_runtime_config();
+	runtime_config->file_name = malloc(6);
+	assert_not_equal(runtime_config->file_name, 0);
 
-	/* for memory leak test (valgrind) - file name should be freed */
-	free_runtime_config(config);
+	free_runtime_config(runtime_config);
+
+	operation_config = alloc_default_operation_config();
+
+	assert_equal(operation_config->no_cache, DEFAULT_NO_CACHE);
+	assert_equal(operation_config->no_serve, DEFAULT_NO_SERVE);
+	assert_equal(operation_config->no_headers, DEFAULT_NO_HEADERS);
+
+	free_operation_config(operation_config);
 }
 
 /* setup and teardown */

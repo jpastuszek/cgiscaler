@@ -49,18 +49,25 @@
 #define COMMANDLINE_TRUE_VAL "true"
 #define COMMANDLINE_FALSE_VAL "false"
 
-/* CGI Query configuration */
-/** CGI Query parameter names */
+/* CGI Query parameter names */
+/** String to match with parameter in CGI query string */
 #define QUERY_WIDTH_PARAM "w"
+/** String to match height parameter in CGI query string */
 #define QUERY_HEIGHT_PARAM "h"
+/** String to match strict enable parameter in CGI query string */
 #define QUERY_STRICT_PARAM "s"
+/** String to mach log quality enable parameter in CGI query string */
 #define QUERY_LOWQ_PARAM "wap"
 
-/** CGI Query true value: what string will match as true */
+/* CGI Query true/false values: what string will match as true or false*/
+/** String to mach true value in CGI query string */
 #define QUERY_TRUE_VAL "true"
+/** String to mach false value in CGI query string */
 #define QUERY_FALSE_VAL "false"
 
-/** When LOWQ_PARAM/SWITCH=TRUE_VAL output data will use this compression parameter (0-100 best) or else DEFAULT_QUALITY will be used */
+/** Quality to use when lowq is enabled.
+*When LOWQ_PARAM/SWITCH=TRUE_VAL output data will use this compression parameter (0-100 best) or else DEFAULT_QUALITY will be used
+ */
 #define LOWQ_QUALITY 20
 
 

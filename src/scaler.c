@@ -95,8 +95,8 @@ MagickWand *load_image(media_fpath *media_file_path, struct dimensions to_size) 
 	_image = ReadImage(image_info, exception);
 	if (_image == (Image *) NULL) {
 		DestroyExceptionInfo(exception);
+		debug(WARN,"Loading image '%s' failed", image_info->filename ? image_info->filename : "<null>");
 		DestroyImageInfo(image_info);
-		debug(WARN,"Loading image '%s' failed", image_info->filename);
 		return 0;
 	}
 

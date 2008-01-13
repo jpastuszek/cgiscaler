@@ -20,4 +20,4 @@
 
 #include "runtime_config.h"
 
-void apply_commandline_config(struct runtime_config *config, int argc, char *argv[]);
+void apply_commandline_config(struct runtime_config *config, struct operation_config *operation_config, int argc, char *argv[]);

@@ -26,7 +26,8 @@
 
 /* commandline.c tests */
 static void test_apply_commandline_config() {
-	struct runtime_config *config;
+	struct runtime_config *runtime_config;
+	struct operation_config *operation_config;
 
 	/* if I change this to use config defines... */
 	char *args1[] = { "test", "-w", "100", "-h", "200" };
@@ -38,93 +39,97 @@ static void test_apply_commandline_config() {
 	char *args4[] = { "test",  "-bogo", "true" };
 
 
-	config = alloc_default_runtime_config();
+	runtime_config = alloc_default_runtime_config();
+	operation_config = alloc_default_operation_config();
 
-	apply_commandline_config(config, 5, args1);
+	apply_commandline_config(runtime_config, operation_config, 5, args1);
 
-	assert_equal(config->file_name, 0);
-	assert_equal(config->size.w, 100);
-	assert_equal(config->size.h, 200);
-	assert_equal(config->strict, DEFAULT_STRICT);
-	assert_equal(config->quality, DEFAULT_QUALITY);
-	assert_equal(config->no_cache, DEFAULT_NO_CACHE);
-	assert_equal(config->no_serve, DEFAULT_NO_SERVE);
-	assert_equal(config->no_headers, DEFAULT_NO_HEADERS);
+	assert_equal(runtime_config->file_name, 0);
+	assert_equal(runtime_config->size.w, 100);
+	assert_equal(runtime_config->size.h, 200);
+	assert_equal(runtime_config->strict, DEFAULT_STRICT);
+	assert_equal(runtime_config->quality, DEFAULT_QUALITY);
+	assert_equal(operation_config->no_cache, DEFAULT_NO_CACHE);
+	assert_equal(operation_config->no_serve, DEFAULT_NO_SERVE);
+	assert_equal(operation_config->no_headers, DEFAULT_NO_HEADERS);
 
-	free_runtime_config(config);
+	free_operation_config(operation_config);
+	free_runtime_config(runtime_config);
 
-	config = alloc_default_runtime_config();
+	runtime_config = alloc_default_runtime_config();
+	operation_config = alloc_default_operation_config();
 
-	apply_commandline_config(config, 12, args2);
+	apply_commandline_config(runtime_config, operation_config, 12, args2);
 
-	assert_string_equal(config->file_name, "abc/e/f.jpg");
-	assert_equal(config->size.w, 100);
-	assert_equal(config->size.h, DEFAULT_HEIGHT);
-	assert_equal(config->strict, 1);
-	assert_equal(config->quality, DEFAULT_QUALITY);
-	assert_equal(config->no_cache, 0);
-	assert_equal(config->no_serve, 1);
-	assert_equal(config->no_headers, 0);
+	assert_string_equal(runtime_config->file_name, "abc/e/f.jpg");
+	assert_equal(runtime_config->size.w, 100);
+	assert_equal(runtime_config->size.h, DEFAULT_HEIGHT);
+	assert_equal(runtime_config->strict, 1);
+	assert_equal(runtime_config->quality, DEFAULT_QUALITY);
+	assert_equal(operation_config->no_cache, 0);
+	assert_equal(operation_config->no_serve, 1);
+	assert_equal(operation_config->no_headers, 0);
 
-	apply_commandline_config(config, 6, args3);
+	apply_commandline_config(runtime_config, operation_config, 6, args3);
 
-	assert_string_equal(config->file_name, "file.gif");
-	assert_equal(config->size.w, 100);
-	assert_equal(config->size.h, 100);
-	assert_equal(config->strict, 1);
-	assert_equal(config->quality, DEFAULT_QUALITY);
-	assert_equal(config->no_cache, 0);
-	assert_equal(config->no_serve, 1);
-	assert_equal(config->no_headers, 0);
+	assert_string_equal(runtime_config->file_name, "file.gif");
+	assert_equal(runtime_config->size.w, 100);
+	assert_equal(runtime_config->size.h, 100);
+	assert_equal(runtime_config->strict, 1);
+	assert_equal(runtime_config->quality, DEFAULT_QUALITY);
+	assert_equal(operation_config->no_cache, 0);
+	assert_equal(operation_config->no_serve, 1);
+	assert_equal(operation_config->no_headers, 0);
 
-	apply_commandline_config(config, 13, all_true);
+	apply_commandline_config(runtime_config, operation_config, 13, all_true);
 
-	assert_string_equal(config->file_name, "file.gif");
-	assert_equal(config->size.w, 100);
-	assert_equal(config->size.h, 100);
-	assert_equal(config->strict, 1);
-	assert_equal(config->quality, LOWQ_QUALITY);
-	assert_equal(config->no_cache, 1);
-	assert_equal(config->no_serve, 1);
-	assert_equal(config->no_headers, 1);
+	assert_string_equal(runtime_config->file_name, "file.gif");
+	assert_equal(runtime_config->size.w, 100);
+	assert_equal(runtime_config->size.h, 100);
+	assert_equal(runtime_config->strict, 1);
+	assert_equal(runtime_config->quality, LOWQ_QUALITY);
+	assert_equal(operation_config->no_cache, 1);
+	assert_equal(operation_config->no_serve, 1);
+	assert_equal(operation_config->no_headers, 1);
 
-	apply_commandline_config(config, 13, all_bogo);
+	apply_commandline_config(runtime_config, operation_config, 13, all_bogo);
 
-	assert_string_equal(config->file_name, "file.gif");
-	assert_equal(config->size.w, 100);
-	assert_equal(config->size.h, 100);
-	assert_equal(config->strict, 1);
-	assert_equal(config->quality, LOWQ_QUALITY);
-	assert_equal(config->no_cache, 1);
-	assert_equal(config->no_serve, 1);
-	assert_equal(config->no_headers, 1);
+	assert_string_equal(runtime_config->file_name, "file.gif");
+	assert_equal(runtime_config->size.w, 100);
+	assert_equal(runtime_config->size.h, 100);
+	assert_equal(runtime_config->strict, 1);
+	assert_equal(runtime_config->quality, LOWQ_QUALITY);
+	assert_equal(operation_config->no_cache, 1);
+	assert_equal(operation_config->no_serve, 1);
+	assert_equal(operation_config->no_headers, 1);
 
 
-	apply_commandline_config(config, 13, all_false);
+	apply_commandline_config(runtime_config, operation_config, 13, all_false);
 
-	assert_string_equal(config->file_name, "file.gif");
-	assert_equal(config->size.w, 100);
-	assert_equal(config->size.h, 100);
-	assert_equal(config->strict, 0);
-	assert_equal(config->quality, DEFAULT_QUALITY);
-	assert_equal(config->no_cache, 0);
-	assert_equal(config->no_serve, 0);
-	assert_equal(config->no_headers, 0);
+	assert_string_equal(runtime_config->file_name, "file.gif");
+	assert_equal(runtime_config->size.w, 100);
+	assert_equal(runtime_config->size.h, 100);
+	assert_equal(runtime_config->strict, 0);
+	assert_equal(runtime_config->quality, DEFAULT_QUALITY);
+	assert_equal(operation_config->no_cache, 0);
+	assert_equal(operation_config->no_serve, 0);
+	assert_equal(operation_config->no_headers, 0);
 
-	apply_commandline_config(config, 13, all_bogo);
+	apply_commandline_config(runtime_config, operation_config, 13, all_bogo);
 
-	assert_string_equal(config->file_name, "file.gif");
-	assert_equal(config->size.w, 100);
-	assert_equal(config->size.h, 100);
-	assert_equal(config->strict, 0);
-	assert_equal(config->quality, DEFAULT_QUALITY);
-	assert_equal(config->no_cache, 0);
-	assert_equal(config->no_serve, 0);
-	assert_equal(config->no_headers, 0);
+	assert_string_equal(runtime_config->file_name, "file.gif");
+	assert_equal(runtime_config->size.w, 100);
+	assert_equal(runtime_config->size.h, 100);
+	assert_equal(runtime_config->strict, 0);
+	assert_equal(runtime_config->quality, DEFAULT_QUALITY);
+	assert_equal(operation_config->no_cache, 0);
+	assert_equal(operation_config->no_serve, 0);
+	assert_equal(operation_config->no_headers, 0);
 
-	apply_commandline_config(config, 3, args4);
+	apply_commandline_config(runtime_config, operation_config, 3, args4);
 
-	free_runtime_config(config);
+	free_operation_config(operation_config);
+	free_runtime_config(runtime_config);
 }
 
 /* setup and teardown */
