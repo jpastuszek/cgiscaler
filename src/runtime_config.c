@@ -23,9 +23,32 @@
 #include "runtime_config.h"
 #include "config.h"
 
+/** Allocate all coniguration structures and initializes them to default values.
+* All defaults are defined in config.h.
+*/
+void alloc_default_config() {
+	runtime_config = alloc_default_runtime_config();
+	operation_config = alloc_default_operation_config();
+	logging_config = alloc_default_logging_config();
+	query_string_config = alloc_default_query_string_config();
+	storage_config = alloc_default_storage_config();
+	error_handling_config = alloc_default_error_handling_config();
+}
+
+/** Releases memory allocated to runtime configuration. */
+void free_config() {
+	free_error_handling_config(error_handling_config);
+	free_storage_config(storage_config);
+	free_query_string_config(query_string_config);
+	free_logging_config(logging_config);
+	free_operation_config(operation_config);
+	free_runtime_config(runtime_config);
+}
+
 /** Allocates default runtime configuration.
 * It will use constants defined in config.h as defaults.
 * @return allocated structure initialized with default values
+* @see free_runtime_config()
 */
 struct runtime_config *alloc_default_runtime_config() {
 	struct runtime_config *config;
@@ -52,6 +75,7 @@ void free_runtime_config(struct runtime_config *config) {
 /** Allocates default operation configuration.
 * It will use constants defined in config.h as defaults.
 * @return allocated structure initialized with default values
+* @see free_operation_config()
 */
 struct operation_config *alloc_default_operation_config() {
 	struct operation_config *config;
@@ -74,6 +98,7 @@ void free_operation_config(struct operation_config *config) {
 /** Allocates default logging configuration.
 * It will use constants defined in config.h as defaults.
 * @return allocated structure initialized with default values
+* @see free_logging_config()
 */
 struct logging_config *alloc_default_logging_config() {
 	struct logging_config *config;
@@ -101,6 +126,7 @@ void free_logging_config(struct logging_config *config) {
 /** Allocates default query string parameters configuration.
 * It will use constants defined in config.h as defaults.
 * @return allocated structure initialized with default values
+* @see free_query_string_config()
 */
 struct query_string_config* alloc_default_query_string_config() {
 	struct query_string_config *config;
@@ -126,4 +152,58 @@ struct query_string_config* alloc_default_query_string_config() {
 void free_query_string_config(struct query_string_config *config) {
 	free(config);
 }
+
+/**  Allocates default storage configuration.
+* It will use constants defined in config.h as defaults.
+* @return allocated structure initialized with default values
+* @see free_storage_config()
+*/
+struct storage_config* alloc_default_storage_config() {
+	struct storage_config *config;
+	config = malloc(sizeof(struct storage_config));
+	if (!config)
+		exit(66);
+
+	config->media_directory = malloc(strlen(MEDIA_PATH) + 1);
+	strcpy(config->media_directory, MEDIA_PATH);
+
+	config->cache_directory = malloc(strlen(CACHE_PATH) + 1);
+	strcpy(config->cache_directory, CACHE_PATH);
+
+	return config;
+}
+
+/** Frees memory resources allocated for configuration structure. */
+void free_storage_config(struct storage_config *config) {
+	if (config->media_directory)
+		free(config->media_directory);
+	if (config->cache_directory)
+		free(config->cache_directory);
+
+	free(config);
+}
+
+/**  Allocates default error handling configuration.
+* It will use constants defined in config.h as defaults.
+* @return allocated structure initialized with default values
+* @see free_error_handling_config()
+*/
+struct error_handling_config* alloc_default_error_handling_config() {
+	struct error_handling_config *config;
+	config = malloc(sizeof(struct error_handling_config));
+	if (!config)
+		exit(66);
+
+	config->error_image_file = ERROR_FILE_PATH;
+	config->error_image_mimetype = ERROR_FILE_MIME_TYPE;
+	config->error_message = ERROR_FAILBACK_MESSAGE;
+
+	return config;
+}
+
+/** Frees memory resources allocated for configuration structure. */
+void free_error_handling_config(struct error_handling_config *config) {
+	free(config);
+}
+
 

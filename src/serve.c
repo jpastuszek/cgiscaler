@@ -28,21 +28,36 @@
 #include <unistd.h>
 
 #include "serve.h"
+#include "runtime_config.h"
 #include "cache.h"
 #include "file_utils.h"
-#include "config.h"
 #include "debug.h"
 
-void sent_headers(unsigned int length, char *mime_type) {
+extern struct runtime_config *runtime_config;
+extern struct error_handling_config *error_handling_config;
+extern struct operation_config *operation_config;
+
+
+/** Send HTTP headers to STDOUT.
+* @param content_length content lenght that will be send after HTTP headers - used to set "Content-Length" header
+* @param mime_type mime type to include in HTTP headers
+*/
+void send_headers(unsigned int content_length, char *mime_type) {
 	printf("Content-Type: %s\n", mime_type);
-	printf("Content-Length: %u\n", length);
+	printf("Content-Length: %u\n", content_length);
 	printf("\n");
 
 	/* Fflush is necessary to avoid overwriting buffered headers by direct fd writes */
 	fflush(stdout);
 }
 
-int serve_from_file(abs_fpath *absolute_file_path, char *mime_type, short int no_headers) {
+/** Serve file content.
+* @param absolute_file_path absolute file location that will be served
+* @param mime_type mime type to include in HTTP headers
+* @return 1 on success 0 on failure
+* @see serve_from_blob()
+*/
+int serve_from_file(abs_fpath *absolute_file_path, char *mime_type) {
 	unsigned char *buffer;
 	int file;
 	size_t bytes_read, bytes_written, total_bytes_read, total_bytes_written;
@@ -71,8 +86,8 @@ int serve_from_file(abs_fpath *absolute_file_path, char *mime_type, short int no
 	}
 
 	/* Sending headers */
-	if (!no_headers)
-		sent_headers((unsigned int) file_size, mime_type);
+	if (!operation_config->no_headers)
+		send_headers((unsigned int) file_size, mime_type);
 
 	/* After we have sent headers we don't return 0 */
 
@@ -129,20 +144,25 @@ int serve_from_file(abs_fpath *absolute_file_path, char *mime_type, short int no
 	return 1;
 }
 
-/* serving from blob */
-void serve_from_blob(unsigned char *blob, size_t blob_len, char *mime_type, short int no_headers) {
+/** Serve from data array.
+* @param blob data array to serve
+* @param blob_len length of data array in bytes
+* @param mime_type mime type to include in HTTP headers
+* @see serve_from_file()
+*/
+void serve_from_blob(unsigned char *blob, size_t blob_len, char *mime_type) {
 	size_t bytes_written;
 	size_t total_blob_written;
 
 	debug(DEB,"Serving from BLOB: size: %d", blob_len);
 
-	if (!no_headers)
-		sent_headers((unsigned int) blob_len, mime_type);
+	if (!operation_config->no_headers)
+		send_headers((unsigned int) blob_len, mime_type);
 
 	/* using stdout (FILE *) write instead of fd 1 is safer as printf also is using stdout */
-/*	fwrite(blob, blob_len, 1, stdout); */
+	/* fwrite(blob, blob_len, 1, stdout); */
 
-/* using write is risky as we are writing to fd directly... where using printf we are writing to stdout (FILE *) buffers but at this point we should have buffers flushed */
+	/* using write is risky as we are writing to fd directly... where using printf we are writing to stdout (FILE *) buffers but at this point we should have buffers flushed */
 	total_blob_written = 0;
 	while(1) {
 		debug(DEB, "Writing %d bytes to stdout", blob_len - total_blob_written);
@@ -161,27 +181,31 @@ void serve_from_blob(unsigned char *blob, size_t blob_len, char *mime_type, shor
 	}
 }
 
-/* we will try error image but if it does not exist we will fail back to error message */
-void serve_error(short int no_headers) {
+/** This function will try to serve error image but if it does not exist we will fail back to error message.
+* @see serve_error_message()
+*/
+void serve_error() {
 	abs_fpath *absolute_media_file_path;
 
-	absolute_media_file_path = create_absolute_media_file_path(ERROR_FILE_PATH);
+	absolute_media_file_path = create_absolute_media_file_path(error_handling_config->error_image_file);
 
 	debug(DEB,"Serving error image: '%s'", absolute_media_file_path);
-	if (!serve_from_file(absolute_media_file_path, ERROR_FILE_MIME_TYPE, no_headers))
-		serve_error_message(no_headers);
+	if (!serve_from_file(absolute_media_file_path, error_handling_config->error_image_mimetype))
+		serve_error_message();
 
 	free_fpath(absolute_media_file_path);
 }
 
-/* serving plain text message as an absolute fail-back */
-void serve_error_message(short int no_headers) {
-	if (!no_headers) {
+/** Serve plain text error message.
+* This function will be used as absolute file back to return anythink to web server
+*/
+void serve_error_message() {
+	if (!operation_config->no_headers) {
 		printf("Content-Type: text/plain\n");
 		printf("\n");
 	}
 
-	printf(ERROR_FAILBACK_MESSAGE);
+	printf(error_handling_config->error_message);
 	fflush(stdout);
 }
 

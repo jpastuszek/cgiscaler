@@ -19,6 +19,11 @@
  ***************************************************************************/
 
 #include "main.h"
+#include "runtime_config.h"
+
+extern struct runtime_config *runtime_config;
+extern struct operation_config *operation_config;
+extern struct logging_config *logging_config;
 
 #ifndef TEST_CONFIG_H
 
@@ -31,11 +36,6 @@ int main(int argc, char *argv[])
 #endif
 
 int _main(int argc, char *argv[]) {
-	struct runtime_config *runtime_config;
-	struct operation_config *operation_config;
-	struct logging_config *logging_config;
-	struct query_string_config *query_string_config;
-
 	cache_fpath *cache_file_path;
 	unsigned char *blob;
 	size_t blob_len;
@@ -48,30 +48,20 @@ int _main(int argc, char *argv[]) {
 	timer_start(&run_timing);
 	timer_start(&serve_timing);
 	
-	runtime_config = alloc_default_runtime_config();
-	operation_config = alloc_default_operation_config();
-	logging_config = alloc_default_logging_config();
-	query_string_config = alloc_default_query_string_config();
+	/* allocate configuration with default values */
+	alloc_default_config();
 
 	debug_start(logging_config->log_file);
 
-	/* logging configured - no need to keep this */
-	free_logging_config(logging_config);
-
-	apply_commandline_config(runtime_config, operation_config, argc, argv);
-	apply_query_string_config(runtime_config, query_string_config, getenv("PATH_INFO"), getenv("QUERY_STRING"));
-
-	/* query string parsed - no need to keep this */
-	free_query_string_config(query_string_config);
+	apply_commandline_config(argc, argv);
+	apply_query_string_config(getenv("PATH_INFO"), getenv("QUERY_STRING"));
 
 	if (!runtime_config->file_name) {
 		debug(ERR, "No file name given");
 
-		if (!operation_config->no_serve)
-			serve_error(operation_config->no_headers);
+		serve_error();
 
-		free_operation_config(operation_config);
-		free_runtime_config(runtime_config);
+		free_config();
 		debug(PROF, "Finished with error after %.3f s",  timer_stop(&run_timing));
 		exit(70);
 	}
@@ -82,11 +72,11 @@ int _main(int argc, char *argv[]) {
 	if (!operation_config->no_cache) {
 		 if (!operation_config->no_serve) {
 			/* if we have served from cache OK... cleanup and exit success */
-			if (serve_from_cache_file(runtime_config->file_name, cache_file_path, OUT_FORMAT_MIME_TYPE, operation_config->no_headers)) {
+			if (serve_from_cache_file(runtime_config->file_name, cache_file_path, OUT_FORMAT_MIME_TYPE)) {
 				if (!operation_config->no_cache)
 					free_fpath(cache_file_path);
-				free_operation_config(operation_config);
-				free_runtime_config(runtime_config);
+
+				free_config();
 				debug(PROF, "Served from cache after %.3f s",  timer_stop(&run_timing));
 				exit(0);
 			}
@@ -95,8 +85,8 @@ int _main(int argc, char *argv[]) {
 			if (check_if_cached(runtime_config->file_name, cache_file_path) == CACHE_OK) {
 				if (!operation_config->no_cache)
 					free_fpath(cache_file_path);
-				free_operation_config(operation_config);
-				free_runtime_config(runtime_config);
+
+				free_config();
 				debug(PROF, "Finished from cache after %.3f s",  timer_stop(&run_timing));
 				exit(0);
 			}
@@ -116,18 +106,18 @@ int _main(int argc, char *argv[]) {
 
 	if (!blob) {
 		if (!operation_config->no_serve)
-			serve_error(operation_config->no_headers);
+			serve_error();
 		if (!operation_config->no_cache)
 			free_fpath(cache_file_path);
-		free_operation_config(operation_config);
-		free_runtime_config(runtime_config);
+
+		free_config();
 		MagickWandTerminus();
 		exit(80);
 	}
 
 	/* image processing is done */
 	if (!operation_config->no_serve) {
-		serve_from_blob(blob, blob_len, OUT_FORMAT_MIME_TYPE, operation_config->no_headers);
+		serve_from_blob(blob, blob_len, OUT_FORMAT_MIME_TYPE);
 		debug(PROF, "Served after %.3f s",  timer_stop(&serve_timing));
 	}
 
@@ -141,8 +131,7 @@ int _main(int argc, char *argv[]) {
 	if (!operation_config->no_cache)
 		free_fpath(cache_file_path);
 
-	free_operation_config(operation_config);
-	free_runtime_config(runtime_config);
+	free_config();
 
 	debug(PROF, "Total run time %.3f s",  timer_stop(&run_timing));
 

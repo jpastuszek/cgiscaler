@@ -18,10 +18,10 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include "scaler.h"
+#include "serve.h"
 #include "query_string.h"
 #include "commandline.h"
-#include "serve.h"
+#include "scaler.h"
 #include "cache.h"
 #include "file_utils.h"
 #include "config.h"

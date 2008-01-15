@@ -20,9 +20,13 @@
 #include <stdio.h>
 
 #include "../cgreen/cgreen.h"
-#include "test_config.h"
+#include "runtime_config.h"
 #include "debug.h"
 #include "query_string.h"
+
+extern struct runtime_config *runtime_config;
+extern struct query_string_config *query_string_config;
+
 
 /* query_string.c tests */
 static void test_query_string_param() {
@@ -48,15 +52,13 @@ static void test_query_string_param() {
 }
 
 static void test_get_query_string_config() {
-	struct runtime_config *runtime_config;
-	struct query_string_config *query_string_config;
 	char test_query_string[256];
 
 	runtime_config = alloc_default_runtime_config();
 	query_string_config = alloc_default_query_string_config();
 
 	/* testing defaults */
-	apply_query_string_config(runtime_config, query_string_config, "", "");
+	apply_query_string_config("", "");
 
 	assert_not_equal(runtime_config, 0);
 	assert_equal(runtime_config->file_name, 0);
@@ -65,7 +67,7 @@ static void test_get_query_string_config() {
 	assert_equal(runtime_config->strict, DEFAULT_STRICT);
 	assert_equal(runtime_config->quality, DEFAULT_QUALITY);
 
-	apply_query_string_config(runtime_config, query_string_config, "/some/path/funny.jpeg", "");
+	apply_query_string_config("/some/path/funny.jpeg", "");
 	assert_not_equal(runtime_config, 0);
 	assert_string_equal(runtime_config->file_name, "some/path/funny.jpeg");
 	assert_equal(runtime_config->size.w, DEFAULT_WIDTH);
@@ -76,7 +78,7 @@ static void test_get_query_string_config() {
 
 	snprintf(test_query_string, 256, "%s=123&%s=213&beer=czech_lager&%s=%s&%s=%s", QUERY_WIDTH_PARAM, QUERY_HEIGHT_PARAM, QUERY_STRICT_PARAM, QUERY_TRUE_VAL, QUERY_LOWQ_PARAM, QUERY_TRUE_VAL);
 
-	apply_query_string_config(runtime_config, query_string_config, "/some/path/funny.jpeg", test_query_string);
+	apply_query_string_config("/some/path/funny.jpeg", test_query_string);
 	assert_string_equal(runtime_config->file_name, "some/path/funny.jpeg");
 	assert_equal(runtime_config->size.w, 123);
 	assert_equal(runtime_config->size.h, 213);
@@ -91,7 +93,7 @@ static void test_get_query_string_config() {
 
 	snprintf(test_query_string, 256, "beer=czech_lager&%s=%s&%s=%s", QUERY_STRICT_PARAM, "xbrna", QUERY_LOWQ_PARAM, "false");
 
-	apply_query_string_config(runtime_config, query_string_config, "/some/path/funny.jpeg", test_query_string);
+	apply_query_string_config("/some/path/funny.jpeg", test_query_string);
 	assert_string_equal(runtime_config->file_name, "some/path/funny.jpeg");
 	assert_equal(runtime_config->size.w, DEFAULT_WIDTH);
 	assert_equal(runtime_config->size.h, DEFAULT_HEIGHT);
@@ -100,7 +102,7 @@ static void test_get_query_string_config() {
 
 	snprintf(test_query_string, 256, "beer=czech_lager&%s=%s&%s=%s", QUERY_STRICT_PARAM, "xbrna", QUERY_LOWQ_PARAM, QUERY_TRUE_VAL);
 
-	apply_query_string_config(runtime_config, query_string_config, "///some/path/funn/y2.jpeg", test_query_string);
+	apply_query_string_config("///some/path/funn/y2.jpeg", test_query_string);
 	assert_string_equal(runtime_config->file_name, "some/path/funn/y2.jpeg");
 	assert_equal(runtime_config->size.w, DEFAULT_WIDTH);
 	assert_equal(runtime_config->size.h, DEFAULT_HEIGHT);
@@ -109,7 +111,7 @@ static void test_get_query_string_config() {
 
 	snprintf(test_query_string, 256, "%s=104&%s=137&%s=%s", QUERY_WIDTH_PARAM, QUERY_HEIGHT_PARAM, QUERY_STRICT_PARAM, QUERY_FALSE_VAL);
 
-	apply_query_string_config(runtime_config, query_string_config, "photo04/3d/03/0b64a0af1869.jpg", test_query_string);
+	apply_query_string_config("photo04/3d/03/0b64a0af1869.jpg", test_query_string);
 	assert_string_equal(runtime_config->file_name, "photo04/3d/03/0b64a0af1869.jpg");
 	assert_equal(runtime_config->size.w, 104);
 	assert_equal(runtime_config->size.h, 137);
@@ -119,14 +121,14 @@ static void test_get_query_string_config() {
 
 	/* set switches to true */
 	snprintf(test_query_string, 256, "%s=%s&%s=%s", QUERY_STRICT_PARAM, QUERY_TRUE_VAL, QUERY_LOWQ_PARAM, QUERY_TRUE_VAL);
-	apply_query_string_config(runtime_config, query_string_config, "test", test_query_string);
+	apply_query_string_config("test", test_query_string);
 
 	assert_equal(runtime_config->strict, 1);
 	assert_equal(runtime_config->quality, LOWQ_QUALITY);
 
 	/* now try some undefined valuses */
 	snprintf(test_query_string, 256, "%s=%s&%s=%s", QUERY_STRICT_PARAM, "abc", QUERY_LOWQ_PARAM, "0");
-	apply_query_string_config(runtime_config, query_string_config, "test", test_query_string);
+	apply_query_string_config("test", test_query_string);
 
 	/* nothing should change */
 	assert_equal(runtime_config->strict, 1);
@@ -134,14 +136,14 @@ static void test_get_query_string_config() {
 
 	/* false swiches */
 	snprintf(test_query_string, 256, "%s=%s&%s=%s", QUERY_STRICT_PARAM, QUERY_FALSE_VAL, QUERY_LOWQ_PARAM, QUERY_FALSE_VAL);
-	apply_query_string_config(runtime_config, query_string_config, "test", test_query_string);
+	apply_query_string_config("test", test_query_string);
 
 	assert_equal(runtime_config->strict, 0);
 	assert_equal(runtime_config->quality, DEFAULT_QUALITY);
 
 	/* try undefined again */
 	snprintf(test_query_string, 256, "%s=%s&%s=%s", QUERY_STRICT_PARAM, "abc", QUERY_LOWQ_PARAM, "0");
-	apply_query_string_config(runtime_config, query_string_config, "test", test_query_string);
+	apply_query_string_config("test", test_query_string);
 
 	/* all should be unchanged */
 	assert_equal(runtime_config->strict, 0);

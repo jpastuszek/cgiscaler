@@ -44,7 +44,7 @@ time_t get_cache_file_mtime(cache_fpath *cahce_file_path);
 
 fpath *sanitize_file_path(fpath *file_path);
 
-int write_blob_to_file(unsigned char *blob, int blob_len,abs_fpath *absolute_file_path);
+int write_blob_to_file(unsigned char *blob, int blob_len, abs_fpath *absolute_file_path);
 
 /* private - exported for tests */
 time_t get_file_mtime(abs_fpath *absolute_file_path);

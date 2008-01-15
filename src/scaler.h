@@ -23,6 +23,7 @@
 
 #include "file_utils.h"
 #include "query_string.h"
+#include "geometry_math.h"
 
 unsigned char *fit_resize_to_blob(media_fpath *media_file_path, struct dimensions resize_to, int quality, size_t *blob_len, const char *format);
 unsigned char *strict_resize_to_blob(media_fpath *media_file_path, struct dimensions resize_to, int quality, size_t *blob_len, const char *format) ;

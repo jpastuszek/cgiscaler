@@ -27,9 +27,11 @@
 
 #include "../cgreen/cgreen.h"
 #include "asserts.h"
-#include "test_config.h"
+#include "runtime_config.h"
 #include "debug.h"
 #include "file_utils.h"
+
+extern struct storage_config *storage_config;
 
 static void test_create_cache_file_path() {
 	char compare_file_path[255];
@@ -189,10 +191,12 @@ static void test_get_cache_file_mtime() {
 
 /* setup and teardown */
 static void test_setup() {
+	alloc_default_config();
 	debug_start(DEBUG_FILE);
 }
 
 static void test_teardown() {
+	free_config();
 	debug_stop();
 }
 

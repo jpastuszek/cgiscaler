@@ -35,14 +35,14 @@
 
 void remove_cache_file(cache_fpath *cache_file_path);
 
-
-/* this function will check if cache file exists and if corresponding original file mtime differs with cached version
-Returns bit-mask:
-	NO_ORIG original file does not exist
-	NO_CACHE cache file does not exist
-	MTIME_DIFFER original file mtime differs from cache file mtime
-or
-	CACHE_OK original file mtime is same as cache file mtime
+/** This function will check if cache file exists and if corresponding original file mtime differs with cached version.
+* @param media_file_path path to original media file
+* @param cache_file_path path to cache file
+* @return Returns bit-mask:
+*	NO_ORIG original file does not exist
+*	NO_CACHE cache file does not exist
+*	MTIME_DIFFER original file mtime differs from cache file mtime or
+*	CACHE_OK original file mtime is same as cache file mtime
 */
 int check_if_cached(media_fpath *media_file_path, media_fpath *cache_file_path) {
 	int orginal_mtime, cache_mtime;
@@ -72,6 +72,13 @@ int check_if_cached(media_fpath *media_file_path, media_fpath *cache_file_path) 
 	return CACHE_OK;
 }
 
+/** Writes data to cache file making sure mtime is updated accordingly.
+* @param blob data array
+* @param blob_len length of data array in bytes
+* @param media_file_path path to original media file - needed to get original mtime
+* @param cache_file_path path to cache file to be created
+* @return 1 on success 0 on failure
+*/
 int write_blob_to_cache(unsigned char *blob, int blob_len, media_fpath *media_file_path, cache_fpath *cache_file_path) {
 	time_t orginal_mtime;
 	struct utimbuf time_buf;
@@ -108,11 +115,13 @@ int write_blob_to_cache(unsigned char *blob, int blob_len, media_fpath *media_fi
 	return 1;
 }
 
-/* 
-Serves image from cache file
-Returns: 1 on success 0 when no proper cache file or read failure 
+/** Serves image from cache file.
+* @param media_file_path to check if original file still exist and if if it's mtime differs with cache file
+* @param cache_file_path cache file to serve
+* @param mime_type mime type of cache file - to include in HTTP headers
+* @return 1 on success 0 when no proper cache file or read failure
 */
-int serve_from_cache_file(media_fpath *media_file_path, cache_fpath *cache_file_path, char *mime_type, short int no_headers) {
+int serve_from_cache_file(media_fpath *media_file_path, cache_fpath *cache_file_path, char *mime_type) {
 	abs_fpath *absolute_cache_file_path;
 	int ret;
 
@@ -148,12 +157,15 @@ O C M
 
 	/* serve */
 	debug(DEB,"Serving from cache");
-	ret = serve_from_file(absolute_cache_file_path, mime_type, no_headers);
+	ret = serve_from_file(absolute_cache_file_path, mime_type);
 
 	free_fpath(absolute_cache_file_path);
 	return ret;
 }
 
+/** Removes file from cache.
+* @param cache_file_path path to cache file to remove
+*/
 void remove_cache_file(cache_fpath *cache_file_path) {
 	abs_fpath *absolute_cache_file_path;
 	debug(DEB, "Removing old cache file '%s'", cache_file_path);

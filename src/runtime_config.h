@@ -23,6 +23,17 @@
 
 #include "geometry_math.h"
 
+
+/* All configuration structures - these will hold all run time parameters */
+struct runtime_config *runtime_config;
+struct operation_config *operation_config;
+struct logging_config *logging_config;
+struct query_string_config *query_string_config;
+struct storage_config *storage_config;
+struct error_handling_config *error_handling_config;
+
+
+
 /** Holds runtime request parameters. */
 struct runtime_config {
 	/** File name (relative path) received from CGI. */
@@ -77,6 +88,27 @@ struct query_string_config {
 	unsigned short int default_quality;
 };
 
+/** Storage configuration */
+struct storage_config {
+	/** Path to media directory that  images will be served from */
+	char *media_directory;
+	/** Path to cache directory where generated thumbnails will be stored and served from */
+	char *cache_directory;
+};
+
+/** Defines configuration for error handling */
+struct error_handling_config {
+	/** Path to image file that will be served on errors */
+	char *error_image_file;
+	/** Mime-type of error image file to serve within HTTP headers */
+	char *error_image_mimetype;
+	/** In case error image is not available this text will be served */
+	char *error_message;
+};
+
+void alloc_default_config();
+void free_config();
+
 struct runtime_config *alloc_default_runtime_config();
 void free_runtime_config(struct runtime_config *config);
 
@@ -88,5 +120,12 @@ void free_logging_config(struct logging_config *config);
 
 struct query_string_config* alloc_default_query_string_config();
 void free_query_string_config(struct query_string_config *config);
+
+struct storage_config* alloc_default_storage_config();
+void free_storage_config(struct storage_config *config);
+
+struct error_handling_config* alloc_default_error_handling_config();
+void free_error_handling_config(struct error_handling_config *config);
+
 
 #endif

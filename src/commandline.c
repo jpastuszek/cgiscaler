@@ -22,17 +22,19 @@
 #include <stdlib.h>
 
 #include "commandline.h"
+#include "runtime_config.h"
 #include "file_utils.h"
 #include "config.h"
 #include "debug.h"
 
+extern struct runtime_config *runtime_config;
+extern struct operation_config *operation_config;
+
 /** Apply configuration specified as command line parameters.
-* @param runtime_config allocated runtime configuration structure to apply switches
-* @param operation_config allocated operation configuration structure to apply switched
 * @param argc argc parameter from main function
 * @param argv argv parameter from main function
 */
-void apply_commandline_config(struct runtime_config *runtime_config, struct operation_config *operation_config, int argc, char *argv[]) {
+void apply_commandline_config(int argc, char *argv[]) {
 	int i;
 	char *file_name = 0;
 

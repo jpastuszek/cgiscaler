@@ -28,12 +28,13 @@
 #include "stdio_capture.h"
 #include "asserts.h"
 #include "file_utils.h"
-#include "test_config.h"
+#include "runtime_config.h"
 #include "debug.h"
 #include "serve.h"
 
-/* serve.c tests */
+struct operation_config *operation_config;
 
+/* serve.c tests */
 static void test_serve_from_file() {
 	int stdout_fd;
 	int status;
@@ -43,7 +44,8 @@ static void test_serve_from_file() {
 	absolute_media_file_path = create_absolute_media_file_path(IMAGE_TEST_FILE);
 
 	if (!fork_with_stdout_capture(&stdout_fd)) {
-		status = serve_from_file(absolute_media_file_path, OUT_FORMAT_MIME_TYPE, 0);
+		operation_config->no_headers = 0;
+		status = serve_from_file(absolute_media_file_path, OUT_FORMAT_MIME_TYPE);
 		if (!status) {
 			restore_stdout();
 			assert_true_with_message(0, "serve_from_file failed");
@@ -61,7 +63,8 @@ static void test_serve_from_file() {
 	absolute_media_file_path = create_absolute_media_file_path(IMAGE_TEST_FILE);
 
 	if (!fork_with_stdout_capture(&stdout_fd)) {
-		status = serve_from_file(absolute_media_file_path, OUT_FORMAT_MIME_TYPE, 1);
+		operation_config->no_headers = 1;
+		status = serve_from_file(absolute_media_file_path, OUT_FORMAT_MIME_TYPE);
 		if (!status) {
 			restore_stdout();
 			assert_true_with_message(0, "serve_from_file failed");
@@ -76,7 +79,8 @@ static void test_serve_from_file() {
 
 	/* bogus file */
 	if (!fork_with_stdout_capture(&stdout_fd)) {
-		status = serve_from_file("bogo_file_name.jpg", OUT_FORMAT_MIME_TYPE, 0);
+		operation_config->no_headers = 0;
+		status = serve_from_file("bogo_file_name.jpg", OUT_FORMAT_MIME_TYPE);
 		if (status) {
 			restore_stdout();
 			assert_true_with_message(0, "serve_from_file failed");
@@ -96,7 +100,8 @@ static void test_serve_from_blob() {
 	memset(blob, 54, 31666);
 
 	if (!fork_with_stdout_capture(&stdout_fd)) {
-		serve_from_blob(blob, 31666, OUT_FORMAT_MIME_TYPE, 0);
+		operation_config->no_headers = 0;
+		serve_from_blob(blob, 31666, OUT_FORMAT_MIME_TYPE);
 		exit(0);
 	}
 
@@ -106,7 +111,8 @@ static void test_serve_from_blob() {
 	finish_fork(stdout_fd);
 
 	if (!fork_with_stdout_capture(&stdout_fd)) {
-		serve_from_blob(blob, 31666, OUT_FORMAT_MIME_TYPE, 1);
+		operation_config->no_headers = 1;
+		serve_from_blob(blob, 31666, OUT_FORMAT_MIME_TYPE);
 		exit(0);
 	}
 
@@ -125,7 +131,8 @@ static void test_serve_error() {
 	absolute_media_file_path = create_absolute_media_file_path(ERROR_FILE_PATH);
 
 	if (!fork_with_stdout_capture(&stdout_fd)) {
-		serve_error(0);
+		operation_config->no_headers = 0;
+		serve_error();
 		exit(0);
 	}
 
@@ -135,7 +142,8 @@ static void test_serve_error() {
 	finish_fork(stdout_fd);
 
 	if (!fork_with_stdout_capture(&stdout_fd)) {
-		serve_error(1);
+		operation_config->no_headers = 1;
+		serve_error();
 		exit(0);
 	}
 
@@ -151,7 +159,8 @@ static void test_serve_error_message() {
 	int stdout_fd;
 
 	if (!fork_with_stdout_capture(&stdout_fd)) {
-		serve_error_message(0);
+		operation_config->no_headers = 0;
+		serve_error_message();
 		exit(0);
 	}
 
@@ -161,7 +170,8 @@ static void test_serve_error_message() {
 	finish_fork(stdout_fd);
 
 	if (!fork_with_stdout_capture(&stdout_fd)) {
-		serve_error_message(1);
+		operation_config->no_headers = 1;
+		serve_error_message();
 		exit(0);
 	}
 
@@ -175,10 +185,12 @@ static void test_serve_error_message() {
 
 /* setup and teardown */
 static void test_setup() {
+	alloc_default_config();
 	debug_start(DEBUG_FILE);
 }
 
 static void test_teardown() {
+	free_config();
 	debug_stop();
 }
 

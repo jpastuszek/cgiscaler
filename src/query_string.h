@@ -18,9 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include "runtime_config.h"
-
-void apply_query_string_config(struct runtime_config *config, struct query_string_config *query_string_config, char *file_name, char *query_string);
+void apply_query_string_config(char *file_name, char *query_string);
 
 /* private - exported for tests */
 char *get_query_string_param(char *query_string, char *param_name);

@@ -19,16 +19,15 @@
  ***************************************************************************/
 
 #include "../cgreen/cgreen.h"
-#include "test_config.h"
 #include "runtime_config.h"
 #include "debug.h"
 #include "commandline.h"
 
+extern struct runtime_config *runtime_config;
+extern struct operation_config *operation_config;
+
 /* commandline.c tests */
 static void test_apply_commandline_config() {
-	struct runtime_config *runtime_config;
-	struct operation_config *operation_config;
-
 	/* if I change this to use config defines... */
 	char *args1[] = { "test", "-w", "100", "-h", "200" };
 	char *args2[] = { "test", "-w", "100", "-s", "true", "-nc", "false", "-ns", "true", "-nh", "dsfa", "abc/e/f.jpg" };
@@ -42,7 +41,7 @@ static void test_apply_commandline_config() {
 	runtime_config = alloc_default_runtime_config();
 	operation_config = alloc_default_operation_config();
 
-	apply_commandline_config(runtime_config, operation_config, 5, args1);
+	apply_commandline_config(5, args1);
 
 	assert_equal(runtime_config->file_name, 0);
 	assert_equal(runtime_config->size.w, 100);
@@ -59,7 +58,7 @@ static void test_apply_commandline_config() {
 	runtime_config = alloc_default_runtime_config();
 	operation_config = alloc_default_operation_config();
 
-	apply_commandline_config(runtime_config, operation_config, 12, args2);
+	apply_commandline_config(12, args2);
 
 	assert_string_equal(runtime_config->file_name, "abc/e/f.jpg");
 	assert_equal(runtime_config->size.w, 100);
@@ -70,7 +69,7 @@ static void test_apply_commandline_config() {
 	assert_equal(operation_config->no_serve, 1);
 	assert_equal(operation_config->no_headers, 0);
 
-	apply_commandline_config(runtime_config, operation_config, 6, args3);
+	apply_commandline_config(6, args3);
 
 	assert_string_equal(runtime_config->file_name, "file.gif");
 	assert_equal(runtime_config->size.w, 100);
@@ -81,18 +80,7 @@ static void test_apply_commandline_config() {
 	assert_equal(operation_config->no_serve, 1);
 	assert_equal(operation_config->no_headers, 0);
 
-	apply_commandline_config(runtime_config, operation_config, 13, all_true);
-
-	assert_string_equal(runtime_config->file_name, "file.gif");
-	assert_equal(runtime_config->size.w, 100);
-	assert_equal(runtime_config->size.h, 100);
-	assert_equal(runtime_config->strict, 1);
-	assert_equal(runtime_config->quality, LOWQ_QUALITY);
-	assert_equal(operation_config->no_cache, 1);
-	assert_equal(operation_config->no_serve, 1);
-	assert_equal(operation_config->no_headers, 1);
-
-	apply_commandline_config(runtime_config, operation_config, 13, all_bogo);
+	apply_commandline_config(13, all_true);
 
 	assert_string_equal(runtime_config->file_name, "file.gif");
 	assert_equal(runtime_config->size.w, 100);
@@ -103,8 +91,19 @@ static void test_apply_commandline_config() {
 	assert_equal(operation_config->no_serve, 1);
 	assert_equal(operation_config->no_headers, 1);
 
+	apply_commandline_config(13, all_bogo);
 
-	apply_commandline_config(runtime_config, operation_config, 13, all_false);
+	assert_string_equal(runtime_config->file_name, "file.gif");
+	assert_equal(runtime_config->size.w, 100);
+	assert_equal(runtime_config->size.h, 100);
+	assert_equal(runtime_config->strict, 1);
+	assert_equal(runtime_config->quality, LOWQ_QUALITY);
+	assert_equal(operation_config->no_cache, 1);
+	assert_equal(operation_config->no_serve, 1);
+	assert_equal(operation_config->no_headers, 1);
+
+
+	apply_commandline_config(13, all_false);
 
 	assert_string_equal(runtime_config->file_name, "file.gif");
 	assert_equal(runtime_config->size.w, 100);
@@ -115,7 +114,7 @@ static void test_apply_commandline_config() {
 	assert_equal(operation_config->no_serve, 0);
 	assert_equal(operation_config->no_headers, 0);
 
-	apply_commandline_config(runtime_config, operation_config, 13, all_bogo);
+	apply_commandline_config(13, all_bogo);
 
 	assert_string_equal(runtime_config->file_name, "file.gif");
 	assert_equal(runtime_config->size.w, 100);
@@ -126,7 +125,7 @@ static void test_apply_commandline_config() {
 	assert_equal(operation_config->no_serve, 0);
 	assert_equal(operation_config->no_headers, 0);
 
-	apply_commandline_config(runtime_config, operation_config, 3, args4);
+	apply_commandline_config(3, args4);
 
 	free_operation_config(operation_config);
 	free_runtime_config(runtime_config);

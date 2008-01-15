@@ -196,12 +196,14 @@ static void test_prepare_blob() {
 
 /* setup and teardown */
 static void test_setup() {
+	alloc_default_config();
 	debug_start(DEBUG_FILE);
 	/* now we need ImageMagick after this we should terminate ImgeMagick afterwards */
 	MagickWandGenesis();
 }
 
 static void test_teardown() {
+	free_config();
 	MagickWandTerminus();
 	debug_stop();
 }

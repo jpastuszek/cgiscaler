@@ -29,4 +29,4 @@
 int check_if_cached(media_fpath *media_file_path, media_fpath *cache_file_path);
 
 int write_blob_to_cache(unsigned char *blob, int blob_len, media_fpath *media_file_path, cache_fpath *cache_file_path);
-int serve_from_cache_file(media_fpath *media_file_path, cache_fpath *cache_file_path, char *mime_type, short int no_headers);
+int serve_from_cache_file(media_fpath *media_file_path, cache_fpath *cache_file_path, char *mime_type);

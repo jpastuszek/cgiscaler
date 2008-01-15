@@ -20,7 +20,10 @@
 #ifndef DEBUG_H
 #define DEBUG_H
 
+#ifndef DEBUG
 #define DEBUG
+#endif
+
 #ifdef NDEBUG
 #undef DEBUG
 #endif

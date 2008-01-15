@@ -51,8 +51,8 @@ am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(bindir)"
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
 am_cache_OBJECTS = asserts.$(OBJEXT) cache.$(OBJEXT) debug.$(OBJEXT) \
-	file_utils.$(OBJEXT) serve.$(OBJEXT) stdio_capture.$(OBJEXT) \
-	test_cache.$(OBJEXT)
+	file_utils.$(OBJEXT) runtime_config.$(OBJEXT) serve.$(OBJEXT) \
+	stdio_capture.$(OBJEXT) test_cache.$(OBJEXT)
 cache_OBJECTS = $(am_cache_OBJECTS)
 cache_DEPENDENCIES = $(top_builddir)/cgreen/libcgreen.a
 am_commandline_OBJECTS = asserts.$(OBJEXT) commandline.$(OBJEXT) \
@@ -61,7 +61,8 @@ am_commandline_OBJECTS = asserts.$(OBJEXT) commandline.$(OBJEXT) \
 commandline_OBJECTS = $(am_commandline_OBJECTS)
 commandline_DEPENDENCIES = $(top_builddir)/cgreen/libcgreen.a
 am_file_utils_OBJECTS = asserts.$(OBJEXT) debug.$(OBJEXT) \
-	file_utils.$(OBJEXT) test_file_utils.$(OBJEXT)
+	file_utils.$(OBJEXT) runtime_config.$(OBJEXT) \
+	test_file_utils.$(OBJEXT)
 file_utils_OBJECTS = $(am_file_utils_OBJECTS)
 file_utils_DEPENDENCIES = $(top_builddir)/cgreen/libcgreen.a
 am_geometry_math_OBJECTS = asserts.$(OBJEXT) debug.$(OBJEXT) \
@@ -88,13 +89,14 @@ am_runtime_config_OBJECTS = debug.$(OBJEXT) runtime_config.$(OBJEXT) \
 runtime_config_OBJECTS = $(am_runtime_config_OBJECTS)
 runtime_config_DEPENDENCIES = $(top_builddir)/cgreen/libcgreen.a
 am_scaler_OBJECTS = asserts.$(OBJEXT) debug.$(OBJEXT) \
-	file_utils.$(OBJEXT) geometry_math.$(OBJEXT) scaler.$(OBJEXT) \
+	file_utils.$(OBJEXT) geometry_math.$(OBJEXT) \
+	runtime_config.$(OBJEXT) scaler.$(OBJEXT) \
 	test_scaler.$(OBJEXT)
 scaler_OBJECTS = $(am_scaler_OBJECTS)
 scaler_DEPENDENCIES = $(top_builddir)/cgreen/libcgreen.a
 am_serve_OBJECTS = asserts.$(OBJEXT) cache.$(OBJEXT) debug.$(OBJEXT) \
-	file_utils.$(OBJEXT) serve.$(OBJEXT) stdio_capture.$(OBJEXT) \
-	test_serve.$(OBJEXT)
+	file_utils.$(OBJEXT) runtime_config.$(OBJEXT) serve.$(OBJEXT) \
+	stdio_capture.$(OBJEXT) test_serve.$(OBJEXT)
 serve_OBJECTS = $(am_serve_OBJECTS)
 serve_DEPENDENCIES = $(top_builddir)/cgreen/libcgreen.a
 binSCRIPT_INSTALL = $(INSTALL_SCRIPT)
@@ -231,18 +233,20 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 METASOURCES = AUTO
 file_utils_LDADD = $(top_builddir)/cgreen/libcgreen.a
-file_utils_SOURCES = asserts.c debug.c file_utils.c test_file_utils.c
+file_utils_SOURCES = asserts.c debug.c file_utils.c runtime_config.c \
+	test_file_utils.c
+
 noinst_HEADERS = asserts.h cache.h commandline.h debug.h file_utils.h \
 	geometry_math.h main.h query_string.h runtime_config.h scaler.h serve.h stdio_capture.h \
 	test_config.h
 
 serve_LDADD = $(top_builddir)/cgreen/libcgreen.a
-serve_SOURCES = asserts.c cache.c debug.c file_utils.c serve.c stdio_capture.c \
-	test_serve.c
+serve_SOURCES = asserts.c cache.c debug.c file_utils.c runtime_config.c serve.c \
+	stdio_capture.c test_serve.c
 
 cache_LDADD = $(top_builddir)/cgreen/libcgreen.a
-cache_SOURCES = asserts.c cache.c debug.c file_utils.c serve.c stdio_capture.c \
-	test_cache.c
+cache_SOURCES = asserts.c cache.c debug.c file_utils.c runtime_config.c serve.c \
+	stdio_capture.c test_cache.c
 
 geometry_math_SOURCES = asserts.c debug.c geometry_math.c test_geometry_math.c
 geometry_math_LDADD = $(top_builddir)/cgreen/libcgreen.a
@@ -253,8 +257,8 @@ commandline_SOURCES = asserts.c commandline.c debug.c file_utils.c \
 	runtime_config.c test_commandline.c
 
 commandline_LDADD = $(top_builddir)/cgreen/libcgreen.a
-scaler_SOURCES = asserts.c debug.c file_utils.c geometry_math.c scaler.c \
-	test_scaler.c
+scaler_SOURCES = asserts.c debug.c file_utils.c geometry_math.c \
+	runtime_config.c scaler.c test_scaler.c
 
 AM_CFLAGS = -Wall -lMagick -lWand
 scaler_LDADD = $(top_builddir)/cgreen/libcgreen.a

@@ -22,17 +22,20 @@
 #include <string.h>
 
 #include "query_string.h"
+#include "runtime_config.h"
 #include "file_utils.h"
 #include "debug.h"
 
+extern struct runtime_config *runtime_config;
+extern struct query_string_config *query_string_config;
+
+
 /* TODO: %xx in query string decoding... no need for filename (apache) */
 /** Apply configuration changes by reading provided CGI query string and file name.
-* @param runtime_config allocated runtime configuration structure to which apply configuration
-* @param query_string_config query string configuration structure to obtain maching string from
 * @param file_name path to file to update runtime configuration with
 * @param query_string string to parse - should be in CGI format
 */
-void apply_query_string_config(struct runtime_config *runtime_config, struct query_string_config *query_string_config, char *file_name, char *query_string) {
+void apply_query_string_config(char *file_name, char *query_string) {
 	char *w;
 	char *h;
 	char *s;

@@ -26,12 +26,13 @@
 #include "../cgreen/cgreen.h"
 #include "stdio_capture.h"
 #include "asserts.h"
+#include "runtime_config.h"
 #include "file_utils.h"
 #include "serve.h"
-#include "test_config.h"
 #include "debug.h"
 #include "cache.h"
 
+struct operation_config *operation_config;
 
 /* cache.c tests */
 static void test_if_cached() {
@@ -137,7 +138,8 @@ static void test_serve_from_cache_file() {
 	assert_equal(write_blob_to_cache(blob, 3000, IMAGE_TEST_FILE, cache_file_path), 1);
 
 	if (!fork_with_stdout_capture(&stdout_fd)) {
-		status = serve_from_cache_file(IMAGE_TEST_FILE, cache_file_path, OUT_FORMAT_MIME_TYPE, 0);
+		operation_config->no_headers = 0;
+		status = serve_from_cache_file(IMAGE_TEST_FILE, cache_file_path, OUT_FORMAT_MIME_TYPE);
 		if (!status) {
 			restore_stdout();
 			assert_true_with_message(0, "serve_from_cache failed");
@@ -157,7 +159,8 @@ static void test_serve_from_cache_file() {
 	assert_equal(write_blob_to_cache(blob, 3000, IMAGE_TEST_FILE, cache_file_path), 1);
 
 	if (!fork_with_stdout_capture(&stdout_fd)) {
-		status = serve_from_cache_file(IMAGE_TEST_FILE, cache_file_path, OUT_FORMAT_MIME_TYPE, 1);
+		operation_config->no_headers = 1;
+		status = serve_from_cache_file(IMAGE_TEST_FILE, cache_file_path, OUT_FORMAT_MIME_TYPE);
 		if (!status) {
 			restore_stdout();
 			assert_true_with_message(0, "serve_from_cache failed");
@@ -177,7 +180,8 @@ static void test_serve_from_cache_file() {
 	assert_equal(write_blob_to_file(blob, 3000, absolute_cache_file_path), 1);
 
 	if (!fork_with_stdout_capture(&stdout_fd)) {
-		status = serve_from_cache_file(IMAGE_TEST_FILE, cache_file_path, OUT_FORMAT_MIME_TYPE, 1);
+		operation_config->no_headers = 1;
+		status = serve_from_cache_file(IMAGE_TEST_FILE, cache_file_path, OUT_FORMAT_MIME_TYPE);
 		if (status) {
 			restore_stdout();
 			assert_true_with_message(0, "serve_from_cache failed");
@@ -192,7 +196,9 @@ static void test_serve_from_cache_file() {
 
 	/* test with no cache */
 	if (!fork_with_stdout_capture(&stdout_fd)) {
-		status = serve_from_cache_file(IMAGE_TEST_FILE, cache_file_path, OUT_FORMAT_MIME_TYPE, 1);
+		operation_config->no_headers = 1;
+		status = serve_from_cache_file(IMAGE_TEST_FILE, cache_file_path, OUT_FORMAT_MIME_TYPE);
+
 		if (status) {
 			restore_stdout();
 			assert_true_with_message(0, "serve_from_cache failed");
@@ -213,7 +219,8 @@ static void test_serve_from_cache_file() {
 	assert_equal(write_blob_to_file(blob, 3000, absolute_cache_file_path), 1);
 
 	if (!fork_with_stdout_capture(&stdout_fd)) {
-		status = serve_from_cache_file("bogo.file", cache_file_path, OUT_FORMAT_MIME_TYPE, 1);
+		operation_config->no_headers = 1;
+		status = serve_from_cache_file("bogo.file", cache_file_path, OUT_FORMAT_MIME_TYPE);
 		if (status) {
 			restore_stdout();
 			assert_true_with_message(0, "serve_from_cache failed");
@@ -234,10 +241,12 @@ static void test_serve_from_cache_file() {
 
 /* setup and teardown */
 static void test_setup() {
+	alloc_default_config();
 	debug_start(DEBUG_FILE);
 }
 
 static void test_teardown() {
+	free_config();
 	debug_stop();
 }
 

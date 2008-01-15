@@ -18,6 +18,4 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include "runtime_config.h"
-
-void apply_commandline_config(struct runtime_config *config, struct operation_config *operation_config, int argc, char *argv[]);
+void apply_commandline_config(int argc, char *argv[]);

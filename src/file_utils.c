@@ -28,10 +28,21 @@
 #include <errno.h>
 
 #include "file_utils.h"
-#include "config.h"
+#include "runtime_config.h"
 #include "debug.h"
 
-/* Returns allocated cache file path string (ex. test/a/x.jpg-100-200-1-0.jpg */
+extern struct storage_config *storage_config;
+
+/** Returns allocated  relative cache file path string.
+* For example "test/a/x.jpg-100-200-1-0.jpg"
+* @param file_path path to file
+* @param file_extension extension of cache file
+* @param w width of thumbnail
+* @param h height of thumbnail
+* @param strict strict parameter
+* @param quality quality value
+* @return allocated relative cache file path
+*/
 cache_fpath *create_cache_file_path(fpath *file_path, char *file_extension, int w, int h, int strict, int quality) {
 	char *cache_file_name;
 	int cache_file_name_len, cache_file_name_buff_len = 40;
@@ -65,30 +76,45 @@ cache_fpath *create_cache_file_path(fpath *file_path, char *file_extension, int 
 	return cache_file_name;
 }
 
-/* Returns allocated media file path */
+/** Returns allocated media file path.
+* @param media_file_path relative path to media file
+* @return allocated absolute media file path
+* @see free_fpath()
+* @see create_absolute_cache_file_path()
+*/
 abs_fpath *create_absolute_media_file_path(media_fpath *media_file_path) {
 	char *path;
-	path = malloc(strlen(MEDIA_PATH) + strlen(media_file_path) + 1);
-	strcpy(path, MEDIA_PATH);
+	path = malloc(strlen(storage_config->media_directory) + strlen(media_file_path) + 1);
+	strcpy(path, storage_config->media_directory);
 	strcat(path, media_file_path);
 	
 	return path;
 }
 
-/* Returns allocated cache file path */
+/** Returns allocated cache file path.
+* @param cache_file_path relative path to cache file
+* @return allocated absolute cache file path
+* @see free_fpath()
+* @see create_absolute_media_file_path()
+*/
 abs_fpath *create_absolute_cache_file_path(cache_fpath *cache_file_path) {
 	char *path;
-	path = malloc(strlen(CACHE_PATH) + strlen(cache_file_path) + 1);
-	strcpy(path, CACHE_PATH);
+	path = malloc(strlen(storage_config->cache_directory) + strlen(cache_file_path) + 1);
+	strcpy(path, storage_config->cache_directory);
 	strcat(path, cache_file_path);
 	
 	return path;
 }
 
+/** Frees allocated memory for file path */
 void free_fpath(fpath *file_path) {
 	free(file_path);
 }
 
+/** Creates directory structure inside cache directory for cache file storage.
+* @param cache_file_path relative path to cache file - directory part from this path will be used
+* @return 1 for success 0 on filure
+*/
 int create_cache_dir_struct(cache_fpath *cache_file_path) {
 	char *next_slash;
 	char *full_path;
@@ -100,12 +126,12 @@ int create_cache_dir_struct(cache_fpath *cache_file_path) {
 		return 0;
 
 	/* we are not going to include tailing '/' */
-	full_path = malloc(strlen(CACHE_PATH));
+	full_path = malloc(strlen(storage_config->cache_directory));
 	if (!full_path)
 		exit(66);
 
-	strncpy(full_path, CACHE_PATH, strlen(CACHE_PATH) - 1);
-	full_path[strlen(CACHE_PATH) - 1] = 0;
+	strncpy(full_path, storage_config->cache_directory, strlen(storage_config->cache_directory) - 1);
+	full_path[strlen(storage_config->cache_directory) - 1] = 0;
 
 	while ((next_slash = index(cache_file_path, '/')) != 0) {
 		
@@ -148,7 +174,10 @@ int create_cache_dir_struct(cache_fpath *cache_file_path) {
 	return 1;
 }
 
-/* returns file mtime or 0 if file does not exists */
+/** Returns file mtime. 
+* @param absolute_file_path path to file
+* @return mtime or 0 on failure
+*/
 time_t get_file_mtime(abs_fpath *absolute_file_path) {
 	struct stat s;
 	debug(DEB, "Checking mtime: %s", absolute_file_path);
@@ -157,6 +186,10 @@ time_t get_file_mtime(abs_fpath *absolute_file_path) {
 	return s.st_mtime;
 }
 
+/** Returns media file mtime.
+* @param media_file_path relative path to media file
+* @return mtime or 0 on failure
+*/
 time_t get_media_file_mtime(media_fpath *media_file_path) {
 	abs_fpath *absolute_file_path;
 	time_t time;
@@ -168,6 +201,10 @@ time_t get_media_file_mtime(media_fpath *media_file_path) {
 	return time;
 }
 
+/** Returns cache file mtime.
+* @param cahce_file_path relative path to cache file
+* @return mtime or 0 on failure
+*/
 time_t get_cache_file_mtime(cache_fpath *cahce_file_path) {
 	abs_fpath *absolute_file_path;
 	time_t time;
@@ -179,7 +216,11 @@ time_t get_cache_file_mtime(cache_fpath *cahce_file_path) {
 	return time;
 }
 
-
+/** This function will sanitize file path.
+* It will check if given path is not empty, if it does not contain ".." like parts and it will remove all leading '/' characters form given path.
+* @param file_path path to check
+* @return allocated sanitized file path or 0 if file path did not pass the test
+*/
 fpath *sanitize_file_path(fpath *file_path) {
 	fpath *rel_file_path;
 	rel_file_path = make_file_name_relative(file_path);
@@ -202,6 +243,12 @@ fpath *sanitize_file_path(fpath *file_path) {
 	return rel_file_path;
 }
 
+/** Writes data array to file.
+* @param blob data array
+* @param blob_len length of data array in bytes
+* @param absolute_file_path path to file to be written
+* @return 1 on success 0 on failure
+*/
 int write_blob_to_file(unsigned char *blob, int blob_len,abs_fpath *absolute_file_path) {
 	int out_file;
 	size_t bytes_written;
@@ -240,7 +287,11 @@ int write_blob_to_file(unsigned char *blob, int blob_len,abs_fpath *absolute_fil
 	return 1;
 }
 
-/* Returns relative file path (no beginning /) */
+/** Returns relative file path.
+* This function will remove all leading '/' character.
+* @param file_path file path to use
+* @return allocated modified file path
+*/
 fpath *make_file_name_relative(fpath *file_path) {
 	char *return_name;
 	
@@ -256,7 +307,10 @@ fpath *make_file_name_relative(fpath *file_path) {
 	return return_name;
 }
 
-/* Returns 1 if there are '..' sequences in the file_path */
+/** Checks for double dot sequences in given file path.
+* @param file_path file path to check
+* @return 1 if file path contain '..' sequences 0 otherwise
+*/
 int check_for_double_dot(fpath *file_path) {
 	int dot_offset;
 	char *dot;

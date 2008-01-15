@@ -19,7 +19,7 @@ run_test() {
 run_all() {
 	echo "=== Running Unit tests:"
 	for TEST in ${TESTS[@]}; do
-		run_test test_$TEST
+		run_test $TEST
 		echo ""
 	done
 
