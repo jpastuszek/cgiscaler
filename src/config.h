@@ -30,7 +30,7 @@
 /** Default Run-time configuration (when applicable 0 means false, 1 true) */
 #define DEFAULT_WIDTH 64
 #define DEFAULT_HEIGHT 64
-#define DEFAULT_STRICT 0
+#define DEFAULT_STRICT SM_FIT
 #define DEFAULT_QUALITY 80
 #define DEFAULT_NO_CACHE 0
 #define DEFAULT_NO_SERVE 0
@@ -109,16 +109,17 @@
 /** Maximum number of pixels that output image will be limited to */
 #define MAX_PIXEL_NO 200000
 
+// BIG FAT WARNING: units of this valuse are library version dependant!!! test in debug first!
 /** Maximum number of open pixel cache files  */
 #define RESOURCE_LIMIT_FILE 8
-/** Maximum amount of disk space permitted for use by the pixel cache  in GB */
-#define RESOURCE_LIMIT_DISK 2
+/** Maximum amount of disk space permitted for use by the pixel cache in GB */
+#define RESOURCE_LIMIT_DISK 2*1024*1024
 /** Maximum amount of memory map to allocate for the pixel cache in MB - when this limit is exceeded, the image pixels are cached to disk */
 #define RESOURCE_LIMIT_MAP 0
 /** Maximum amount of memory to allocate for the pixel cache from the heap in MB - when this limit is exceeded, the image pixels are cached to memory-mapped disk */
-#define RESOURCE_LIMIT_MEMORY 256
+#define RESOURCE_LIMIT_MEMORY 256*1024*1024
 /** Maximum amount of memory to allocate for image from in MB - images that exceed the area limit are cached to disk  */
-#define RESOURCE_LIMIT_AREA 256
+#define RESOURCE_LIMIT_AREA 256*1024*1024
 
 /** Disk/cache file serving buffer */
 #define WRITE_BUFFER_LEN 8192

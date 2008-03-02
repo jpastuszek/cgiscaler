@@ -26,26 +26,28 @@
 
 //TODO: Test remaining structures
 /* runtime_config.c tests */
-static void test_alloc_default_runtime_config() {
-	struct runtime_config *runtime_config;
+static void test_alloc_default_output_config() {
+	struct output_config *output_config;
 	struct operation_config *operation_config;
 
-	runtime_config = alloc_default_runtime_config();
+	output_config = alloc_default_output_config();
 
-	assert_not_equal(runtime_config, 0);
-	assert_equal(runtime_config->file_name, 0);
-	assert_equal(runtime_config->size.w, DEFAULT_WIDTH);
-	assert_equal(runtime_config->size.h, DEFAULT_HEIGHT);
-	assert_equal(runtime_config->strict, DEFAULT_STRICT);
-	assert_equal(runtime_config->quality, DEFAULT_QUALITY);
+	assert_not_equal(output_config, 0);
+	assert_equal(output_config->file_name, 0);
+	assert_string_equal(output_config->format, OUT_FORMAT);
+	assert_equal(output_config->size.w, DEFAULT_WIDTH);
+	assert_equal(output_config->size.h, DEFAULT_HEIGHT);
+	assert_equal(output_config->quality, DEFAULT_QUALITY);
+	assert_equal(output_config->scale_method, DEFAULT_STRICT);
 
-	free_runtime_config(runtime_config);
 
-	runtime_config = alloc_default_runtime_config();
-	runtime_config->file_name = malloc(6);
-	assert_not_equal(runtime_config->file_name, 0);
+	free_output_config(output_config);
 
-	free_runtime_config(runtime_config);
+	output_config = alloc_default_output_config();
+	output_config->file_name = malloc(6);
+	assert_not_equal(output_config->file_name, 0);
+
+	free_output_config(output_config);
 
 	operation_config = alloc_default_operation_config();
 
@@ -66,12 +68,12 @@ static void test_teardown() {
 }
 
 int main(int argc, char **argv) {
-	TestSuite *runtime_config_suite = create_named_test_suite(__FILE__);
+	TestSuite *output_config_suite = create_named_test_suite(__FILE__);
 
-	add_test(runtime_config_suite, test_alloc_default_runtime_config);
+	add_test(output_config_suite, test_alloc_default_output_config);
 
-	setup(runtime_config_suite, test_setup);
-	teardown(runtime_config_suite, test_teardown);
+	setup(output_config_suite, test_setup);
+	teardown(output_config_suite, test_teardown);
 
-	return run_test_suite(runtime_config_suite, create_text_reporter());
+	return run_test_suite(output_config_suite, create_text_reporter());
 }

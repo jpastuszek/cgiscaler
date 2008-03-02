@@ -87,7 +87,7 @@ MagickWand *load_image(media_fpath *media_file_path, struct dimensions to_size) 
 		debug(DEB, "Trying image size: %ux%u", to_size.w, to_size.h);
 	}
 
-	debug(DEB,"Loading image: '%s'", media_file_path);
+	debug(DEB,"Loading image: '%s'", image_info->filename);
 	timer_start(&timing);
 
 	exception = AcquireExceptionInfo();

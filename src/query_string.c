@@ -26,23 +26,26 @@
 #include "file_utils.h"
 #include "debug.h"
 
-extern struct runtime_config *runtime_config;
-extern struct query_string_config *query_string_config;
+extern struct output_config *output_config;
+extern struct simple_query_string_config *simple_query_string_config;
 
+#ifdef DEBUG
+extern char **scale_method_names;
+#endif
 
 /* TODO: %xx in query string decoding... no need for filename (apache) */
 /** Apply configuration changes by reading provided CGI query string and file name.
 * @param file_name path to file to update runtime configuration with
 * @param query_string string to parse - should be in CGI format
 */
-void apply_query_string_config(char *file_name, char *query_string) {
+void apply_simple_query_string_config(char *file_name, char *query_string) {
 	char *w;
 	char *h;
 	char *s;
 	char *lowq;
 
 	/* strange env... failing */
-	if (!runtime_config || !file_name)
+	if (!output_config || !file_name)
 		return;
 
 	debug(DEB, "Processing query file name: '%s'", file_name);
@@ -50,33 +53,33 @@ void apply_query_string_config(char *file_name, char *query_string) {
 	/* this will allocat the file name */
 	file_name = sanitize_file_path(file_name);
 	if (file_name) {
-		if (runtime_config->file_name)
-			free(runtime_config->file_name);
-		runtime_config->file_name = file_name;
+		if (output_config->file_name)
+			free(output_config->file_name);
+		output_config->file_name = file_name;
 	}
 
 	debug(DEB, "Processing query string: '%s' target name: '%s'", query_string, file_name);
 
-	w = get_query_string_param(query_string, query_string_config->query_width_param);
-	h = get_query_string_param(query_string, query_string_config->query_height_param);
-	s = get_query_string_param(query_string, query_string_config->query_strict_param);
-	lowq = get_query_string_param(query_string, query_string_config->query_lowq_param);
+	w = get_query_string_param(query_string, simple_query_string_config->query_width_param);
+	h = get_query_string_param(query_string, simple_query_string_config->query_height_param);
+	s = get_query_string_param(query_string, simple_query_string_config->query_strict_param);
+	lowq = get_query_string_param(query_string, simple_query_string_config->query_lowq_param);
 
 	if (w) {
-		runtime_config->size.w = atoi(w);
+		output_config->size.w = atoi(w);
 		free(w);
 	}
 
 	if (h) {
-		runtime_config->size.h = atoi(h);
+		output_config->size.h = atoi(h);
 		free(h);
 	}
 
 	if (s) {
-		if (!strcmp(s, query_string_config->query_true_param))
-			runtime_config->strict = 1;
-		else if (!strcmp(s, query_string_config->query_false_param))
-			runtime_config->strict = 0;
+		if (!strcmp(s, simple_query_string_config->query_true_param))
+			output_config->scale_method = SM_STRICT;
+		else if (!strcmp(s, simple_query_string_config->query_false_param))
+			output_config->scale_method = SM_FIT;
 		else
 			debug(ERR, "Unrecognized parameter for strict: %s", s);
 
@@ -84,19 +87,21 @@ void apply_query_string_config(char *file_name, char *query_string) {
 	}
 
 	if (lowq) {
-		if (!strcmp(lowq, query_string_config->query_true_param))
-			runtime_config->quality = query_string_config->low_quality;
-		else if (!strcmp(lowq, query_string_config->query_false_param))
-			runtime_config->quality = query_string_config->default_quality;
+		if (!strcmp(lowq, simple_query_string_config->query_true_param))
+			output_config->quality = simple_query_string_config->low_quality_value;
+		else if (!strcmp(lowq, simple_query_string_config->query_false_param))
+			output_config->quality = simple_query_string_config->default_quality_value;
 		else
 			debug(ERR, "Unrecognized parameter for lowq: %s", lowq);
 
 		free(lowq);
 	}
 
-	debug(DEB, "Run-time conifg after query string: file: '%s', size w: %d h: %d, strict: %d quality: %d", runtime_config->file_name ? runtime_config->file_name : "<null>", runtime_config->size.w, runtime_config->size.h, runtime_config->strict, runtime_config->quality);
+#ifdef DEBUG
+	debug(DEB, "Run-time conifg after query string: file: '%s', size w: %d h: %d, scale method: %s quality: %d", output_config->file_name ? output_config->file_name : "<null>", output_config->size.w, output_config->size.h, scale_method_names[output_config->scale_method], output_config->quality);
+#endif
 
-	/* we don't free file_name as it is used in param structure and will be freed on free_runtime_config */
+	/* we don't free file_name as it is used in param structure and will be freed on free_output_config */
 }
 
 /* it could be probably implemented with scanf sort of functions */

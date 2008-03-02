@@ -27,8 +27,12 @@
 #include "config.h"
 #include "debug.h"
 
-extern struct runtime_config *runtime_config;
+extern struct output_config *output_config;
 extern struct operation_config *operation_config;
+
+#ifdef DEBUG
+extern char **scale_method_names;
+#endif
 
 /** Apply configuration specified as command line parameters.
 * @param argc argc parameter from main function
@@ -50,7 +54,7 @@ void apply_commandline_config(int argc, char *argv[]) {
 					return;
 				}
 
-				runtime_config->size.w = atoi(argv[i+1]);
+				output_config->size.w = atoi(argv[i+1]);
 
 				i++;
 				continue;
@@ -62,7 +66,7 @@ void apply_commandline_config(int argc, char *argv[]) {
 					return;
 				}
 
-				runtime_config->size.h = atoi(argv[i+1]);
+				output_config->size.h = atoi(argv[i+1]);
 
 				i++;
 				continue;
@@ -75,9 +79,9 @@ void apply_commandline_config(int argc, char *argv[]) {
 				}
 
 				if (!strcmp(argv[i+1], COMMANDLINE_TRUE_VAL))
-					runtime_config->strict = 1;
+					output_config->scale_method = SM_STRICT;
 				else if (!strcmp(argv[i+1], COMMANDLINE_FALSE_VAL))
-					runtime_config->strict = 0;
+					output_config->scale_method = SM_FIT;
 				else
 					debug(ERR, "Unrecognized parameter for strict: %s", argv[i+1]);
 
@@ -92,9 +96,9 @@ void apply_commandline_config(int argc, char *argv[]) {
 				}
 
 				if (!strcmp(argv[i+1], COMMANDLINE_TRUE_VAL))
-					runtime_config->quality = LOWQ_QUALITY;
+					output_config->quality = LOWQ_QUALITY;
 				else if (!strcmp(argv[i+1], COMMANDLINE_FALSE_VAL))
-					runtime_config->quality = DEFAULT_QUALITY;
+					output_config->quality = DEFAULT_QUALITY;
 				else
 					debug(ERR, "Unrecognized parameter for lowq: %s", argv[i+1]);
 
@@ -166,11 +170,13 @@ void apply_commandline_config(int argc, char *argv[]) {
 		/* sanitize_file_path will allocate */
 		file_name = sanitize_file_path(argv[i]);
 		if (file_name) {
-			if (runtime_config->file_name)
-				free(runtime_config->file_name);
-			runtime_config->file_name = file_name;
+			if (output_config->file_name)
+				free(output_config->file_name);
+			output_config->file_name = file_name;
 		}
 	}
 
-	debug(DEB, "Run-time config after command line: file: file: '%s', size w: %d h: %d, strict: %d quality: %d Operation coifig: no cache: %d, no serve: %d, no headers: %d", runtime_config->file_name ? runtime_config->file_name : "<null>", runtime_config->size.w, runtime_config->size.h, runtime_config->strict, runtime_config->quality, operation_config->no_cache, operation_config->no_serve, operation_config->no_headers);
+#ifdef DEBUG
+	debug(DEB, "Run-time config after command line: file: file: '%s', size w: %d h: %d, scale method: %s quality: %d Operation coifig: no cache: %d, no serve: %d, no headers: %d", output_config->file_name ? output_config->file_name : "<null>", output_config->size.w, output_config->size.h, scale_method_names[output_config->scale_method], output_config->quality, operation_config->no_cache, operation_config->no_serve, operation_config->no_headers);
+#endif
 }

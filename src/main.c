@@ -21,7 +21,7 @@
 #include "main.h"
 #include "runtime_config.h"
 
-extern struct runtime_config *runtime_config;
+extern struct output_config *output_config;
 extern struct operation_config *operation_config;
 extern struct logging_config *logging_config;
 
@@ -54,9 +54,9 @@ int _main(int argc, char *argv[]) {
 	debug_start(logging_config->log_file);
 
 	apply_commandline_config(argc, argv);
-	apply_query_string_config(getenv("PATH_INFO"), getenv("QUERY_STRING"));
+	apply_simple_query_string_config(getenv("PATH_INFO"), getenv("QUERY_STRING"));
 
-	if (!runtime_config->file_name) {
+	if (!output_config->file_name) {
 		debug(ERR, "No file name given");
 
 		serve_error();
@@ -67,12 +67,12 @@ int _main(int argc, char *argv[]) {
 	}
 
 	if (!operation_config->no_cache)
-		cache_file_path = create_cache_file_path(runtime_config->file_name, OUT_FORMAT_EXTENSION, runtime_config->size.w, runtime_config->size.h, runtime_config->strict, runtime_config->quality);
+		cache_file_path = create_cache_file_path(output_config->file_name, OUT_FORMAT_EXTENSION, output_config->size.w, output_config->size.h, output_config->scale_method, output_config->quality);
 
 	if (!operation_config->no_cache) {
 		 if (!operation_config->no_serve) {
 			/* if we have served from cache OK... cleanup and exit success */
-			if (serve_from_cache_file(runtime_config->file_name, cache_file_path, OUT_FORMAT_MIME_TYPE)) {
+			if (serve_from_cache_file(output_config->file_name, cache_file_path, OUT_FORMAT_MIME_TYPE)) {
 				if (!operation_config->no_cache)
 					free_fpath(cache_file_path);
 
@@ -82,7 +82,7 @@ int _main(int argc, char *argv[]) {
 			}
 		} else {
 			/* check cache only */
-			if (check_if_cached(runtime_config->file_name, cache_file_path) == CACHE_OK) {
+			if (check_if_cached(output_config->file_name, cache_file_path) == CACHE_OK) {
 				if (!operation_config->no_cache)
 					free_fpath(cache_file_path);
 
@@ -99,10 +99,11 @@ int _main(int argc, char *argv[]) {
 	/* we set resource limits so we won't abuse available system resources */
  	set_resource_limits(RESOURCE_LIMIT_DISK, RESOURCE_LIMIT_MAP, RESOURCE_LIMIT_FILE, RESOURCE_LIMIT_MEMORY, RESOURCE_LIMIT_AREA);
 
-	if (runtime_config->strict)
-		blob = strict_resize_to_blob(runtime_config->file_name, runtime_config->size, runtime_config->quality, &blob_len, OUT_FORMAT);
+	// TODO: Implement SM_FREE support
+	if (output_config->scale_method == SM_STRICT)
+		blob = strict_resize_to_blob(output_config->file_name, output_config->size, output_config->quality, &blob_len, output_config->format);
 	else
-		blob = fit_resize_to_blob(runtime_config->file_name, runtime_config->size, runtime_config->quality, &blob_len, OUT_FORMAT);
+		blob = fit_resize_to_blob(output_config->file_name, output_config->size, output_config->quality, &blob_len, output_config->format);
 
 	if (!blob) {
 		if (!operation_config->no_serve)
@@ -117,6 +118,7 @@ int _main(int argc, char *argv[]) {
 
 	/* image processing is done */
 	if (!operation_config->no_serve) {
+		// TODO: Autogenerate mime type from output format
 		serve_from_blob(blob, blob_len, OUT_FORMAT_MIME_TYPE);
 		debug(PROF, "Served after %.3f s",  timer_stop(&serve_timing));
 	}
@@ -125,7 +127,7 @@ int _main(int argc, char *argv[]) {
 	MagickWandTerminus();
 
 	if (!operation_config->no_cache)
-		write_blob_to_cache(blob, blob_len, runtime_config->file_name, cache_file_path);
+		write_blob_to_cache(blob, blob_len, output_config->file_name, cache_file_path);
 
 	free_blob(blob);
 	if (!operation_config->no_cache)

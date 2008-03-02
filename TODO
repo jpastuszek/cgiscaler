@@ -1,8 +1,15 @@
 
 TODO:
  - doxygen documentation
+<<<<<<< .mine
+ - ImageMagick resource limiting
+ - full command line parametrisation
+ - help for command line
+
+=======
  - resource usage limits
  
+>>>>>>> .r96
 Ideas (for v2.0):
  - aspect keep strength: 0 - no aspect keeping i.e. distorted, 100 - keep the aspect not changed i.e original aspect
  - hash tokens to hash the url/parameters along with shared secret to prevent changing of parameters from browser

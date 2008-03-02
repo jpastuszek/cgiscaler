@@ -54,103 +54,103 @@ static void test_query_string_param() {
 static void test_get_query_string_config() {
 	char test_query_string[256];
 
-	runtime_config = alloc_default_runtime_config();
-	query_string_config = alloc_default_query_string_config();
+	output_config = alloc_default_output_config();
+	simple_query_string_config = alloc_default_simple_query_string_config();
 
 	/* testing defaults */
-	apply_query_string_config("", "");
+	apply_simple_query_string_config("", "");
 
-	assert_not_equal(runtime_config, 0);
-	assert_equal(runtime_config->file_name, 0);
-	assert_equal(runtime_config->size.w, DEFAULT_WIDTH);
-	assert_equal(runtime_config->size.h, DEFAULT_HEIGHT);
-	assert_equal(runtime_config->strict, DEFAULT_STRICT);
-	assert_equal(runtime_config->quality, DEFAULT_QUALITY);
+	assert_not_equal(output_config, 0);
+	assert_equal(output_config->file_name, 0);
+	assert_equal(output_config->size.w, DEFAULT_WIDTH);
+	assert_equal(output_config->size.h, DEFAULT_HEIGHT);
+	assert_equal(output_config->scale_method, DEFAULT_STRICT);
+	assert_equal(output_config->quality, DEFAULT_QUALITY);
 
-	apply_query_string_config("/some/path/funny.jpeg", "");
-	assert_not_equal(runtime_config, 0);
-	assert_string_equal(runtime_config->file_name, "some/path/funny.jpeg");
-	assert_equal(runtime_config->size.w, DEFAULT_WIDTH);
-	assert_equal(runtime_config->size.h, DEFAULT_HEIGHT);
-	assert_equal(runtime_config->strict, DEFAULT_STRICT);
-	assert_equal(runtime_config->quality, DEFAULT_QUALITY);
+	apply_simple_query_string_config("/some/path/funny.jpeg", "");
+	assert_not_equal(output_config, 0);
+	assert_string_equal(output_config->file_name, "some/path/funny.jpeg");
+	assert_equal(output_config->size.w, DEFAULT_WIDTH);
+	assert_equal(output_config->size.h, DEFAULT_HEIGHT);
+	assert_equal(output_config->scale_method, DEFAULT_STRICT);
+	assert_equal(output_config->quality, DEFAULT_QUALITY);
 
 
 	snprintf(test_query_string, 256, "%s=123&%s=213&beer=czech_lager&%s=%s&%s=%s", QUERY_WIDTH_PARAM, QUERY_HEIGHT_PARAM, QUERY_STRICT_PARAM, QUERY_TRUE_VAL, QUERY_LOWQ_PARAM, QUERY_TRUE_VAL);
 
-	apply_query_string_config("/some/path/funny.jpeg", test_query_string);
-	assert_string_equal(runtime_config->file_name, "some/path/funny.jpeg");
-	assert_equal(runtime_config->size.w, 123);
-	assert_equal(runtime_config->size.h, 213);
-	assert_equal(runtime_config->strict, 1);
-	assert_equal(runtime_config->quality, LOWQ_QUALITY);
+	apply_simple_query_string_config("/some/path/funny.jpeg", test_query_string);
+	assert_string_equal(output_config->file_name, "some/path/funny.jpeg");
+	assert_equal(output_config->size.w, 123);
+	assert_equal(output_config->size.h, 213);
+	assert_equal(output_config->scale_method, SM_STRICT);
+	assert_equal(output_config->quality, LOWQ_QUALITY);
 
-	free_runtime_config(runtime_config);
-	free_query_string_config(query_string_config);
+	free_output_config(output_config);
+	free_simple_query_string_config(simple_query_string_config);
 
-	runtime_config = alloc_default_runtime_config();
-	query_string_config = alloc_default_query_string_config();
+	output_config = alloc_default_output_config();
+	simple_query_string_config = alloc_default_simple_query_string_config();
 
 	snprintf(test_query_string, 256, "beer=czech_lager&%s=%s&%s=%s", QUERY_STRICT_PARAM, "xbrna", QUERY_LOWQ_PARAM, "false");
 
-	apply_query_string_config("/some/path/funny.jpeg", test_query_string);
-	assert_string_equal(runtime_config->file_name, "some/path/funny.jpeg");
-	assert_equal(runtime_config->size.w, DEFAULT_WIDTH);
-	assert_equal(runtime_config->size.h, DEFAULT_HEIGHT);
-	assert_equal(runtime_config->strict, 0);
-	assert_equal(runtime_config->quality, DEFAULT_QUALITY);
+	apply_simple_query_string_config("/some/path/funny.jpeg", test_query_string);
+	assert_string_equal(output_config->file_name, "some/path/funny.jpeg");
+	assert_equal(output_config->size.w, DEFAULT_WIDTH);
+	assert_equal(output_config->size.h, DEFAULT_HEIGHT);
+	assert_equal(output_config->scale_method, DEFAULT_STRICT);
+	assert_equal(output_config->quality, DEFAULT_QUALITY);
 
 	snprintf(test_query_string, 256, "beer=czech_lager&%s=%s&%s=%s", QUERY_STRICT_PARAM, "xbrna", QUERY_LOWQ_PARAM, QUERY_TRUE_VAL);
 
-	apply_query_string_config("///some/path/funn/y2.jpeg", test_query_string);
-	assert_string_equal(runtime_config->file_name, "some/path/funn/y2.jpeg");
-	assert_equal(runtime_config->size.w, DEFAULT_WIDTH);
-	assert_equal(runtime_config->size.h, DEFAULT_HEIGHT);
-	assert_equal(runtime_config->strict, 0);
-	assert_equal(runtime_config->quality, LOWQ_QUALITY);
+	apply_simple_query_string_config("///some/path/funn/y2.jpeg", test_query_string);
+	assert_string_equal(output_config->file_name, "some/path/funn/y2.jpeg");
+	assert_equal(output_config->size.w, DEFAULT_WIDTH);
+	assert_equal(output_config->size.h, DEFAULT_HEIGHT);
+	assert_equal(output_config->scale_method, DEFAULT_STRICT);
+	assert_equal(output_config->quality, LOWQ_QUALITY);
 
 	snprintf(test_query_string, 256, "%s=104&%s=137&%s=%s", QUERY_WIDTH_PARAM, QUERY_HEIGHT_PARAM, QUERY_STRICT_PARAM, QUERY_FALSE_VAL);
 
-	apply_query_string_config("photo04/3d/03/0b64a0af1869.jpg", test_query_string);
-	assert_string_equal(runtime_config->file_name, "photo04/3d/03/0b64a0af1869.jpg");
-	assert_equal(runtime_config->size.w, 104);
-	assert_equal(runtime_config->size.h, 137);
-	assert_equal(runtime_config->strict, 0);
-	assert_equal(runtime_config->quality, LOWQ_QUALITY);
+	apply_simple_query_string_config("photo04/3d/03/0b64a0af1869.jpg", test_query_string);
+	assert_string_equal(output_config->file_name, "photo04/3d/03/0b64a0af1869.jpg");
+	assert_equal(output_config->size.w, 104);
+	assert_equal(output_config->size.h, 137);
+	assert_equal(output_config->scale_method, SM_FIT);
+	assert_equal(output_config->quality, LOWQ_QUALITY);
 
 
 	/* set switches to true */
 	snprintf(test_query_string, 256, "%s=%s&%s=%s", QUERY_STRICT_PARAM, QUERY_TRUE_VAL, QUERY_LOWQ_PARAM, QUERY_TRUE_VAL);
-	apply_query_string_config("test", test_query_string);
+	apply_simple_query_string_config("test", test_query_string);
 
-	assert_equal(runtime_config->strict, 1);
-	assert_equal(runtime_config->quality, LOWQ_QUALITY);
+	assert_equal(output_config->scale_method, SM_STRICT);
+	assert_equal(output_config->quality, LOWQ_QUALITY);
 
 	/* now try some undefined valuses */
 	snprintf(test_query_string, 256, "%s=%s&%s=%s", QUERY_STRICT_PARAM, "abc", QUERY_LOWQ_PARAM, "0");
-	apply_query_string_config("test", test_query_string);
+	apply_simple_query_string_config("test", test_query_string);
 
 	/* nothing should change */
-	assert_equal(runtime_config->strict, 1);
-	assert_equal(runtime_config->quality, LOWQ_QUALITY);
+	assert_equal(output_config->scale_method, SM_STRICT);
+	assert_equal(output_config->quality, LOWQ_QUALITY);
 
 	/* false swiches */
 	snprintf(test_query_string, 256, "%s=%s&%s=%s", QUERY_STRICT_PARAM, QUERY_FALSE_VAL, QUERY_LOWQ_PARAM, QUERY_FALSE_VAL);
-	apply_query_string_config("test", test_query_string);
+	apply_simple_query_string_config("test", test_query_string);
 
-	assert_equal(runtime_config->strict, 0);
-	assert_equal(runtime_config->quality, DEFAULT_QUALITY);
+	assert_equal(output_config->scale_method, SM_FIT);
+	assert_equal(output_config->quality, DEFAULT_QUALITY);
 
 	/* try undefined again */
 	snprintf(test_query_string, 256, "%s=%s&%s=%s", QUERY_STRICT_PARAM, "abc", QUERY_LOWQ_PARAM, "0");
-	apply_query_string_config("test", test_query_string);
+	apply_simple_query_string_config("test", test_query_string);
 
 	/* all should be unchanged */
-	assert_equal(runtime_config->strict, 0);
-	assert_equal(runtime_config->quality, DEFAULT_QUALITY);
+	assert_equal(output_config->scale_method, SM_FIT);
+	assert_equal(output_config->quality, DEFAULT_QUALITY);
 
-	free_runtime_config(runtime_config);
-	free_query_string_config(query_string_config);
+	free_output_config(output_config);
+	free_simple_query_string_config(simple_query_string_config);
 }
 
 
