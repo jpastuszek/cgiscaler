@@ -21,6 +21,7 @@
 #include "../cgreen/cgreen.h"
 #include "test_config.h"
 #include "debug.h"
+#include "defaults.h"
 #include "runtime_config.h"
 
 
@@ -34,7 +35,9 @@ static void test_alloc_default_output_config() {
 
 	assert_not_equal(output_config, 0);
 	assert_equal(output_config->file_name, 0);
-	assert_string_equal(output_config->format, OUT_FORMAT);
+	assert_string_equal(output_config->format->format, OUT_FORMAT);
+	assert_string_equal(output_config->format->mime_type, TEST_OUT_MIME_TYPE);
+	assert_string_equal(output_config->format->file_ext, TEST_OUT_FILE_EXT);
 	assert_equal(output_config->size.w, DEFAULT_WIDTH);
 	assert_equal(output_config->size.h, DEFAULT_HEIGHT);
 	assert_equal(output_config->quality, DEFAULT_QUALITY);

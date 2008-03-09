@@ -30,7 +30,6 @@
 #include "cache.h"
 #include "serve.h"
 #include "file_utils.h"
-#include "config.h"
 #include "debug.h"
 
 void remove_cache_file(cache_fpath *cache_file_path);

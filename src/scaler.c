@@ -22,7 +22,7 @@
 #include <string.h>
 
 #include "scaler.h"
-#include "config.h"
+#include "runtime_config.h"
 #include "file_utils.h"
 #include "geometry_math.h"
 #include "cache.h"
@@ -115,7 +115,7 @@ MagickWand *load_image(media_fpath *media_file_path, struct dimensions to_size) 
 
 	#ifdef DEBUG
 		to_size = get_image_size(image);
-		debug(DEB, "Resoulting image size: %ux%u", to_size.w, to_size.h);
+		debug(DEB, "Loaded image of size: %ux%u", to_size.w, to_size.h);
 	#endif
 
 	/* this will remove meta data - this is very important as photos have loads of it */
@@ -126,14 +126,14 @@ MagickWand *load_image(media_fpath *media_file_path, struct dimensions to_size) 
 		return 0;
 	}
 
-#ifdef REMOVE_TRANSPARENCY
-	image = remove_transparency(image);
-	if (!image) {
-		debug(ERR, "Removing transparency failed!");
-		DestroyMagickWand(image);
-		return 0;
+	if (output_config->remove_transparency) {
+		image = remove_transparency(image);
+		if (!image) {
+			debug(ERR, "Removing transparency failed!");
+			DestroyMagickWand(image);
+			return 0;
+		}
 	}
-#endif
 
 	return image;
 }
@@ -153,7 +153,7 @@ MagickWand *remove_transparency(MagickWand *image) {
 	if (MagickGetImageMatte(image) == MagickFalse)
 		return image;
 
-	debug(DEB, "Removing transparency and colloring it to background color '%s'", DEFAULT_BACKGROUND_COLOR);
+	debug(DEB, "Removing transparency and colloring it to background color '%s'", output_config->transparency_replacement_color);
 	timer_start(&timeing);
 
 	/* Set background to DEFAULT_BACKGROUND_COLOR - in case of transparent gifs or png */
@@ -163,9 +163,9 @@ MagickWand *remove_transparency(MagickWand *image) {
 		return 0;
 	}
 
-	status = PixelSetColor(bg_color, DEFAULT_BACKGROUND_COLOR);
+	status = PixelSetColor(bg_color, output_config->transparency_replacement_color);
 	if (status == MagickFalse) {
-		debug(ERR, "Failed to set Pixel Wand Color to '%s'", DEFAULT_BACKGROUND_COLOR);
+		debug(ERR, "Failed to set Pixel Wand Color to '%s'", output_config->transparency_replacement_color);
 		DestroyPixelWand(bg_color);
 		return 0;
 	}
@@ -279,7 +279,7 @@ MagickWand *fit_resize(media_fpath *media_file_path, struct dimensions resize_to
 	resize_to = resize_to_fit_in(image_size, resize_to);
 
 	/* we are reducing requested thumbnail resolution to MAX_PIXEL_NO */
-	resize_to = reduce_filed(resize_to, MAX_PIXEL_NO);
+	resize_to = reduce_filed(resize_to, resource_limit_config->max_pixel_no);
 
 	load_size = resize_to;
 	load_size.w *= 2;
@@ -345,7 +345,7 @@ MagickWand *strict_resize(media_fpath *media_file_path, struct dimensions resize
 	struct point position;
 
 	/* we are reducing requested thumbnail resolution to MAX_PIXEL_NO */
-	resize_to = reduce_filed(resize_to, MAX_PIXEL_NO);
+	resize_to = reduce_filed(resize_to, resource_limit_config->max_pixel_no);
 
 	load_size = resize_to;
 	load_size.w *= 2;
@@ -487,7 +487,7 @@ MagickWand *resize(MagickWand *image, struct dimensions to_size) {
 	}
 
 	/* Full filtered resize */
-	status = MagickResizeImage(image, to_size.w, to_size.h, RESIZE_FILTER, RESIZE_SMOOTH_FACTOR);
+	status = MagickResizeImage(image, to_size.w, to_size.h, output_config->scaling_filter, output_config->blur_factor);
 	if (status == MagickFalse) {
 		debug(ERR, "Image resize failed!");
 		return 0;

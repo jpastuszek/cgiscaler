@@ -18,29 +18,22 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef GEOMETRY_MATH_H
-#define GEOMETRY_MATH_H
+#ifndef FORMAT_INFO_H
+#define FORMAT_INFO_H
 
-/** Structure to hold dimensions. */
-struct dimensions {
-	int w;
-	int h;
+/** Image format information structure. */
+struct format_info {
+	char *format;
+	char *mime_type;
+	char *file_ext;
 };
-
-/** Structure to hold position. */
-struct point {
-	int x;
-	int y;
-};
-
-/** Structure defining a rectangular box */
-struct box {
-	struct point position;
-	struct dimensions size;
-};
-
 
 #endif
 
-struct dimensions resize_to_fit_in(struct dimensions a, struct dimensions b);
-struct dimensions reduce_filed(struct dimensions a, int field);
+struct format_info *format_to_format_info(char *format);
+void free_format_info(struct format_info *fi);
+
+/* for testing */
+struct format_info *get_format_info_from_builtin(char *format);
+struct format_info *get_format_info_from_magick(char *format);
+

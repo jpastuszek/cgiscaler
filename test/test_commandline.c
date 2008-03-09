@@ -20,11 +20,9 @@
 
 #include "../cgreen/cgreen.h"
 #include "runtime_config.h"
+#include "defaults.h"
 #include "debug.h"
 #include "commandline.h"
-
-extern struct runtime_config *runtime_config;
-extern struct operation_config *operation_config;
 
 /* commandline.c tests */
 static void test_apply_commandline_config() {
@@ -37,9 +35,7 @@ static void test_apply_commandline_config() {
 	char *all_false[] = { "test", "-w", "100", "-s", "false", "-wap", "false", "-nc", "false", "-ns", "false", "-nh", "false" };	
 	char *args4[] = { "test",  "-bogo", "true" };
 
-
-	output_config = alloc_default_output_config();
-	operation_config = alloc_default_operation_config();
+	/* default values already set by test_setup */
 
 	apply_commandline_config(5, args1);
 
@@ -126,17 +122,16 @@ static void test_apply_commandline_config() {
 	assert_equal(operation_config->no_headers, 0);
 
 	apply_commandline_config(3, args4);
-
-	free_operation_config(operation_config);
-	free_output_config(output_config);
 }
 
 /* setup and teardown */
 static void test_setup() {
-	debug_start(DEBUG_FILE);
+	alloc_default_config();
+	debug_start(logging_config->log_file);
 }
 
 static void test_teardown() {
+	free_config();
 	debug_stop();
 }
 

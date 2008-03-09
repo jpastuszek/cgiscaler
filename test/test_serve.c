@@ -45,7 +45,7 @@ static void test_serve_from_file() {
 
 	if (!fork_with_stdout_capture(&stdout_fd)) {
 		operation_config->no_headers = 0;
-		status = serve_from_file(absolute_media_file_path, OUT_FORMAT_MIME_TYPE);
+		status = serve_from_file(absolute_media_file_path, output_config->format->mime_type);
 		if (!status) {
 			restore_stdout();
 			assert_true_with_message(0, "serve_from_file failed");
@@ -64,7 +64,7 @@ static void test_serve_from_file() {
 
 	if (!fork_with_stdout_capture(&stdout_fd)) {
 		operation_config->no_headers = 1;
-		status = serve_from_file(absolute_media_file_path, OUT_FORMAT_MIME_TYPE);
+		status = serve_from_file(absolute_media_file_path, output_config->format->mime_type);
 		if (!status) {
 			restore_stdout();
 			assert_true_with_message(0, "serve_from_file failed");
@@ -80,7 +80,7 @@ static void test_serve_from_file() {
 	/* bogus file */
 	if (!fork_with_stdout_capture(&stdout_fd)) {
 		operation_config->no_headers = 0;
-		status = serve_from_file("bogo_file_name.jpg", OUT_FORMAT_MIME_TYPE);
+		status = serve_from_file("bogo_file_name.jpg", output_config->format->mime_type);
 		if (status) {
 			restore_stdout();
 			assert_true_with_message(0, "serve_from_file failed");
@@ -101,7 +101,7 @@ static void test_serve_from_blob() {
 
 	if (!fork_with_stdout_capture(&stdout_fd)) {
 		operation_config->no_headers = 0;
-		serve_from_blob(blob, 31666, OUT_FORMAT_MIME_TYPE);
+		serve_from_blob(blob, 31666, output_config->format->mime_type);
 		exit(0);
 	}
 
@@ -112,7 +112,7 @@ static void test_serve_from_blob() {
 
 	if (!fork_with_stdout_capture(&stdout_fd)) {
 		operation_config->no_headers = 1;
-		serve_from_blob(blob, 31666, OUT_FORMAT_MIME_TYPE);
+		serve_from_blob(blob, 31666, output_config->format->mime_type);
 		exit(0);
 	}
 
@@ -128,7 +128,7 @@ static void test_serve_error() {
 	int stdout_fd;
 	abs_fpath *absolute_media_file_path;
 
-	absolute_media_file_path = create_absolute_media_file_path(ERROR_FILE_PATH);
+	absolute_media_file_path = create_absolute_media_file_path(error_handling_config->error_image_file);
 
 	if (!fork_with_stdout_capture(&stdout_fd)) {
 		operation_config->no_headers = 0;
@@ -165,7 +165,7 @@ static void test_serve_error_message() {
 	}
 
 	assert_headers_read(stdout_fd);
-	assert_byte_read(stdout_fd, strlen(ERROR_FAILBACK_MESSAGE));
+	assert_byte_read(stdout_fd, strlen(error_handling_config->error_message));
 
 	finish_fork(stdout_fd);
 
@@ -176,7 +176,7 @@ static void test_serve_error_message() {
 	}
 
 
-	assert_byte_read(stdout_fd, strlen(ERROR_FAILBACK_MESSAGE));
+	assert_byte_read(stdout_fd, strlen(error_handling_config->error_message));
 
 	finish_fork(stdout_fd);
 
@@ -186,7 +186,7 @@ static void test_serve_error_message() {
 /* setup and teardown */
 static void test_setup() {
 	alloc_default_config();
-	debug_start(DEBUG_FILE);
+	debug_start(logging_config->log_file);
 }
 
 static void test_teardown() {

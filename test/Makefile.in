@@ -35,8 +35,9 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 bin_PROGRAMS = cache$(EXEEXT) commandline$(EXEEXT) file_utils$(EXEEXT) \
-	geometry_math$(EXEEXT) main$(EXEEXT) query_string$(EXEEXT) \
-	runtime_config$(EXEEXT) scaler$(EXEEXT) serve$(EXEEXT)
+	format_info$(EXEEXT) geometry_math$(EXEEXT) main$(EXEEXT) \
+	query_string$(EXEEXT) runtime_config$(EXEEXT) scaler$(EXEEXT) \
+	serve$(EXEEXT)
 subdir = test
 DIST_COMMON = $(noinst_HEADERS) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in
@@ -51,51 +52,59 @@ am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(bindir)"
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
 am_cache_OBJECTS = asserts.$(OBJEXT) cache.$(OBJEXT) debug.$(OBJEXT) \
-	file_utils.$(OBJEXT) runtime_config.$(OBJEXT) serve.$(OBJEXT) \
+	file_utils.$(OBJEXT) format_info.$(OBJEXT) \
+	runtime_config.$(OBJEXT) serve.$(OBJEXT) \
 	stdio_capture.$(OBJEXT) test_cache.$(OBJEXT)
 cache_OBJECTS = $(am_cache_OBJECTS)
 cache_DEPENDENCIES = $(top_builddir)/cgreen/libcgreen.a
 am_commandline_OBJECTS = asserts.$(OBJEXT) commandline.$(OBJEXT) \
-	debug.$(OBJEXT) file_utils.$(OBJEXT) runtime_config.$(OBJEXT) \
-	test_commandline.$(OBJEXT)
+	debug.$(OBJEXT) file_utils.$(OBJEXT) format_info.$(OBJEXT) \
+	runtime_config.$(OBJEXT) test_commandline.$(OBJEXT)
 commandline_OBJECTS = $(am_commandline_OBJECTS)
 commandline_DEPENDENCIES = $(top_builddir)/cgreen/libcgreen.a
 am_file_utils_OBJECTS = asserts.$(OBJEXT) debug.$(OBJEXT) \
-	file_utils.$(OBJEXT) runtime_config.$(OBJEXT) \
-	test_file_utils.$(OBJEXT)
+	file_utils.$(OBJEXT) format_info.$(OBJEXT) \
+	runtime_config.$(OBJEXT) test_file_utils.$(OBJEXT)
 file_utils_OBJECTS = $(am_file_utils_OBJECTS)
 file_utils_DEPENDENCIES = $(top_builddir)/cgreen/libcgreen.a
+am_format_info_OBJECTS = debug.$(OBJEXT) format_info.$(OBJEXT) \
+	runtime_config.$(OBJEXT) test_format_info.$(OBJEXT)
+format_info_OBJECTS = $(am_format_info_OBJECTS)
+format_info_DEPENDENCIES = $(top_builddir)/cgreen/libcgreen.a
 am_geometry_math_OBJECTS = asserts.$(OBJEXT) debug.$(OBJEXT) \
-	geometry_math.$(OBJEXT) test_geometry_math.$(OBJEXT)
+	format_info.$(OBJEXT) geometry_math.$(OBJEXT) \
+	runtime_config.$(OBJEXT) test_geometry_math.$(OBJEXT)
 geometry_math_OBJECTS = $(am_geometry_math_OBJECTS)
 geometry_math_DEPENDENCIES = $(top_builddir)/cgreen/libcgreen.a
 geometry_math_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(geometry_math_LDFLAGS) $(LDFLAGS) -o $@
 am_main_OBJECTS = asserts.$(OBJEXT) cache.$(OBJEXT) \
-	commandline.$(OBJEXT) debug.$(OBJEXT) file_utils.$(OBJEXT) \
-	geometry_math.$(OBJEXT) main.$(OBJEXT) query_string.$(OBJEXT) \
+	cgiscaler.$(OBJEXT) commandline.$(OBJEXT) debug.$(OBJEXT) \
+	file_utils.$(OBJEXT) format_info.$(OBJEXT) \
+	geometry_math.$(OBJEXT) query_string.$(OBJEXT) \
 	runtime_config.$(OBJEXT) scaler.$(OBJEXT) serve.$(OBJEXT) \
 	stdio_capture.$(OBJEXT) test_main.$(OBJEXT)
 main_OBJECTS = $(am_main_OBJECTS)
 main_DEPENDENCIES = $(top_builddir)/cgreen/libcgreen.a
 am_query_string_OBJECTS = debug.$(OBJEXT) file_utils.$(OBJEXT) \
-	query_string.$(OBJEXT) runtime_config.$(OBJEXT) \
-	test_query_string.$(OBJEXT)
+	format_info.$(OBJEXT) query_string.$(OBJEXT) \
+	runtime_config.$(OBJEXT) test_query_string.$(OBJEXT)
 query_string_OBJECTS = $(am_query_string_OBJECTS)
 query_string_DEPENDENCIES = $(top_builddir)/cgreen/libcgreen.a
-am_runtime_config_OBJECTS = debug.$(OBJEXT) runtime_config.$(OBJEXT) \
-	test_runtime_config.$(OBJEXT)
+am_runtime_config_OBJECTS = debug.$(OBJEXT) format_info.$(OBJEXT) \
+	runtime_config.$(OBJEXT) test_runtime_config.$(OBJEXT)
 runtime_config_OBJECTS = $(am_runtime_config_OBJECTS)
 runtime_config_DEPENDENCIES = $(top_builddir)/cgreen/libcgreen.a
 am_scaler_OBJECTS = asserts.$(OBJEXT) debug.$(OBJEXT) \
-	file_utils.$(OBJEXT) geometry_math.$(OBJEXT) \
-	runtime_config.$(OBJEXT) scaler.$(OBJEXT) \
-	test_scaler.$(OBJEXT)
+	file_utils.$(OBJEXT) format_info.$(OBJEXT) \
+	geometry_math.$(OBJEXT) runtime_config.$(OBJEXT) \
+	scaler.$(OBJEXT) test_scaler.$(OBJEXT)
 scaler_OBJECTS = $(am_scaler_OBJECTS)
 scaler_DEPENDENCIES = $(top_builddir)/cgreen/libcgreen.a
 am_serve_OBJECTS = asserts.$(OBJEXT) cache.$(OBJEXT) debug.$(OBJEXT) \
-	file_utils.$(OBJEXT) runtime_config.$(OBJEXT) serve.$(OBJEXT) \
+	file_utils.$(OBJEXT) format_info.$(OBJEXT) \
+	runtime_config.$(OBJEXT) serve.$(OBJEXT) \
 	stdio_capture.$(OBJEXT) test_serve.$(OBJEXT)
 serve_OBJECTS = $(am_serve_OBJECTS)
 serve_DEPENDENCIES = $(top_builddir)/cgreen/libcgreen.a
@@ -114,11 +123,13 @@ LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
 SOURCES = $(cache_SOURCES) $(commandline_SOURCES) \
-	$(file_utils_SOURCES) $(geometry_math_SOURCES) $(main_SOURCES) \
+	$(file_utils_SOURCES) $(format_info_SOURCES) \
+	$(geometry_math_SOURCES) $(main_SOURCES) \
 	$(query_string_SOURCES) $(runtime_config_SOURCES) \
 	$(scaler_SOURCES) $(serve_SOURCES)
 DIST_SOURCES = $(cache_SOURCES) $(commandline_SOURCES) \
-	$(file_utils_SOURCES) $(geometry_math_SOURCES) $(main_SOURCES) \
+	$(file_utils_SOURCES) $(format_info_SOURCES) \
+	$(geometry_math_SOURCES) $(main_SOURCES) \
 	$(query_string_SOURCES) $(runtime_config_SOURCES) \
 	$(scaler_SOURCES) $(serve_SOURCES)
 HEADERS = $(noinst_HEADERS)
@@ -233,45 +244,51 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 METASOURCES = AUTO
 file_utils_LDADD = $(top_builddir)/cgreen/libcgreen.a
-file_utils_SOURCES = asserts.c debug.c file_utils.c runtime_config.c \
-	test_file_utils.c
+file_utils_SOURCES = asserts.c debug.c file_utils.c format_info.c \
+	runtime_config.c test_file_utils.c
 
-noinst_HEADERS = asserts.h cache.h commandline.h debug.h file_utils.h \
-	geometry_math.h main.h query_string.h runtime_config.h scaler.h serve.h stdio_capture.h \
-	test_config.h
+noinst_HEADERS = asserts.h cache.h cgiscaler.h commandline.h debug.h defaults.h \
+	file_utils.h format_info.h geometry_math.h query_string.h runtime_config.h scaler.h \
+	serve.h stdio_capture.h test_config.h test_defaults.h
 
 serve_LDADD = $(top_builddir)/cgreen/libcgreen.a
-serve_SOURCES = asserts.c cache.c debug.c file_utils.c runtime_config.c serve.c \
-	stdio_capture.c test_serve.c
+serve_SOURCES = asserts.c cache.c debug.c file_utils.c format_info.c \
+	runtime_config.c serve.c stdio_capture.c test_serve.c
 
 cache_LDADD = $(top_builddir)/cgreen/libcgreen.a
-cache_SOURCES = asserts.c cache.c debug.c file_utils.c runtime_config.c serve.c \
-	stdio_capture.c test_cache.c
+cache_SOURCES = asserts.c cache.c debug.c file_utils.c format_info.c \
+	runtime_config.c serve.c stdio_capture.c test_cache.c
 
-geometry_math_SOURCES = asserts.c debug.c geometry_math.c test_geometry_math.c
+geometry_math_SOURCES = asserts.c debug.c format_info.c geometry_math.c \
+	runtime_config.c test_geometry_math.c
+
 geometry_math_LDADD = $(top_builddir)/cgreen/libcgreen.a
 geometry_math_LDFLAGS = -lm
-runtime_config_SOURCES = debug.c runtime_config.c test_runtime_config.c
+runtime_config_SOURCES = debug.c format_info.c runtime_config.c \
+	test_runtime_config.c
+
 runtime_config_LDADD = $(top_builddir)/cgreen/libcgreen.a
 commandline_SOURCES = asserts.c commandline.c debug.c file_utils.c \
-	runtime_config.c test_commandline.c
+	format_info.c runtime_config.c test_commandline.c
 
 commandline_LDADD = $(top_builddir)/cgreen/libcgreen.a
-scaler_SOURCES = asserts.c debug.c file_utils.c geometry_math.c \
+scaler_SOURCES = asserts.c debug.c file_utils.c format_info.c geometry_math.c \
 	runtime_config.c scaler.c test_scaler.c
 
 AM_CFLAGS = -Wall -lMagick -lWand
 scaler_LDADD = $(top_builddir)/cgreen/libcgreen.a
-query_string_SOURCES = debug.c file_utils.c query_string.c runtime_config.c \
-	test_query_string.c
+query_string_SOURCES = debug.c file_utils.c format_info.c query_string.c \
+	runtime_config.c test_query_string.c
 
 query_string_LDADD = $(top_builddir)/cgreen/libcgreen.a
 main_LDADD = $(top_builddir)/cgreen/libcgreen.a
-main_SOURCES = asserts.c cache.c commandline.c debug.c file_utils.c \
-	geometry_math.c main.c query_string.c runtime_config.c scaler.c serve.c stdio_capture.c \
-	test_main.c
+main_SOURCES = asserts.c cache.c cgiscaler.c commandline.c debug.c file_utils.c \
+	format_info.c geometry_math.c query_string.c runtime_config.c scaler.c serve.c \
+	stdio_capture.c test_main.c
 
 bin_SCRIPTS = memory_test unit_test
+format_info_SOURCES = debug.c format_info.c runtime_config.c test_format_info.c
+format_info_LDADD = $(top_builddir)/cgreen/libcgreen.a
 all: all-am
 
 .SUFFIXES:
@@ -342,6 +359,9 @@ commandline$(EXEEXT): $(commandline_OBJECTS) $(commandline_DEPENDENCIES)
 file_utils$(EXEEXT): $(file_utils_OBJECTS) $(file_utils_DEPENDENCIES) 
 	@rm -f file_utils$(EXEEXT)
 	$(LINK) $(file_utils_OBJECTS) $(file_utils_LDADD) $(LIBS)
+format_info$(EXEEXT): $(format_info_OBJECTS) $(format_info_DEPENDENCIES) 
+	@rm -f format_info$(EXEEXT)
+	$(LINK) $(format_info_OBJECTS) $(format_info_LDADD) $(LIBS)
 geometry_math$(EXEEXT): $(geometry_math_OBJECTS) $(geometry_math_DEPENDENCIES) 
 	@rm -f geometry_math$(EXEEXT)
 	$(geometry_math_LINK) $(geometry_math_OBJECTS) $(geometry_math_LDADD) $(LIBS)
@@ -388,11 +408,12 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/asserts.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cache.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cgiscaler.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/commandline.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/debug.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/file_utils.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/format_info.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/geometry_math.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/main.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/query_string.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/runtime_config.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/scaler.Po@am__quote@
@@ -401,6 +422,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_cache.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_commandline.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_file_utils.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_format_info.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_geometry_math.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_main.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_query_string.Po@am__quote@

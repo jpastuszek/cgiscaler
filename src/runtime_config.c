@@ -18,11 +18,13 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include "runtime_config.h"
+
 #include <stdlib.h>
 #include <string.h>
 #include <wand/MagickWand.h>
-#include "runtime_config.h"
-#include "config.h"
+#include "defaults.h"
+
 
 char *scale_method_names_tmp[] = {"FIT", "STRICT", "FREE"};
 char **scale_method_names = scale_method_names_tmp;
@@ -37,6 +39,8 @@ void alloc_default_config() {
 	storage_config = alloc_default_storage_config();
 	error_handling_config = alloc_default_error_handling_config();
 	resource_limit_config = alloc_default_resource_limit_config();
+
+	simple_query_string_config = alloc_default_simple_query_string_config();
 }
 
 /** Releases memory allocated to runtime configuration. */
@@ -47,6 +51,8 @@ void free_config() {
 	free_logging_config(logging_config);
 	free_operation_config(operation_config);
 	free_output_config(output_config);
+
+	free_simple_query_string_config(simple_query_string_config);
 }
 
 /** Allocates default output configuration.
@@ -63,7 +69,8 @@ struct output_config *alloc_default_output_config() {
 
 	config->file_name = 0;
 
-	config->format = strdup(OUT_FORMAT);
+	config->format = format_to_format_info(OUT_FORMAT);
+	
 
 	config->size.w = DEFAULT_WIDTH;
 	config->size.h = DEFAULT_HEIGHT;
@@ -91,7 +98,7 @@ void free_output_config(struct output_config *config) {
 	if (config->file_name)
 		free(config->file_name);
 	if (config->format)
-		free(config->format);
+		free_format_info(config->format);
 	if (config->transparency_replacement_color)
 		free(config->transparency_replacement_color);
 

@@ -15,6 +15,7 @@ add_executable(cache
   debug.c
   file_utils.c
   serve.c
+  format_info.c
   )
 target_link_libraries(cache ${Magick_LIBRARY} ${Wand_LIBRARY} cgreen)
 
@@ -25,6 +26,7 @@ add_executable(commandline
   commandline.c
   debug.c
   file_utils.c
+  format_info.c
   )
 target_link_libraries(commandline ${Magick_LIBRARY} ${Wand_LIBRARY}
   cgreen)
@@ -35,15 +37,28 @@ add_executable(file_utils
   runtime_config.c
   debug.c
   file_utils.c
+  format_info.c
   )
 target_link_libraries(file_utils ${Magick_LIBRARY} ${Wand_LIBRARY}
+  cgreen)
+
+add_executable(format_info
+  test_format_info.c
+  asserts.c
+  runtime_config.c
+  debug.c
+  format_info.c
+  )
+target_link_libraries(format_info ${Magick_LIBRARY} ${Wand_LIBRARY}
   cgreen)
 
 add_executable(geometry_math
   test_geometry_math.c
   asserts.c
+  runtime_config.c
   debug.c
   geometry_math.c
+  format_info.c
   )
 target_link_libraries(geometry_math ${Magick_LIBRARY} ${Wand_LIBRARY}
   cgreen)
@@ -57,11 +72,12 @@ add_executable(main
   debug.c
   file_utils.c
   geometry_math.c
-  main.c
+  cgiscaler.c
   query_string.c
   runtime_config.c
   scaler.c
   serve.c
+  format_info.c
   )
 target_link_libraries(main ${Magick_LIBRARY} ${Wand_LIBRARY} cgreen)
 
@@ -72,6 +88,7 @@ add_executable(query_string
   debug.c
   file_utils.c
   query_string.c
+  format_info.c
   )
 target_link_libraries(query_string ${Magick_LIBRARY} ${Wand_LIBRARY}
   cgreen)
@@ -80,6 +97,7 @@ add_executable(runtime_config
   test_runtime_config.c
   debug.c
   runtime_config.c
+  format_info.c
   )
 target_link_libraries(runtime_config ${Magick_LIBRARY} ${Wand_LIBRARY}
   cgreen)
@@ -92,6 +110,7 @@ add_executable(scaler
   file_utils.c
   geometry_math.c
   scaler.c
+  format_info.c
   )
 target_link_libraries(scaler ${Magick_LIBRARY} ${Wand_LIBRARY} cgreen)
 
@@ -106,6 +125,7 @@ add_executable(serve
   geometry_math.c
   scaler.c
   serve.c
+  format_info.c
   )
 target_link_libraries(serve ${Magick_LIBRARY} ${Wand_LIBRARY} cgreen)
 

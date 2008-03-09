@@ -17,17 +17,20 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef FILE_UTILS_H
-#define FILE_UTILS_H
 
 #include <sys/types.h>
 #include "query_string.h"
+
+#ifndef FILE_UTILS_H
+#define FILE_UTILS_H
 
 typedef char fpath;
 typedef char abs_fpath;
 
 typedef fpath media_fpath;
 typedef fpath cache_fpath;
+
+#endif
 
 cache_fpath *create_cache_file_path(fpath *file_path, char *file_extension, int w, int h, int strict, int quality);
 
@@ -50,5 +53,3 @@ int write_blob_to_file(unsigned char *blob, int blob_len, abs_fpath *absolute_fi
 time_t get_file_mtime(abs_fpath *absolute_file_path);
 fpath *make_file_name_relative(fpath *file_path);
 int check_for_double_dot(fpath *file_path);
-
-#endif

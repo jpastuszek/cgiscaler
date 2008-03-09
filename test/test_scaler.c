@@ -68,7 +68,6 @@ static void test_fit_resize() {
 
 	img = get_image_size(image_ping);
 
-	/* TODO: This is not releasing all the memory */
 	free_image(image_ping);
 
 	image = fit_resize(IMAGE_TEST_FILE, a);
@@ -115,33 +114,33 @@ static void test_resize_field_limiting() {
 	a.w = IMAGE_TEST_FILE_WIDTH - 10;
 	a.h = IMAGE_TEST_FILE_HEIGHT - 10;
 
-	/* MAX_PIXEL_NO is set to lower then a.w * a.h */
-	if (a.w * a.h > MAX_PIXEL_NO)
+	/* resource_limit_config->max_pixel_no is set to lower then a.w * a.h */
+	if (a.w * a.h > resource_limit_config->max_pixel_no)
 		assert_true(1);
 	else
 		assert_true(0);
 
 	/* fit_resize */
-	image = fit_resize(IMAGE_TEST_FILE, reduce_filed(a, MAX_PIXEL_NO));
+	image = fit_resize(IMAGE_TEST_FILE, reduce_filed(a, resource_limit_config->max_pixel_no));
 	assert_not_equal(image, 0);
 
 	img = get_image_size(image);
 
 	assert_not_equal(img.w, a.w);
 	assert_not_equal(img.h, a.h);
-	assert_equal_low_precision(img.w * img.h, MAX_PIXEL_NO, 0.1);
+	assert_equal_low_precision(img.w * img.h, resource_limit_config->max_pixel_no, 0.1);
 
 	free_image(image);
 
 	/* strict_resize */
-	image = strict_resize(IMAGE_TEST_FILE, reduce_filed(a, MAX_PIXEL_NO));
+	image = strict_resize(IMAGE_TEST_FILE, reduce_filed(a, resource_limit_config->max_pixel_no));
 	assert_not_equal(image, 0);
 
 	img = get_image_size(image);
 
 	assert_not_equal(img.w, a.w);
 	assert_not_equal(img.h, a.h);
-	assert_equal_low_precision(img.w * img.h, MAX_PIXEL_NO, 0.1);
+	assert_equal_low_precision(img.w * img.h, resource_limit_config->max_pixel_no, 0.1);
 
 	free_image(image);
 }
@@ -162,8 +161,9 @@ static void test_remove_transparentcy() {
 
 	/* we assert that we don't have transparent pixel */
 	assert_image_pixel_alpha(image, 10, 10, 1.0);
+	debug(DEB, "### Transparency color: %s", output_config->transparency_replacement_color);
 	/* and color is DEFAULT_BACKGROUND_COLOR_MAGICK_STR */
-	assert_image_pixel_color(image, 10, 10, DEFAULT_BACKGROUND_COLOR);
+	assert_image_pixel_color(image, 10, 10, output_config->transparency_replacement_color);
 
 	free_image(image);
 }
@@ -197,7 +197,7 @@ static void test_prepare_blob() {
 /* setup and teardown */
 static void test_setup() {
 	alloc_default_config();
-	debug_start(DEBUG_FILE);
+	debug_start(logging_config->log_file);
 	/* now we need ImageMagick after this we should terminate ImgeMagick afterwards */
 	MagickWandGenesis();
 }

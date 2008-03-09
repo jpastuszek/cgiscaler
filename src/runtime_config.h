@@ -22,7 +22,7 @@
 #define RUNTIME_CONFIG_H
 
 #include "geometry_math.h"
-
+#include "format_info.h"
 
 /* All global configuration structures */
 struct output_config *output_config;
@@ -49,8 +49,8 @@ struct output_config {
 	/** File name (relative path) received from CGI to produce output from */
 	char *file_name;
 
-	/** Image format - "GIF", "JPG" and others supported by ImageMagick */
-	char *format;
+	/** Image format information */
+	struct format_info *format;
 	/** Requested thumbnail dimensions */
 	struct dimensions size;
 	/** Requested thumbail quality */
@@ -162,6 +162,8 @@ struct resource_limit_config {
 	unsigned long int area_limit;
 };
 
+#endif
+
 void alloc_default_config();
 void free_config();
 
@@ -185,5 +187,3 @@ void free_error_handling_config(struct error_handling_config *config);
 
 struct resource_limit_config* alloc_default_resource_limit_config();
 void free_resource_limit_config(struct resource_limit_config *config);
-
-#endif

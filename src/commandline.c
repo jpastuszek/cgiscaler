@@ -96,9 +96,9 @@ void apply_commandline_config(int argc, char *argv[]) {
 				}
 
 				if (!strcmp(argv[i+1], COMMANDLINE_TRUE_VAL))
-					output_config->quality = LOWQ_QUALITY;
+					output_config->quality = simple_query_string_config->low_quality_value;
 				else if (!strcmp(argv[i+1], COMMANDLINE_FALSE_VAL))
-					output_config->quality = DEFAULT_QUALITY;
+					output_config->quality = simple_query_string_config->default_quality_value;
 				else
 					debug(ERR, "Unrecognized parameter for lowq: %s", argv[i+1]);
 
@@ -177,6 +177,6 @@ void apply_commandline_config(int argc, char *argv[]) {
 	}
 
 #ifdef DEBUG
-	debug(DEB, "Run-time config after command line: file: file: '%s', size w: %d h: %d, scale method: %s quality: %d Operation coifig: no cache: %d, no serve: %d, no headers: %d", output_config->file_name ? output_config->file_name : "<null>", output_config->size.w, output_config->size.h, scale_method_names[output_config->scale_method], output_config->quality, operation_config->no_cache, operation_config->no_serve, operation_config->no_headers);
+	debug(DEB, "Run-time config after command line: file: '%s', size w: %d h: %d, scale method: %s quality: %d Operation coifig: no cache: %d, no serve: %d, no headers: %d", output_config->file_name ? output_config->file_name : "<null>", output_config->size.w, output_config->size.h, scale_method_names[output_config->scale_method], output_config->quality, operation_config->no_cache, operation_config->no_serve, operation_config->no_headers);
 #endif
 }

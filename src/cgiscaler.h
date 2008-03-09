@@ -24,8 +24,6 @@
 #include "scaler.h"
 #include "cache.h"
 #include "file_utils.h"
-#include "config.h"
 #include "debug.h"
 
-/* so we can test it! :D */
-int _main(int argc, char *argv[]);
+int cgiscaler(int argc, char *argv[]);

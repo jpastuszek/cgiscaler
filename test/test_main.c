@@ -29,10 +29,11 @@
 #include "asserts.h"
 #include "file_utils.h"
 #include "test_config.h"
+#include "test_defaults.h"
 #include "runtime_config.h"
 #include "debug.h"
 #include "serve.h"
-#include "main.h"
+#include "cgiscaler.h"
 
 extern struct storage_config *storage_config;
 
@@ -47,7 +48,7 @@ static void test_error() {
 	free_storage_config(storage_config);
 
 	if (!fork_with_stdout_capture(&stdout_fd)) {
-		_main(2, argv);
+		cgiscaler(2, argv);
 		exit(0);
 	}
 
@@ -57,7 +58,7 @@ static void test_error() {
 	finish_fork(stdout_fd);
 
 	if (!fork_with_stdout_capture(&stdout_fd)) {
-		_main(4, argv_nh);
+		cgiscaler(4, argv_nh);
 		exit(0);
 	}
 
@@ -84,7 +85,7 @@ static void test_without_cached() {
 
 	/* real file */
 	if (!fork_with_stdout_capture(&stdout_fd)) {
-		_main(2, argv);
+		cgiscaler(2, argv);
 		exit(0);
 	}
 
@@ -96,7 +97,7 @@ static void test_without_cached() {
 
 	/* real file, no headers */
 	if (!fork_with_stdout_capture(&stdout_fd)) {
-		_main(4, argv_nh);
+		cgiscaler(4, argv_nh);
 		exit(0);
 	}
 
@@ -110,7 +111,7 @@ static void test_without_cached() {
 
 	/* bogus file */
 	if (!fork_with_stdout_capture(&stdout_fd)) {
-		_main(4, argv_bogo);
+		cgiscaler(4, argv_bogo);
 		exit(0);
 	}
 	
@@ -139,7 +140,7 @@ static void test_no_cache_no_file_name_given() {
 	free_storage_config(storage_config);
 
 	if (!fork_with_stdout_capture(&stdout_fd)) {
-		_main(3, argv_nc);
+		cgiscaler(3, argv_nc);
 		exit(0);
 	}
 
@@ -170,7 +171,7 @@ static void test_from_cache() {
 	assert_file_not_exists(absolute_cach_file_path);
 
 	if (!fork_with_stdout_capture(&stdout_fd)) {
-		_main(2, argv);
+		cgiscaler(2, argv);
 		exit(0);
 	}
 
@@ -184,7 +185,7 @@ static void test_from_cache() {
 	assert_file_exists(absolute_cach_file_path);
 
 	if (!fork_with_stdout_capture(&stdout_fd)) {
-		_main(2, argv);
+		cgiscaler(2, argv);
 		exit(0);
 	}
 
@@ -213,7 +214,7 @@ static void test_bad_param() {
 	free_storage_config(storage_config);
 
 	if (!fork_with_stdout_capture(&stdout_fd)) {
-		_main(3, argv_nc);
+		cgiscaler(3, argv_nc);
 		exit(0);
 	}
 
@@ -243,7 +244,7 @@ static void test_no_cache () {
 	assert_file_not_exists(absolute_cach_file_path);
 
 	if (!fork_with_stdout_capture(&stdout_fd)) {
-		_main(4, argv);
+		cgiscaler(4, argv);
 		exit(0);
 	}
 
@@ -279,7 +280,7 @@ static void test_no_heders() {
 	assert_file_not_exists(absolute_cach_file_path);
 
 	if (!fork_with_stdout_capture(&stdout_fd)) {
-		_main(4, argv);
+		cgiscaler(4, argv);
 		exit(0);
 	}
 
@@ -313,7 +314,7 @@ static void test_no_server() {
 	assert_file_not_exists(absolute_cach_file_path);
 
 	if (!fork_with_stdout_capture(&stdout_fd)) {
-		_main(4, argv);
+		cgiscaler(4, argv);
 		exit(0);
 	}
 
@@ -346,7 +347,7 @@ static void test_no_serve_no_cache_no_header() {
 	assert_file_not_exists(absolute_cach_file_path);
 
 	if (!fork_with_stdout_capture(&stdout_fd)) {
-		_main(8, argv);
+		cgiscaler(8, argv);
 		exit(0);
 	}
 

@@ -4,7 +4,7 @@ find_package(Magick REQUIRED)
 find_package(Wand REQUIRED)
 
 add_executable(cgiscaler cache.c  commandline.c  debug.c  file_utils.c
-  geometry_math.c  main.c  query_string.c  runtime_config.c  scaler.c
+  geometry_math.c  main.c cgiscaler.c format_info.c  query_string.c  runtime_config.c  scaler.c
   serve.c)
 target_link_libraries(cgiscaler ${Magick_LIBRARY})
 target_link_libraries(cgiscaler ${Wand_LIBRARY})

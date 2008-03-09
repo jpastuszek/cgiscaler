@@ -18,55 +18,52 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include <math.h>
 #include "../cgreen/cgreen.h"
-#include "asserts.h"
 #include "runtime_config.h"
-#include "config.h"
 #include "debug.h"
-#include "geometry_math.h"
+#include "format_info.h"
 
-/* geometry_math.c tests */
-static void test_resize_to_fit_in() {
-	struct dimensions a, b, c;
 
-	a.w = 100;
-	a.h = 200;
+static void test_get_format_info_from_builtin() {
+	struct format_info *fi;
 
-	/* down fit */
-	b.w = 200;
-	b.h = 100;
+	fi = get_format_info_from_builtin("JPG");
+	assert_string_equal(fi->format, "JPG");
+	assert_string_equal(fi->mime_type, "image/jpeg");
+	assert_string_equal(fi->file_ext, "jpg");
 
-	c = resize_to_fit_in(a, b);
-	assert_equal(c.w, 50);
-	assert_equal(c.h, 100);
-
-	/* up fit */
-	b.w = 1200;
-	b.h = 1200;
-
-	c = resize_to_fit_in(a, b);
-	assert_equal(c.w, 600);
-	assert_equal(c.h, 1200);
+	free_format_info(fi);
 }
 
-static void test_reduce_filed() {
-	struct dimensions a, b;
+static void test_get_format_info_from_magick() {
+	struct format_info *fi;
 
-	/* field = 100*200 = 20000 */
-	a.w = 100;
-	a.h = 200;
+	fi = get_format_info_from_magick("JPG");
+	assert_string_equal(fi->format, "JPG");
+	assert_string_equal(fi->mime_type, "image/jpeg");
+	assert_string_equal(fi->file_ext, "jpg");
 
-	b = reduce_filed(a, 1234);
-	/* we check if reduction worked (within 10% lower precision margin) */
-	assert_equal_low_precision((double) b.w * b.h, (double) 1234,  (double) 0.1);
-	/* we check if aspect ratio did not changed (within 10% precision margin) */
-	assert_equal_precision((double) b.w / b.h,(double) a.w / a.h,(double)  0.1);
+	free_format_info(fi);
+}
 
-	/* over reduction - nothing should change */
-	b = reduce_filed(a, 999999);
-	assert_equal(a.w, 100);
-	assert_equal(a.h, 200);
+static void test_format_to_format_info() {
+	struct format_info *fi;
+
+	/* this should use builtin */
+	fi = format_to_format_info("JPG");
+	assert_string_equal(fi->format, "JPG");
+	assert_string_equal(fi->mime_type, "image/jpeg");
+	assert_string_equal(fi->file_ext, "jpg");
+
+	free_format_info(fi);
+
+	/* this should use magick */
+	fi = format_to_format_info("MIFF");
+	assert_string_equal(fi->format, "MIFF");
+	assert_string_equal(fi->mime_type, "image/x-miff");
+	assert_string_equal(fi->file_ext, "miff");
+
+	free_format_info(fi);
 }
 
 /* setup and teardown */
@@ -81,13 +78,14 @@ static void test_teardown() {
 }
 
 int main(int argc, char **argv) {
-	TestSuite *geometry_math_suite = create_named_test_suite(__FILE__);
+	TestSuite *file_format_info_suite = create_named_test_suite(__FILE__);
 
-	add_test(geometry_math_suite, test_resize_to_fit_in);
-	add_test(geometry_math_suite, test_reduce_filed);
+	add_test(file_format_info_suite, test_get_format_info_from_builtin);
+	add_test(file_format_info_suite, test_get_format_info_from_magick);
+	add_test(file_format_info_suite, test_format_to_format_info);
 
-	setup(geometry_math_suite, test_setup);
-	teardown(geometry_math_suite, test_teardown);
+	setup(file_format_info_suite, test_setup);
+	teardown(file_format_info_suite, test_teardown);
 
-	return run_test_suite(geometry_math_suite, create_text_reporter());
+	return run_test_suite(file_format_info_suite, create_text_reporter());
 }

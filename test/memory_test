@@ -2,7 +2,7 @@
 
 cd "`dirname $0.`/.."
 
-TESTS=( "file_utils" "runtime_config" "commandline" "query_string" "geometry_math" "serve" "cache"  "scaler" "main" )
+TESTS=( "file_utils" "format_info" "runtime_config" "commandline" "query_string" "geometry_math" "serve" "cache"  "scaler" "main" )
 
 TOTAL_ERRORS=0
 TOTAL_LEAKS=0
@@ -41,7 +41,7 @@ for TEST in ${TESTS[@]}; do
 	if [ $ERRORS != "0" -o $LEAKS != "0" ]; then
 		cp valgrind_test_resoult valgrind_errors_$TEST
 		echo "See 'valgrind_errors_$TEST'"
-		echo "Run 'valgrind --leak-check=full --trace-children=yes test/test_$TEST' to retest"
+		echo "Run 'valgrind --leak-check=full --trace-children=yes test/$TEST' to retest"
 	fi
 
 	rm valgrind_test_resoult

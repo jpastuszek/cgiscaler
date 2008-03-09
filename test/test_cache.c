@@ -27,12 +27,11 @@
 #include "stdio_capture.h"
 #include "asserts.h"
 #include "runtime_config.h"
+#include "config.h"
 #include "file_utils.h"
 #include "serve.h"
 #include "debug.h"
 #include "cache.h"
-
-struct operation_config *operation_config;
 
 /* cache.c tests */
 static void test_if_cached() {
@@ -43,7 +42,7 @@ static void test_if_cached() {
 	struct utimbuf time_buf;
 
 	/* tests with bogo file */
-	cache_file_path = create_cache_file_path("bogo.jpg", OUT_FORMAT_EXTENSION, 0, 0, 0, 0);
+	cache_file_path = create_cache_file_path("bogo.jpg", output_config->format->file_ext, 0, 0, 0, 0);
 	absolute_cach_file_path = create_absolute_cache_file_path(cache_file_path);
 
 	assert_equal(check_if_cached("bogo.jpg", cache_file_path), NO_ORIG | NO_CACHE);
@@ -61,7 +60,7 @@ static void test_if_cached() {
 	free_fpath(cache_file_path);
 
 	/* and now with real file */
-	cache_file_path = create_cache_file_path(IMAGE_TEST_FILE, OUT_FORMAT_EXTENSION, 0, 0, 0, 0);
+	cache_file_path = create_cache_file_path(IMAGE_TEST_FILE, output_config->format->file_ext, 0, 0, 0, 0);
 	absolute_cach_file_path = create_absolute_cache_file_path(cache_file_path);
 	absolute_media_file_path = create_absolute_media_file_path(IMAGE_TEST_FILE);
 
@@ -98,14 +97,14 @@ static void test_write_blob_to_cache() {
 
 
 	/* tests with bogo file */
-	cache_file_path = create_cache_file_path("blob.test", OUT_FORMAT_EXTENSION, 0, 0, 0, 0);
+	cache_file_path = create_cache_file_path("blob.test", output_config->format->file_ext, 0, 0, 0, 0);
 
 	assert_equal(write_blob_to_cache(blob, 3000, "blob.test", cache_file_path), 0);
 
 	free_fpath(cache_file_path);
 
 	/* now we will try existing original file */
-	cache_file_path = create_cache_file_path(IMAGE_TEST_FILE, OUT_FORMAT_EXTENSION, 0, 0, 0, 0);
+	cache_file_path = create_cache_file_path(IMAGE_TEST_FILE, output_config->format->file_ext, 0, 0, 0, 0);
 	absolute_cach_file_path = create_absolute_cache_file_path(cache_file_path);
 
 	assert_not_equal(write_blob_to_cache(blob, 3000, IMAGE_TEST_FILE, cache_file_path), 0);
@@ -131,7 +130,7 @@ static void test_serve_from_cache_file() {
 	memset(blob, 54, 3000);
 
 	/* tests with real file */
-	cache_file_path = create_cache_file_path(IMAGE_TEST_FILE, OUT_FORMAT_EXTENSION, 0, 0, 0, 0);
+	cache_file_path = create_cache_file_path(IMAGE_TEST_FILE, output_config->format->file_ext, 0, 0, 0, 0);
 	absolute_cache_file_path = create_absolute_cache_file_path(cache_file_path);
 
 	/* create test cache file - mtime should be set properly */
@@ -139,7 +138,7 @@ static void test_serve_from_cache_file() {
 
 	if (!fork_with_stdout_capture(&stdout_fd)) {
 		operation_config->no_headers = 0;
-		status = serve_from_cache_file(IMAGE_TEST_FILE, cache_file_path, OUT_FORMAT_MIME_TYPE);
+		status = serve_from_cache_file(IMAGE_TEST_FILE, cache_file_path, output_config->format->mime_type);
 		if (!status) {
 			restore_stdout();
 			assert_true_with_message(0, "serve_from_cache failed");
@@ -160,7 +159,7 @@ static void test_serve_from_cache_file() {
 
 	if (!fork_with_stdout_capture(&stdout_fd)) {
 		operation_config->no_headers = 1;
-		status = serve_from_cache_file(IMAGE_TEST_FILE, cache_file_path, OUT_FORMAT_MIME_TYPE);
+		status = serve_from_cache_file(IMAGE_TEST_FILE, cache_file_path, output_config->format->mime_type);
 		if (!status) {
 			restore_stdout();
 			assert_true_with_message(0, "serve_from_cache failed");
@@ -181,7 +180,7 @@ static void test_serve_from_cache_file() {
 
 	if (!fork_with_stdout_capture(&stdout_fd)) {
 		operation_config->no_headers = 1;
-		status = serve_from_cache_file(IMAGE_TEST_FILE, cache_file_path, OUT_FORMAT_MIME_TYPE);
+		status = serve_from_cache_file(IMAGE_TEST_FILE, cache_file_path, output_config->format->mime_type);
 		if (status) {
 			restore_stdout();
 			assert_true_with_message(0, "serve_from_cache failed");
@@ -197,7 +196,7 @@ static void test_serve_from_cache_file() {
 	/* test with no cache */
 	if (!fork_with_stdout_capture(&stdout_fd)) {
 		operation_config->no_headers = 1;
-		status = serve_from_cache_file(IMAGE_TEST_FILE, cache_file_path, OUT_FORMAT_MIME_TYPE);
+		status = serve_from_cache_file(IMAGE_TEST_FILE, cache_file_path, output_config->format->mime_type);
 
 		if (status) {
 			restore_stdout();
@@ -212,7 +211,7 @@ static void test_serve_from_cache_file() {
 	free_fpath(cache_file_path);
 
 	/* test with no original file */
-	cache_file_path = create_cache_file_path("bogo.file", OUT_FORMAT_EXTENSION, 0, 0, 0, 0);
+	cache_file_path = create_cache_file_path("bogo.file", output_config->format->file_ext, 0, 0, 0, 0);
 	absolute_cache_file_path = create_absolute_cache_file_path(cache_file_path);
 
 	/* create test cache file */
@@ -220,7 +219,7 @@ static void test_serve_from_cache_file() {
 
 	if (!fork_with_stdout_capture(&stdout_fd)) {
 		operation_config->no_headers = 1;
-		status = serve_from_cache_file("bogo.file", cache_file_path, OUT_FORMAT_MIME_TYPE);
+		status = serve_from_cache_file("bogo.file", cache_file_path, output_config->format->mime_type);
 		if (status) {
 			restore_stdout();
 			assert_true_with_message(0, "serve_from_cache failed");
@@ -242,7 +241,7 @@ static void test_serve_from_cache_file() {
 /* setup and teardown */
 static void test_setup() {
 	alloc_default_config();
-	debug_start(DEBUG_FILE);
+	debug_start(logging_config->log_file);
 }
 
 static void test_teardown() {

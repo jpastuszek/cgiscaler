@@ -21,12 +21,9 @@
 
 #include "../cgreen/cgreen.h"
 #include "runtime_config.h"
+#include "defaults.h"
 #include "debug.h"
 #include "query_string.h"
-
-extern struct runtime_config *runtime_config;
-extern struct query_string_config *query_string_config;
-
 
 /* query_string.c tests */
 static void test_query_string_param() {
@@ -53,9 +50,6 @@ static void test_query_string_param() {
 
 static void test_get_query_string_config() {
 	char test_query_string[256];
-
-	output_config = alloc_default_output_config();
-	simple_query_string_config = alloc_default_simple_query_string_config();
 
 	/* testing defaults */
 	apply_simple_query_string_config("", "");
@@ -148,18 +142,17 @@ static void test_get_query_string_config() {
 	/* all should be unchanged */
 	assert_equal(output_config->scale_method, SM_FIT);
 	assert_equal(output_config->quality, DEFAULT_QUALITY);
-
-	free_output_config(output_config);
-	free_simple_query_string_config(simple_query_string_config);
 }
 
 
 /* setup and teardown */
 static void test_setup() {
-	debug_start(DEBUG_FILE);
+	alloc_default_config();
+	debug_start(logging_config->log_file);
 }
 
 static void test_teardown() {
+	free_config();
 	debug_stop();
 }
 

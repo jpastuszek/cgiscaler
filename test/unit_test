@@ -2,7 +2,7 @@
 
 cd "`dirname $0.`/.."
 
-TESTS=( "file_utils" "runtime_config" "commandline" "query_string" "geometry_math" "serve" "cache"  "scaler" "main" )
+TESTS=( "file_utils" "format_info" "runtime_config" "commandline" "query_string" "geometry_math" "serve" "cache"  "scaler" "main" )
 
 PASSED=0
 FAILED=0

@@ -28,18 +28,17 @@
 #include "../cgreen/cgreen.h"
 #include "asserts.h"
 #include "runtime_config.h"
+#include "config.h"
 #include "debug.h"
 #include "file_utils.h"
-
-extern struct storage_config *storage_config;
 
 static void test_create_cache_file_path() {
 	char compare_file_path[255];
 	char *cache_file;
 
-	cache_file = create_cache_file_path("test.jpg", OUT_FORMAT_EXTENSION, 23, 12, 1, 32);
+	cache_file = create_cache_file_path("test.jpg", output_config->format->file_ext, 23, 12, 1, 32);
 
-	snprintf(compare_file_path, 256, "%s-23-12-1-32.%s", "test.jpg", OUT_FORMAT_EXTENSION);
+	snprintf(compare_file_path, 256, "%s-23-12-1-32.%s", "test.jpg", output_config->format->file_ext);
 	assert_string_equal(cache_file, compare_file_path);
 
 	free_fpath(cache_file);
@@ -54,7 +53,7 @@ static void test_create_absolute_media_file_path() {
 	file_path = create_absolute_media_file_path("test.jpg");
 	assert_not_equal(file_path, 0);
 
-	snprintf(compare_file_path, 256, "%s%s", MEDIA_PATH, "test.jpg");
+	snprintf(compare_file_path, 256, "%s%s", storage_config->media_directory, "test.jpg");
 	assert_string_equal(file_path, compare_file_path);
 
 	free_fpath(file_path);
@@ -68,7 +67,7 @@ static void test_create_absolute_cache_file_path() {
 	file_path = create_absolute_cache_file_path("test.jpg");
 	assert_not_equal(file_path, 0);
 
-	snprintf(compare_file_path, 256, "%s%s", CACHE_PATH, "test.jpg");
+	snprintf(compare_file_path, 256, "%s%s", storage_config->cache_directory, "test.jpg");
 	assert_string_equal(file_path, compare_file_path);
 
 	free_fpath(file_path);
@@ -102,13 +101,13 @@ static void test_create_cache_dir_struct() {
 	status = create_cache_dir_struct("abc/d///ghi/test.jpg");
 	assert_not_equal(status, 0);
 
-	strcpy(path1, CACHE_PATH);
+	strcpy(path1, storage_config->cache_directory);
 	strcat(path1, "abc");
 
-	strcpy(path2, CACHE_PATH);
+	strcpy(path2, storage_config->cache_directory);
 	strcat(path2, "abc/d");
 
-	strcpy(path3, CACHE_PATH);
+	strcpy(path3, storage_config->cache_directory);
 	strcat(path3, "abc/d/ghi");
 
 	assert_dir_exists(path1);
@@ -192,7 +191,7 @@ static void test_get_cache_file_mtime() {
 /* setup and teardown */
 static void test_setup() {
 	alloc_default_config();
-	debug_start(DEBUG_FILE);
+	debug_start(logging_config->log_file);
 }
 
 static void test_teardown() {
