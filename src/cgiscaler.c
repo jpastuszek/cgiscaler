@@ -122,6 +122,7 @@ int cgiscaler(int argc, char *argv[]) {
 
 		free_config();
 		MagickWandTerminus();
+		debug(PROF, "Finished with error after %.3f s",  timer_stop(&run_timing));
 		exit(80);
 	}
 

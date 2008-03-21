@@ -327,3 +327,28 @@ int check_for_double_dot(fpath *file_path) {
 	
 	return 0;
 }
+
+/** Extracts extension from file path.
+* @param file_path path to file or file name
+* @return allocated string containing extracted extension or 0
+*/
+char *extract_file_extension(char *file_path) {
+	char *ext;
+	int len;
+
+	len = strlen(file_path);
+	if (!len)
+		return 0;
+
+	// point to last char
+	ext = file_path + len - 1;
+
+	// we look for a dot
+	while (*ext != '.') {
+		if (ext == file_path)
+			return 0;
+		ext--;
+	}
+
+	return strdup(++ext);
+}

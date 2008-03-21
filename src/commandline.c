@@ -44,28 +44,33 @@ static char doc[] = "CGIScaler is an image thumbnailer that comunicates with a w
 
 static struct argp_option options[] = {
 	{0, 0, 0, 0, "Output geometry"},
-	{"width",	'w', "INTEGER",	0, "Width of output image" DEFAULT(DEFAULT_WIDTH) },
-	{"height",	'h', "INTEGER",	0, "Height of output image" DEFAULT(DEFAULT_HEIGHT) },
+	{"width",		'w', "INTEGER",	0, "Width of output image" DEFAULT(DEFAULT_WIDTH) },
+	{"height",		'h', "INTEGER",	0, "Height of output image" DEFAULT(DEFAULT_HEIGHT) },
 
 	{0, 0, 0, 0, "Simple scaling controls"},
 #if DEFAULT_SCALE_METHOD == SM_FIT
-	{"strict",	's', 0,		0, "Do strict scaling (overwrites fit scaling)"},
+	{"strict-resize", 	's', 0,	0, "Do strict scaling (overwrites fit scaling)"},
 #else
-	{"fit",		'f', 0,		0, "Do fit scaling (overwrites strict scaling)"},
+	{"fit-resize",		'f', 0,		0, "Do fit scaling (overwrites strict scaling)"},
 #endif
-	{"lowq",	'l', 0,		0, "Produce more compressed output" DEFAULT(off)},
+	{"low-quality",		'l', 0,		0, "Produce more compressed output" DEFAULT(off)},
 
 	{0, 0, 0, 0, "Input and output"},
-	{"mediadir",	'm', "DIRECTORY",	0, "Root directory of media store - all file paths are relative to this directory"},
-	{"cachedir",	'c', "DIRECTORY",	0, "Root directory of cache store - all cached thumbnails will go here"},
-	{"infile",	'i', "FILE",	0, "Use this file instead of one passed in PATH_INFO environment"},
+	{"media-dir",		'm', "DIRECTORY",	0, "Root directory of media store - all file paths are relative to this directory"},
+	{"cache-dir",		'c', "DIRECTORY",	0, "Root directory of cache store - all cached thumbnails will go here"},
+	{"in-file",		'i', "FILE",	0, "Use this file instead of one passed in PATH_INFO environment"},
 	//{"outfile",	'o', "FILE",	0, "Output to file instead of stdout"},
+
 	{0, 0, 0, 0, "General operation"},
-	{"noserver",	'S', 0,		0, "Do not serve the resoulting image"},
-	{"noheaders",	'H', 0,		0, "Do not serve HTTP headers"},
-	{"nocache",	'C', 0,		0, "Do disable cache"},
+	{"no-server",		'S', 0,		0, "Do not serve the resoulting image"},
+	{"no-headers",		'H', 0,		0, "Do not serve HTTP headers"},
+	{"no-cache",		'C', 0,		0, "Do disable cache"},
+
+	{0, 0, 0, 0, "Error handling"},
+	{"error-file",		'e', "FILE",	0, "Serve this file in case of error"},
+	{"error-message",	'M', "STRING",	0, "Error message to serve in case error file cannot be served"},
 	{ 0 }
-     };
+};
 
 //static char args_doc[] = "[-whsflSHC] [-i image_file] [-m media_dir] [-c cache_dir]";
 
@@ -112,6 +117,14 @@ static error_t parse_opt (int key, char *arg, struct argp_state *state) {
 		case 'C':
 			operation_config->no_cache = 1;
 			break;
+
+		case 'e':
+			error_handling_config->error_image_file = strdup(arg);
+			break;
+		case 'M':
+			error_handling_config->error_message = strdup(arg);
+			break;
+
 		case ARGP_KEY_ARG:
 			// non taged arg
 			break;
@@ -131,9 +144,6 @@ static struct argp argp = { options, parse_opt, 0, doc };
 * @param argv argv parameter from main function
 */
 void apply_commandline_config(int argc, char *argv[]) {
-	int i;
-	char *file_name = 0;
-
 	argp_parse (&argp, argc, argv, 0, 0, 0);
 
 #ifdef DEBUG

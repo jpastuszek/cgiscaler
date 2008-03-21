@@ -62,6 +62,8 @@ void debug_stop() {
 
 	debug("<<<<", "Stopping debug");
 
+	fsync(debug_file_fd);
+
 	/* Std* should not be closed */
 	if (debug_file_fd > 2)
 		close(debug_file_fd);

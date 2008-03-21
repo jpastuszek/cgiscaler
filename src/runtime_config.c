@@ -70,7 +70,7 @@ struct output_config *alloc_default_output_config() {
 	config->file_name = 0;
 
 	config->format = format_to_format_info(OUT_FORMAT);
-	
+	config->fail_mime_type = strdup(FAIL_BACK_MIME_TYPE);
 
 	config->size.w = DEFAULT_WIDTH;
 	config->size.h = DEFAULT_HEIGHT;
@@ -99,6 +99,8 @@ void free_output_config(struct output_config *config) {
 		free(config->file_name);
 	if (config->format)
 		free_format_info(config->format);
+	if (config->fail_mime_type)
+		free(config->fail_mime_type);
 	if (config->transparency_replacement_color)
 		free(config->transparency_replacement_color);
 
@@ -240,7 +242,6 @@ struct error_handling_config* alloc_default_error_handling_config() {
 		exit(66);
 
 	config->error_image_file = strdup(ERROR_FILE_PATH);
-	config->error_image_mimetype = strdup(ERROR_FILE_MIME_TYPE);
 	config->error_message = strdup(ERROR_FAILBACK_MESSAGE);
 
 	return config;
@@ -250,8 +251,6 @@ struct error_handling_config* alloc_default_error_handling_config() {
 void free_error_handling_config(struct error_handling_config *config) {
 	if (config->error_image_file)
 		free(config->error_image_file);
-	if (config->error_image_mimetype)
-		free(config->error_image_mimetype);
 	if (config->error_message)
 		free(config->error_message);
 

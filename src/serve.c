@@ -59,15 +59,38 @@ void send_headers(unsigned int content_length, char *mime_type) {
 */
 int serve_from_file(abs_fpath *absolute_file_path, char *mime_type) {
 	unsigned char *buffer;
+	char *ext;
 	int file;
 	size_t bytes_read, bytes_written, total_bytes_read, total_bytes_written;
 	off_t file_size;
+	struct format_info *fi;
+
+	if (!mime_type) {
+		ext = extract_file_extension(absolute_file_path);
+		if (ext) {
+			fi = file_extension_to_format_info(ext);
+			if (fi) {
+				mime_type = strdup(fi->mime_type);
+				free_format_info(fi);
+			}
+			free(ext);
+		}
+		
+		if (!mime_type) {
+			debug(WARN,"Failed to find maching mime-type for file: %s, using fail back default: %s", absolute_file_path, output_config->fail_mime_type);
+			mime_type = strdup(output_config->fail_mime_type);
+		}
+	} else {
+		// we duplicat that string as we will try to free it later on
+		mime_type = strdup(mime_type);
+	}
 
 	debug(DEB,"Serving from file: '%s' mime-type: '%s'", absolute_file_path, mime_type);
 
 	file = open(absolute_file_path, O_RDONLY);
 	if (file == -1) {
 		debug(WARN,"Failed to open file '%s': %s", absolute_file_path, strerror(errno));
+		free(mime_type);
 		return 0;
 	}
 
@@ -76,12 +99,14 @@ int serve_from_file(abs_fpath *absolute_file_path, char *mime_type) {
 	if (file_size == -1) {
 		close(file);
 		debug(WARN,"Failed to get file size: %s", strerror(errno));
+		free(mime_type);
 		return 0;
 	}
 
 	if (lseek(file, 0, SEEK_SET) == -1) {
 		close(file);
 		debug(WARN,"Failed to reposition file offset: %s", strerror(errno));
+		free(mime_type);
 		return 0;
 	}
 
@@ -103,6 +128,7 @@ int serve_from_file(abs_fpath *absolute_file_path, char *mime_type) {
 		bytes_read = read(file, buffer, WRITE_BUFFER_LEN);
 		if (bytes_read == -1) {
 			debug(ERR,"Failed reading file: %s", strerror(errno));
+			free(mime_type);
 			exit(10);
 		}
 
@@ -113,6 +139,7 @@ int serve_from_file(abs_fpath *absolute_file_path, char *mime_type) {
 				debug(ERR,"Failed to serve all data: bytes served: %d content length sent: %d", total_bytes_read, file_size);
 				close(file);
 				free(buffer);
+				free(mime_type);
 				return(0);
 			}
 			break;
@@ -130,6 +157,7 @@ int serve_from_file(abs_fpath *absolute_file_path, char *mime_type) {
 				debug(ERR,"Failed writing to stdout: %s", strerror(errno));
 				close(file);
 				free(buffer);
+				free(mime_type);
 				exit(10);
 			}
 			bytes_read -= bytes_written;
@@ -141,6 +169,7 @@ int serve_from_file(abs_fpath *absolute_file_path, char *mime_type) {
 
 	close(file);
 	free(buffer);
+	free(mime_type);
 	return 1;
 }
 
@@ -187,10 +216,12 @@ void serve_from_blob(unsigned char *blob, size_t blob_len, char *mime_type) {
 void serve_error() {
 	abs_fpath *absolute_media_file_path;
 
+	
+
 	absolute_media_file_path = create_absolute_media_file_path(error_handling_config->error_image_file);
 
 	debug(DEB,"Serving error image: '%s'", absolute_media_file_path);
-	if (!serve_from_file(absolute_media_file_path, error_handling_config->error_image_mimetype))
+	if (!serve_from_file(absolute_media_file_path, 0))
 		serve_error_message();
 
 	free_fpath(absolute_media_file_path);

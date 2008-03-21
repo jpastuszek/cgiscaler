@@ -187,6 +187,20 @@ static void test_get_cache_file_mtime() {
 	free(test_blob);
 }
 
+static void test_extract_file_extension() {
+	char *ext;
+
+	ext = extract_file_extension("blah/test/test.jpg");
+	assert_string_equal(ext, "jpg");
+	free(ext);
+
+	ext = extract_file_extension("blah/test/test.jpeg");
+	assert_string_equal(ext, "jpeg");
+	free(ext);
+
+	ext = extract_file_extension("blah/test/test");
+	assert_equal(ext, 0);
+}
 
 /* setup and teardown */
 static void test_setup() {
@@ -212,6 +226,7 @@ int main(int argc, char **argv) {
 	add_test(file_utils_suite, test_sanitize_file_path);
 	add_test(file_utils_suite, test_write_blob_to_file);
 	add_test(file_utils_suite, test_get_cache_file_mtime);
+	add_test(file_utils_suite, test_extract_file_extension);
 
 	setup(file_utils_suite, test_setup);
 	teardown(file_utils_suite, test_teardown);

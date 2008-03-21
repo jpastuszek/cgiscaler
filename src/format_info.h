@@ -30,10 +30,14 @@ struct format_info {
 
 #endif
 
+struct format_info *file_extension_to_format_info(char *file_ext);
 struct format_info *format_to_format_info(char *format);
 void free_format_info(struct format_info *fi);
 
 /* for testing */
-struct format_info *get_format_info_from_builtin(char *format);
-struct format_info *get_format_info_from_magick(char *format);
+struct format_info *file_extension_to_format_info_from_builtin(char *file_ext);
+struct format_info *file_extension_to_format_info_from_magick(char *file_ext);
+
+struct format_info *format_to_format_info_from_builtin(char *format);
+struct format_info *format_to_format_info_from_magick(char *format);
 

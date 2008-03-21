@@ -21,16 +21,86 @@
 #include "format_info.h"
 #include <wand/MagickWand.h>
 #include <string.h>
+#include <ctype.h>
 #include "debug.h"
 
 /** Build in format, mime-type and file extension mapping */
 static struct format_info builtin_format_info[] = { 
 	{ "JPG", "image/jpeg", "jpg" },
-	{ "JPEG", "image/jpeg", "jpg" },
+	{ "JPEG", "image/jpeg", "jpeg" },
 	{ "GIF", "image/gif", "gif" },
 	{ "PNG", "image/png", "png" },
 	{ 0, 0, 0},
 };
+
+/** Populates format_info structure from file extension.
+* @param file_ext file extension
+* @return Allocated format_info structure or 0 if error occurred
+* @see free_format_info()
+*/
+struct format_info *file_extension_to_format_info(char *file_ext) {
+	struct format_info *fi;
+	fi = file_extension_to_format_info_from_builtin(file_ext);
+	if (fi)
+		return fi;
+
+	return file_extension_to_format_info_from_magick(file_ext);
+}
+
+/** Populates format_info structure from file extension using built-in data.
+* @param file_ext file extension
+* @return Allocated format_info structure or 0 if error occurred
+* @see free_format_info()
+*/
+struct format_info *file_extension_to_format_info_from_builtin(char *file_ext) {
+	struct format_info *fi;
+	int i;
+	for (i = 0; builtin_format_info[i].format; i++) {
+		if (!strcmp(builtin_format_info[i].file_ext, file_ext)) {
+			fi = malloc(sizeof(struct format_info));
+			fi->format = strdup(builtin_format_info[i].format);
+			fi->mime_type = strdup(builtin_format_info[i].mime_type);
+			fi->file_ext = strdup(builtin_format_info[i].file_ext);
+			return fi;
+		}
+	}
+	return 0;
+}
+
+/** Populates format_info structure from file extension using Magick.
+* @param file_ext file extension
+* @return Allocated format_info structure or 0 if error occurred
+* @see free_format_info()
+*/
+struct format_info *file_extension_to_format_info_from_magick(char *file_ext) {
+	struct format_info *fi;
+	short int i;
+	char *mime_type;
+	char *format;
+	short int file_ext_len;
+
+	file_ext_len = strlen(file_ext);
+	format = malloc(file_ext_len + 1);
+
+	// we simply up case the extension and use it as format to ask Magick
+	for (i = 0; i < file_ext_len; i++)
+		format[i] = toupper(file_ext[i]);
+	format[file_ext_len] = 0;
+
+	mime_type = MagickToMime(format);
+	if (!mime_type) {
+		debug(ERR, "Failed to obtain mime-type for format string from Magick: %s", format);
+		return 0;
+	}
+
+	fi = malloc(sizeof(struct format_info));
+
+	fi->format = format;
+	fi->mime_type = mime_type;
+	fi->file_ext = strdup(file_ext);
+
+	return fi;
+}
 
 /** Populates format_info structure from format string.
 * @param format ImageMagick format string
@@ -40,11 +110,11 @@ static struct format_info builtin_format_info[] = {
 struct format_info *format_to_format_info(char *format) {
 	struct format_info *fi;
 
-	fi = get_format_info_from_builtin(format);
+	fi = format_to_format_info_from_builtin(format);
 	if (fi)
 		return fi;
 
-	return get_format_info_from_magick(format);
+	return format_to_format_info_from_magick(format);
 }
 
 /** Frees allocated format_info structure. */
@@ -63,7 +133,7 @@ void free_format_info(struct format_info *fi) {
 * @return Allocated format_info structure or 0 if error occurred
 * @see free_format_info()
 */
-struct format_info *get_format_info_from_builtin(char *format) {
+struct format_info *format_to_format_info_from_builtin(char *format) {
 	struct format_info *fi;
 	int i;
 	for (i = 0; builtin_format_info[i].format; i++) {
@@ -84,7 +154,7 @@ struct format_info *get_format_info_from_builtin(char *format) {
 * @return Allocated format_info structure or 0 if error occurred
 * @see free_format_info()
 */
-struct format_info *get_format_info_from_magick(char *format) {
+struct format_info *format_to_format_info_from_magick(char *format) {
 	struct format_info *fi;
 	short int i;
 	short int format_len;

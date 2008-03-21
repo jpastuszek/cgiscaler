@@ -23,25 +23,102 @@
 #include "debug.h"
 #include "format_info.h"
 
-
-static void test_get_format_info_from_builtin() {
+static void test_file_extension_to_format_info_from_builtin() {
 	struct format_info *fi;
 
-	fi = get_format_info_from_builtin("JPG");
+	fi = file_extension_to_format_info_from_builtin("jpg");
+	assert_not_equal(fi, 0);
 	assert_string_equal(fi->format, "JPG");
 	assert_string_equal(fi->mime_type, "image/jpeg");
 	assert_string_equal(fi->file_ext, "jpg");
 
 	free_format_info(fi);
+
+	fi = file_extension_to_format_info_from_builtin("png");
+	assert_not_equal(fi, 0);
+	assert_string_equal(fi->format, "PNG");
+	assert_string_equal(fi->mime_type, "image/png");
+	assert_string_equal(fi->file_ext, "png");
+
+	free_format_info(fi);
 }
 
-static void test_get_format_info_from_magick() {
+static void test_file_extension_to_format_info_from_magick() {
 	struct format_info *fi;
 
-	fi = get_format_info_from_magick("JPG");
+	fi = file_extension_to_format_info_from_magick("jpg");
+	assert_not_equal(fi, 0);
 	assert_string_equal(fi->format, "JPG");
 	assert_string_equal(fi->mime_type, "image/jpeg");
 	assert_string_equal(fi->file_ext, "jpg");
+
+	free_format_info(fi);
+
+	fi = file_extension_to_format_info_from_magick("miff");
+	assert_not_equal(fi, 0);
+	assert_string_equal(fi->format, "MIFF");
+	assert_string_equal(fi->mime_type, "image/x-miff");
+	assert_string_equal(fi->file_ext, "miff");
+
+	free_format_info(fi);
+}
+
+static void test_file_extension_to_format_info() {
+	struct format_info *fi;
+
+	fi = file_extension_to_format_info("jpg");
+	assert_not_equal(fi, 0);
+	assert_string_equal(fi->format, "JPG");
+	assert_string_equal(fi->mime_type, "image/jpeg");
+	assert_string_equal(fi->file_ext, "jpg");
+
+	free_format_info(fi);
+
+	fi = file_extension_to_format_info("miff");
+	assert_not_equal(fi, 0);
+	assert_string_equal(fi->format, "MIFF");
+	assert_string_equal(fi->mime_type, "image/x-miff");
+	assert_string_equal(fi->file_ext, "miff");
+
+	free_format_info(fi);
+}
+
+static void test_format_to_format_info_from_builtin() {
+	struct format_info *fi;
+
+	fi = format_to_format_info_from_builtin("JPG");
+	assert_not_equal(fi, 0);
+	assert_string_equal(fi->format, "JPG");
+	assert_string_equal(fi->mime_type, "image/jpeg");
+	assert_string_equal(fi->file_ext, "jpg");
+
+	free_format_info(fi);
+
+	fi = format_to_format_info_from_builtin("PNG");
+	assert_not_equal(fi, 0);
+	assert_string_equal(fi->format, "PNG");
+	assert_string_equal(fi->mime_type, "image/png");
+	assert_string_equal(fi->file_ext, "png");
+
+	free_format_info(fi);
+}
+
+static void test_format_to_format_info_from_magick() {
+	struct format_info *fi;
+
+	fi = format_to_format_info_from_magick("JPG");
+	assert_not_equal(fi, 0);
+	assert_string_equal(fi->format, "JPG");
+	assert_string_equal(fi->mime_type, "image/jpeg");
+	assert_string_equal(fi->file_ext, "jpg");
+
+	free_format_info(fi);
+
+	fi = format_to_format_info_from_magick("MIFF");
+	assert_not_equal(fi, 0);
+	assert_string_equal(fi->format, "MIFF");
+	assert_string_equal(fi->mime_type, "image/x-miff");
+	assert_string_equal(fi->file_ext, "miff");
 
 	free_format_info(fi);
 }
@@ -51,6 +128,7 @@ static void test_format_to_format_info() {
 
 	/* this should use builtin */
 	fi = format_to_format_info("JPG");
+	assert_not_equal(fi, 0);
 	assert_string_equal(fi->format, "JPG");
 	assert_string_equal(fi->mime_type, "image/jpeg");
 	assert_string_equal(fi->file_ext, "jpg");
@@ -59,6 +137,7 @@ static void test_format_to_format_info() {
 
 	/* this should use magick */
 	fi = format_to_format_info("MIFF");
+	assert_not_equal(fi, 0);
 	assert_string_equal(fi->format, "MIFF");
 	assert_string_equal(fi->mime_type, "image/x-miff");
 	assert_string_equal(fi->file_ext, "miff");
@@ -80,8 +159,12 @@ static void test_teardown() {
 int main(int argc, char **argv) {
 	TestSuite *file_format_info_suite = create_named_test_suite(__FILE__);
 
-	add_test(file_format_info_suite, test_get_format_info_from_builtin);
-	add_test(file_format_info_suite, test_get_format_info_from_magick);
+	add_test(file_format_info_suite, test_file_extension_to_format_info_from_builtin);
+	add_test(file_format_info_suite, test_file_extension_to_format_info_from_magick);
+	add_test(file_format_info_suite, test_file_extension_to_format_info);
+
+	add_test(file_format_info_suite, test_format_to_format_info_from_builtin);
+	add_test(file_format_info_suite, test_format_to_format_info_from_magick);
 	add_test(file_format_info_suite, test_format_to_format_info);
 
 	setup(file_format_info_suite, test_setup);

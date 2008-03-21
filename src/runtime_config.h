@@ -51,6 +51,8 @@ struct output_config {
 
 	/** Image format information */
 	struct format_info *format;
+	/** If mime type cannot be determined this default will be used */
+	char *fail_mime_type;
 	/** Requested thumbnail dimensions */
 	struct dimensions size;
 	/** Requested thumbail quality */
@@ -140,8 +142,6 @@ struct storage_config {
 struct error_handling_config {
 	/** Path to image file that will be served on errors */
 	char *error_image_file;
-	/** Mime-type of error image file to serve within HTTP headers */
-	char *error_image_mimetype;
 	/** In case error image is not available this text will be served */
 	char *error_message;
 };

@@ -56,11 +56,12 @@
 #define OUT_FORMAT "JPG"
 #define OUT_FORMAT_EXTENSION "jpg"
 /* Mime-type to match output format - will be send in HTTP headers */
-#define OUT_FORMAT_MIME_TYPE "image/jpeg"
 
 #define ERROR_FILE_PATH "test_dir/a/quick_gimp_pattern_test.gif"
-#define ERROR_FILE_MIME_TYPE "image/gif"
 #define ERROR_FAILBACK_MESSAGE "[Error and error image not found]\n"
+
+/** Mime-type that will be send in HTTP headers if corresponding to format/extension could not be found */
+#define FAIL_BACK_MIME_TYPE "image/jpeg"
 
 /* Possible resize filters 
     BesselFilter   BlackmanFilter   BoxFilter

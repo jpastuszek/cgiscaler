@@ -36,7 +36,7 @@
         <geometry_math/>
         <scaler/>
         <main/>
-        <format_info></format_info>
+        <format_info/>
       </runarguments>
       <debugarguments>
         <cgiscaler/>
@@ -47,7 +47,7 @@
         <geometry_math/>
         <scaler/>
         <main/>
-        <format_info></format_info>
+        <format_info/>
       </debugarguments>
       <cwd>
         <cgiscaler>/home/kazuya/Projects/CGIScaler</cgiscaler>
