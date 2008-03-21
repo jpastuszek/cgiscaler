@@ -84,8 +84,9 @@ cache_fpath *create_cache_file_path(fpath *file_path, char *file_extension, int 
 */
 abs_fpath *create_absolute_media_file_path(media_fpath *media_file_path) {
 	char *path;
-	path = malloc(strlen(storage_config->media_directory) + strlen(media_file_path) + 1);
+	path = malloc(strlen(storage_config->media_directory) + strlen(media_file_path) + 2);
 	strcpy(path, storage_config->media_directory);
+	strcat(path, DIRECTORY_DELIMITER);
 	strcat(path, media_file_path);
 	
 	return path;
@@ -99,8 +100,9 @@ abs_fpath *create_absolute_media_file_path(media_fpath *media_file_path) {
 */
 abs_fpath *create_absolute_cache_file_path(cache_fpath *cache_file_path) {
 	char *path;
-	path = malloc(strlen(storage_config->cache_directory) + strlen(cache_file_path) + 1);
+	path = malloc(strlen(storage_config->cache_directory) + strlen(cache_file_path) + 2);
 	strcpy(path, storage_config->cache_directory);
+	strcat(path, DIRECTORY_DELIMITER);
 	strcat(path, cache_file_path);
 	
 	return path;
@@ -126,12 +128,12 @@ int create_cache_dir_struct(cache_fpath *cache_file_path) {
 		return 0;
 
 	/* we are not going to include tailing '/' */
-	full_path = malloc(strlen(storage_config->cache_directory));
+	full_path = malloc(strlen(storage_config->cache_directory) + 1);
 	if (!full_path)
 		exit(66);
 
-	strncpy(full_path, storage_config->cache_directory, strlen(storage_config->cache_directory) - 1);
-	full_path[strlen(storage_config->cache_directory) - 1] = 0;
+	strncpy(full_path, storage_config->cache_directory, strlen(storage_config->cache_directory));
+	full_path[strlen(storage_config->cache_directory)] = 0;
 
 	while ((next_slash = index(cache_file_path, '/')) != 0) {
 		

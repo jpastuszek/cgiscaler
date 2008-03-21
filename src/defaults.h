@@ -26,7 +26,7 @@
 /** Default Run-time configuration (when applicable 0 means false, 1 true) */
 #define DEFAULT_WIDTH 64
 #define DEFAULT_HEIGHT 64
-#define DEFAULT_STRICT SM_FIT
+#define DEFAULT_SCALE_METHOD SM_FIT
 #define DEFAULT_QUALITY 80
 #define DEFAULT_NO_CACHE 0
 #define DEFAULT_NO_SERVE 0
@@ -54,10 +54,10 @@
 #define LOWQ_QUALITY 20
 
 
-/** Path to media source directory (note tailing / char)*/
-#define MEDIA_PATH "/photos/"
-/** Path were to write cache files (note tailing / char) */
-#define CACHE_PATH "/cache/"
+/** Path to media source directory */
+#define MEDIA_PATH "/photos"
+/** Path were to write cache files */
+#define CACHE_PATH "/cache"
 
 /** output format (ex. JPG, GIF, PNG) */
 #define OUT_FORMAT "JPG"
@@ -103,3 +103,4 @@
 #define RESOURCE_LIMIT_MEMORY 256*1024*1024
 /** Maximum amount of memory to allocate for image from in MB - images that exceed the area limit are cached to disk  */
 #define RESOURCE_LIMIT_AREA 256*1024*1024
+

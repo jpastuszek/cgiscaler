@@ -28,12 +28,9 @@
 static void test_apply_commandline_config() {
 	/* if I change this to use config defines... */
 	char *args1[] = { "test", "-w", "100", "-h", "200" };
-	char *args2[] = { "test", "-w", "100", "-s", "true", "-nc", "false", "-ns", "true", "-nh", "dsfa", "abc/e/f.jpg" };
-	char *args3[] = { "test", "file.gif", "-h", "300", "-h", "100" };
-	char *all_true[] = { "test", "-w", "100", "-s", "true", "-wap", "true", "-nc", "true", "-ns", "true", "-nh", "true" };
-	char *all_bogo[] = { "test", "-w", "100", "-s", "1", "-wap", "bogo", "-nc", "xxx", "-ns", "aaa", "-nh", "0" };
-	char *all_false[] = { "test", "-w", "100", "-s", "false", "-wap", "false", "-nc", "false", "-ns", "false", "-nh", "false" };	
-	char *args4[] = { "test",  "-bogo", "true" };
+	char *args2[] = { "test", "-w", "100", "-s", "-S", "-i", "abc/e/f.jpg" };
+	char *args3[] = { "test", "-i", "file.gif", "-h", "300", "-h", "100" };
+	char *all_true[] = { "test", "-w", "100", "-s", "-l", "-C", "-S", "-H" };
 
 	/* default values already set by test_setup */
 
@@ -54,7 +51,7 @@ static void test_apply_commandline_config() {
 	output_config = alloc_default_output_config();
 	operation_config = alloc_default_operation_config();
 
-	apply_commandline_config(12, args2);
+	apply_commandline_config(7, args2);
 
 	assert_string_equal(output_config->file_name, "abc/e/f.jpg");
 	assert_equal(output_config->size.w, 100);
@@ -65,7 +62,7 @@ static void test_apply_commandline_config() {
 	assert_equal(operation_config->no_serve, 1);
 	assert_equal(operation_config->no_headers, 0);
 
-	apply_commandline_config(6, args3);
+	apply_commandline_config(7, args3);
 
 	assert_string_equal(output_config->file_name, "file.gif");
 	assert_equal(output_config->size.w, 100);
@@ -76,18 +73,7 @@ static void test_apply_commandline_config() {
 	assert_equal(operation_config->no_serve, 1);
 	assert_equal(operation_config->no_headers, 0);
 
-	apply_commandline_config(13, all_true);
-
-	assert_string_equal(output_config->file_name, "file.gif");
-	assert_equal(output_config->size.w, 100);
-	assert_equal(output_config->size.h, 100);
-	assert_equal(output_config->scale_method, SM_STRICT);
-	assert_equal(output_config->quality, LOWQ_QUALITY);
-	assert_equal(operation_config->no_cache, 1);
-	assert_equal(operation_config->no_serve, 1);
-	assert_equal(operation_config->no_headers, 1);
-
-	apply_commandline_config(13, all_bogo);
+	apply_commandline_config(8, all_true);
 
 	assert_string_equal(output_config->file_name, "file.gif");
 	assert_equal(output_config->size.w, 100);
@@ -97,31 +83,6 @@ static void test_apply_commandline_config() {
 	assert_equal(operation_config->no_cache, 1);
 	assert_equal(operation_config->no_serve, 1);
 	assert_equal(operation_config->no_headers, 1);
-
-
-	apply_commandline_config(13, all_false);
-
-	assert_string_equal(output_config->file_name, "file.gif");
-	assert_equal(output_config->size.w, 100);
-	assert_equal(output_config->size.h, 100);
-	assert_equal(output_config->scale_method, SM_FIT);
-	assert_equal(output_config->quality, DEFAULT_QUALITY);
-	assert_equal(operation_config->no_cache, 0);
-	assert_equal(operation_config->no_serve, 0);
-	assert_equal(operation_config->no_headers, 0);
-
-	apply_commandline_config(13, all_bogo);
-
-	assert_string_equal(output_config->file_name, "file.gif");
-	assert_equal(output_config->size.w, 100);
-	assert_equal(output_config->size.h, 100);
-	assert_equal(output_config->scale_method, SM_FIT);
-	assert_equal(output_config->quality, DEFAULT_QUALITY);
-	assert_equal(operation_config->no_cache, 0);
-	assert_equal(operation_config->no_serve, 0);
-	assert_equal(operation_config->no_headers, 0);
-
-	apply_commandline_config(3, args4);
 }
 
 /* setup and teardown */

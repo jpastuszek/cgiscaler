@@ -77,7 +77,7 @@ struct output_config *alloc_default_output_config() {
 
 	config->quality = DEFAULT_QUALITY;
 
-	config->scale_method = DEFAULT_STRICT;
+	config->scale_method = DEFAULT_SCALE_METHOD;
 
 	config->scaling_filter = RESIZE_FILTER;
 	config->blur_factor = RESIZE_SMOOTH_FACTOR;

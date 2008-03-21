@@ -31,6 +31,8 @@
 #define DEFAULT_NO_SERVE 0
 #define DEFAULT_NO_HEADERS 0
 
+#define DEFAULT_SCALE_METHOD SM_FIT
+
 /* CGI Query configuration */
 /* CGI Query parameter names */
 #define QUERY_WIDTH_PARAM "w"
@@ -45,10 +47,10 @@
 /* When LOWQ_PARAM/SWITCH=TRUE_VAL output data will use this compression parameter (0-100 best) or else DEFAULT_QUALITY will be used */
 #define LOWQ_QUALITY 20
 
-/* Path to media source directory (note tailing / char)*/
-#define MEDIA_PATH "test/"
-/* Path were to write cache files (note tailing / char) */
-#define CACHE_PATH "/tmp/"
+/* Path to media source directory */
+#define MEDIA_PATH "test"
+/* Path were to write cache files */
+#define CACHE_PATH "/tmp"
 
 /* output format (ex. JPG, GIF, PNG) */
 #define OUT_FORMAT "JPG"

@@ -46,4 +46,7 @@
 
 #define WRITE_BUFFER_LEN 8192
 
+#define DIRECTORY_DELIMITER "/"
+#define VERSION "2.0-alpha"
+
 //#endif

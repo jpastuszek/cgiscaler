@@ -53,7 +53,7 @@ static void test_create_absolute_media_file_path() {
 	file_path = create_absolute_media_file_path("test.jpg");
 	assert_not_equal(file_path, 0);
 
-	snprintf(compare_file_path, 256, "%s%s", storage_config->media_directory, "test.jpg");
+	snprintf(compare_file_path, 256, "%s/%s", storage_config->media_directory, "test.jpg");
 	assert_string_equal(file_path, compare_file_path);
 
 	free_fpath(file_path);
@@ -67,7 +67,7 @@ static void test_create_absolute_cache_file_path() {
 	file_path = create_absolute_cache_file_path("test.jpg");
 	assert_not_equal(file_path, 0);
 
-	snprintf(compare_file_path, 256, "%s%s", storage_config->cache_directory, "test.jpg");
+	snprintf(compare_file_path, 256, "%s/%s", storage_config->cache_directory, "test.jpg");
 	assert_string_equal(file_path, compare_file_path);
 
 	free_fpath(file_path);
@@ -102,13 +102,13 @@ static void test_create_cache_dir_struct() {
 	assert_not_equal(status, 0);
 
 	strcpy(path1, storage_config->cache_directory);
-	strcat(path1, "abc");
+	strcat(path1, "/abc");
 
 	strcpy(path2, storage_config->cache_directory);
-	strcat(path2, "abc/d");
+	strcat(path2, "/abc/d");
 
 	strcpy(path3, storage_config->cache_directory);
-	strcat(path3, "abc/d/ghi");
+	strcat(path3, "/abc/d/ghi");
 
 	assert_dir_exists(path1);
 	assert_dir_exists(path2);

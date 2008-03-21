@@ -20,19 +20,111 @@
 
 #include <string.h>
 #include <stdlib.h>
+#include <argp.h>
 
 #include "commandline.h"
 #include "runtime_config.h"
 #include "file_utils.h"
 #include "config.h"
+#include "defaults.h"
 #include "debug.h"
-
-extern struct output_config *output_config;
-extern struct operation_config *operation_config;
 
 #ifdef DEBUG
 extern char **scale_method_names;
 #endif
+
+const char *argp_program_version = "cgiscaler v" VERSION;
+const char *argp_program_bug_address = "<jpastuszek@gmail.com>";
+		        
+/* Program documentation. */
+static char doc[] = "CGIScaler is an image thumbnailer that comunicates with a web server using CGI\nThis options will override build in defaults (shown in [])";
+
+#define STR(x) #x
+#define DEFAULT(x) " ["STR(x)"]"
+
+static struct argp_option options[] = {
+	{0, 0, 0, 0, "Output geometry"},
+	{"width",	'w', "INTEGER",	0, "Width of output image" DEFAULT(DEFAULT_WIDTH) },
+	{"height",	'h', "INTEGER",	0, "Height of output image" DEFAULT(DEFAULT_HEIGHT) },
+
+	{0, 0, 0, 0, "Simple scaling controls"},
+#if DEFAULT_SCALE_METHOD == SM_FIT
+	{"strict",	's', 0,		0, "Do strict scaling (overwrites fit scaling)"},
+#else
+	{"fit",		'f', 0,		0, "Do fit scaling (overwrites strict scaling)"},
+#endif
+	{"lowq",	'l', 0,		0, "Produce more compressed output" DEFAULT(off)},
+
+	{0, 0, 0, 0, "Input and output"},
+	{"mediadir",	'm', "DIRECTORY",	0, "Root directory of media store - all file paths are relative to this directory"},
+	{"cachedir",	'c', "DIRECTORY",	0, "Root directory of cache store - all cached thumbnails will go here"},
+	{"infile",	'i', "FILE",	0, "Use this file instead of one passed in PATH_INFO environment"},
+	//{"outfile",	'o', "FILE",	0, "Output to file instead of stdout"},
+	{0, 0, 0, 0, "General operation"},
+	{"noserver",	'S', 0,		0, "Do not serve the resoulting image"},
+	{"noheaders",	'H', 0,		0, "Do not serve HTTP headers"},
+	{"nocache",	'C', 0,		0, "Do disable cache"},
+	{ 0 }
+     };
+
+//static char args_doc[] = "[-whsflSHC] [-i image_file] [-m media_dir] [-c cache_dir]";
+
+static error_t parse_opt (int key, char *arg, struct argp_state *state) {
+	char *file_name;
+	// struct arguments *arguments = state->input;
+	switch (key) {
+		case 'w':
+			output_config->size.w = atoi(arg);
+			break;
+		case 'h':
+			output_config->size.h = atoi(arg);
+			break;
+		case 's':
+			output_config->scale_method = SM_STRICT;
+			break;
+		case 'f':
+			output_config->scale_method = SM_FIT;
+			break;
+		case 'l':
+			output_config->quality = simple_query_string_config->low_quality_value;
+			break;
+		case 'i':
+			/* sanitize_file_path will allocate */
+			file_name = sanitize_file_path(arg);
+			if (file_name) {
+				if (output_config->file_name)
+					free(output_config->file_name);
+				output_config->file_name = file_name;
+			}
+			break;
+		case 'm':
+			storage_config->media_directory = strdup(arg);
+			break;
+		case 'c':
+			storage_config->cache_directory = strdup(arg);
+			break;
+		case 'S':
+			operation_config->no_serve = 1;
+			break;
+		case 'H':
+			operation_config->no_headers = 1;
+			break;
+		case 'C':
+			operation_config->no_cache = 1;
+			break;
+		case ARGP_KEY_ARG:
+			// non taged arg
+			break;
+		case ARGP_KEY_END:
+			// done
+			break;
+		default:
+			return ARGP_ERR_UNKNOWN;
+	}
+	return 0;
+}
+
+static struct argp argp = { options, parse_opt, 0, doc };
 
 /** Apply configuration specified as command line parameters.
 * @param argc argc parameter from main function
@@ -42,141 +134,11 @@ void apply_commandline_config(int argc, char *argv[]) {
 	int i;
 	char *file_name = 0;
 
-	if (argc <= 1)
-		return;
-
-	for (i = 1; i < argc; i++) {
-		if (argv[i][0] == '-') {
-			/* Runtime config parameters */
-			if (!strcmp(argv[i] + 1, COMMANDLINE_WIDTH_SWITCH)) {
-				if (argc - i <= 1) {
-					debug(ERR, "Expected integer for width parameter");
-					return;
-				}
-
-				output_config->size.w = atoi(argv[i+1]);
-
-				i++;
-				continue;
-			}
-
-			if (!strcmp(argv[i] + 1, COMMANDLINE_HEIGHT_SWITCH)) {
-				if (argc - i <= 1) {
-					debug(ERR, "Expected integer for heigth parameter");
-					return;
-				}
-
-				output_config->size.h = atoi(argv[i+1]);
-
-				i++;
-				continue;
-			}
-
-			if (!strcmp(argv[i] + 1, COMMANDLINE_STRICT_SWITCH)) {
-				if (argc - i <= 1) {
-					debug(ERR, "Expected boolean parameter for strict");
-					return;
-				}
-
-				if (!strcmp(argv[i+1], COMMANDLINE_TRUE_VAL))
-					output_config->scale_method = SM_STRICT;
-				else if (!strcmp(argv[i+1], COMMANDLINE_FALSE_VAL))
-					output_config->scale_method = SM_FIT;
-				else
-					debug(ERR, "Unrecognized parameter for strict: %s", argv[i+1]);
-
-				i++;
-				continue;
-			}
-
-			if (!strcmp(argv[i] + 1, COMMANDLINE_LOWQ_SWITCH)) {
-				if (argc - i <= 1) {
-					debug(ERR, "Expected boolean parameter for lowq");
-					return;
-				}
-
-				if (!strcmp(argv[i+1], COMMANDLINE_TRUE_VAL))
-					output_config->quality = simple_query_string_config->low_quality_value;
-				else if (!strcmp(argv[i+1], COMMANDLINE_FALSE_VAL))
-					output_config->quality = simple_query_string_config->default_quality_value;
-				else
-					debug(ERR, "Unrecognized parameter for lowq: %s", argv[i+1]);
-
-				i++;
-				continue;
-			}
-
-			/* Operation config parameters */
-			if (!strcmp(argv[i] + 1, COMMANDLINE_NO_CACHE_SWITCH)) {
-				if (argc - i <= 1) {
-					debug(ERR, "Expected boolean parameter for no_cache");
-					return;
-				}
-
-				if (!strcmp(argv[i+1], COMMANDLINE_TRUE_VAL))
-					operation_config->no_cache = 1;
-				else if (!strcmp(argv[i+1], COMMANDLINE_FALSE_VAL))
-					operation_config->no_cache = 0;
-				else
-					debug(ERR, "Unrecognized parameter for no_cache: %s", argv[i+1]);
-
-				i++;
-				continue;
-			}
-
-			if (!strcmp(argv[i] + 1, COMMANDLINE_NO_SERVE_SWITCH)) {
-				if (argc - i <= 1) {
-					debug(ERR, "Expected boolean parameter for no_serve");
-					return;
-				}
-
-				if (!strcmp(argv[i+1], COMMANDLINE_TRUE_VAL))
-					operation_config->no_serve = 1;
-				else if (!strcmp(argv[i+1], COMMANDLINE_FALSE_VAL))
-					operation_config->no_serve = 0;
-				else
-					debug(ERR, "Unrecognized parameter for no_serve: %s", argv[i+1]);
-
-				i++;
-				continue;
-			}
-
-			if (!strcmp(argv[i] + 1, COMMANDLINE_NO_HEADERS_SWITCH)) {
-				if (argc - i <= 1) {
-					debug(ERR, "Expected boolean parameter for no_headers");
-					return;
-				}
-
-				if (!strcmp(argv[i+1], COMMANDLINE_TRUE_VAL))
-					operation_config->no_headers = 1;
-				else if (!strcmp(argv[i+1], COMMANDLINE_FALSE_VAL))
-					operation_config->no_headers = 0;
-				else
-					debug(ERR, "Unrecognized parameter for no_headers: %s", argv[i+1]);
-
-				i++;
-				continue;
-			}
-
-			debug(ERR, "Unknown parameter %s", argv[i]);
-			return;
-		}
-
-		if (file_name) {
-			debug(ERR, "Non-switch parameter where file name already defined");
-			return;
-		}
-
-		/* sanitize_file_path will allocate */
-		file_name = sanitize_file_path(argv[i]);
-		if (file_name) {
-			if (output_config->file_name)
-				free(output_config->file_name);
-			output_config->file_name = file_name;
-		}
-	}
+	argp_parse (&argp, argc, argv, 0, 0, 0);
 
 #ifdef DEBUG
 	debug(DEB, "Run-time config after command line: file: '%s', size w: %d h: %d, scale method: %s quality: %d Operation coifig: no cache: %d, no serve: %d, no headers: %d", output_config->file_name ? output_config->file_name : "<null>", output_config->size.w, output_config->size.h, scale_method_names[output_config->scale_method], output_config->quality, operation_config->no_cache, operation_config->no_serve, operation_config->no_headers);
 #endif
+	return;
 }
+

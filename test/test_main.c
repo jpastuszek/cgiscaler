@@ -40,15 +40,15 @@ extern struct storage_config *storage_config;
 static void test_error() {
 	int stdout_fd;
 	abs_fpath *absolute_media_file_path;
-	char *argv[] = {"test", "bogo/bogo.jpg"};
-	char *argv_nh[] = {"test", "-nh", "true", "bogo/bogo.jpg"};
+	char *argv[] = {"test", "-i", "bogo/bogo.jpg"};
+	char *argv_nh[] = {"test", "-H", "-i", "bogo/bogo.jpg"};
 
 	storage_config = alloc_default_storage_config();
 	absolute_media_file_path = create_absolute_media_file_path(ERROR_FILE_PATH);
 	free_storage_config(storage_config);
 
 	if (!fork_with_stdout_capture(&stdout_fd)) {
-		cgiscaler(2, argv);
+		cgiscaler(3, argv);
 		exit(0);
 	}
 
@@ -75,9 +75,9 @@ static void test_without_cached() {
 	cache_fpath *cache_file_path;
 	abs_fpath *absolute_cach_file_path;
 
-	char *argv[] = {"test", IMAGE_TEST_FILE};
-	char *argv_bogo[] = {"test", "bogo/bogo.jpg"};
-	char *argv_nh[] = {"test", "-nh", "true", IMAGE_TEST_FILE};
+	char *argv[] = {"test", "-i", IMAGE_TEST_FILE};
+	char *argv_nh[] = {"test", "-H", "-i", IMAGE_TEST_FILE};
+	char *argv_bogo[] = {"test", "-i", "bogo/bogo.jpg"};
 
 	storage_config = alloc_default_storage_config();
 	absolute_media_file_path = create_absolute_media_file_path(IMAGE_TEST_FILE);
@@ -85,7 +85,7 @@ static void test_without_cached() {
 
 	/* real file */
 	if (!fork_with_stdout_capture(&stdout_fd)) {
-		cgiscaler(2, argv);
+		cgiscaler(3, argv);
 		exit(0);
 	}
 
@@ -111,7 +111,7 @@ static void test_without_cached() {
 
 	/* bogus file */
 	if (!fork_with_stdout_capture(&stdout_fd)) {
-		cgiscaler(4, argv_bogo);
+		cgiscaler(3, argv_bogo);
 		exit(0);
 	}
 	
@@ -133,14 +133,14 @@ static void test_without_cached() {
 static void test_no_cache_no_file_name_given() {
 	int stdout_fd;
 	abs_fpath *absolute_media_file_path;
-	char *argv_nc[] = {"test", "-nc", "true"};
+	char *argv_nc[] = {"test", "-C"};
 
 	storage_config = alloc_default_storage_config();
 	absolute_media_file_path = create_absolute_media_file_path(ERROR_FILE_PATH);
 	free_storage_config(storage_config);
 
 	if (!fork_with_stdout_capture(&stdout_fd)) {
-		cgiscaler(3, argv_nc);
+		cgiscaler(2, argv_nc);
 		exit(0);
 	}
 
@@ -158,7 +158,7 @@ static void test_from_cache() {
 	abs_fpath *absolute_media_file_path;
 	cache_fpath *cache_file_path;
 	abs_fpath *absolute_cach_file_path;
-	char *argv[] = {"test", IMAGE_TEST_FILE};
+	char *argv[] = {"test", "-i", IMAGE_TEST_FILE};
 
 	storage_config = alloc_default_storage_config();
 	absolute_media_file_path = create_absolute_media_file_path(IMAGE_TEST_FILE);
@@ -171,7 +171,7 @@ static void test_from_cache() {
 	assert_file_not_exists(absolute_cach_file_path);
 
 	if (!fork_with_stdout_capture(&stdout_fd)) {
-		cgiscaler(2, argv);
+		cgiscaler(3, argv);
 		exit(0);
 	}
 
@@ -185,7 +185,7 @@ static void test_from_cache() {
 	assert_file_exists(absolute_cach_file_path);
 
 	if (!fork_with_stdout_capture(&stdout_fd)) {
-		cgiscaler(2, argv);
+		cgiscaler(3, argv);
 		exit(0);
 	}
 
@@ -203,18 +203,18 @@ static void test_from_cache() {
 	free_fpath(absolute_cach_file_path);
 }
 
-
+// TODO: this test has no sense after swiched to Argp for cmdline parsing
 static void test_bad_param() {
 	int stdout_fd;
 	abs_fpath *absolute_media_file_path;
-	char *argv_nc[] = {"test", "-bogo", "true"};
+	char *argv_nc[] = {"test" };
 
 	storage_config = alloc_default_storage_config();
 	absolute_media_file_path = create_absolute_media_file_path(ERROR_FILE_PATH);
 	free_storage_config(storage_config);
 
 	if (!fork_with_stdout_capture(&stdout_fd)) {
-		cgiscaler(3, argv_nc);
+		cgiscaler(1, argv_nc);
 		exit(0);
 	}
 
@@ -232,7 +232,7 @@ static void test_no_cache () {
 	abs_fpath *absolute_media_file_path;
 	cache_fpath *cache_file_path;
 	abs_fpath *absolute_cach_file_path;
-	char *argv[] = {"test", "-nc", "true", IMAGE_TEST_FILE};
+	char *argv[] = {"test", "-C", "-i", IMAGE_TEST_FILE};
 
 	storage_config = alloc_default_storage_config();
 	absolute_media_file_path = create_absolute_media_file_path(IMAGE_TEST_FILE);
@@ -268,7 +268,7 @@ static void test_no_heders() {
 	abs_fpath *absolute_media_file_path;
 	cache_fpath *cache_file_path;
 	abs_fpath *absolute_cach_file_path;
-	char *argv[] = {"test", "-nh", "true", IMAGE_TEST_FILE};
+	char *argv[] = {"test", "-H", "-i", IMAGE_TEST_FILE};
 
 	storage_config = alloc_default_storage_config();
 	absolute_media_file_path = create_absolute_media_file_path(IMAGE_TEST_FILE);
@@ -302,7 +302,7 @@ static void test_no_server() {
 	abs_fpath *absolute_media_file_path;
 	cache_fpath *cache_file_path;
 	abs_fpath *absolute_cach_file_path;
-	char *argv[] = {"test", "-ns", "true", IMAGE_TEST_FILE};
+	char *argv[] = {"test", "-S", "-i", IMAGE_TEST_FILE};
 
 	storage_config = alloc_default_storage_config();
 	absolute_media_file_path = create_absolute_media_file_path(IMAGE_TEST_FILE);
@@ -332,11 +332,12 @@ static void test_no_server() {
 	free_fpath(cache_file_path);	
 }
 
+// TODO: This test will not work with usage printed out to stderr...
 static void test_no_serve_no_cache_no_header() {
 	int stdout_fd;
 	cache_fpath *cache_file_path;
 	abs_fpath *absolute_cach_file_path;
-	char *argv[] = {"test", "-ns", "true", "-nc", "true", "-nh", "true", IMAGE_TEST_FILE};
+	char *argv[] = {"test", "-S", "-C", "-H", "-i", IMAGE_TEST_FILE};
 
 	storage_config = alloc_default_storage_config();
 	cache_file_path = create_cache_file_path(IMAGE_TEST_FILE, OUT_FORMAT_EXTENSION, DEFAULT_WIDTH, DEFAULT_HEIGHT, DEFAULT_STRICT, DEFAULT_QUALITY);
@@ -347,7 +348,7 @@ static void test_no_serve_no_cache_no_header() {
 	assert_file_not_exists(absolute_cach_file_path);
 
 	if (!fork_with_stdout_capture(&stdout_fd)) {
-		cgiscaler(8, argv);
+		cgiscaler(6, argv);
 		exit(0);
 	}
 

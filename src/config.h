@@ -25,6 +25,7 @@
 
 
 /** Command-line configuration */
+#define COMMANDLINE_HELP_SWITCH "help"
 #define COMMANDLINE_WIDTH_SWITCH "w"
 #define COMMANDLINE_HEIGHT_SWITCH "h"
 #define COMMANDLINE_STRICT_SWITCH "s"
@@ -36,5 +37,9 @@
 #define COMMANDLINE_TRUE_VAL "true"
 #define COMMANDLINE_FALSE_VAL "false"
 
+#define VERSION "2.0-alpha"
+
 /** Disk/cache file serving buffer */
 #define WRITE_BUFFER_LEN 8192
+#define DIRECTORY_DELIMITER "/"
+
