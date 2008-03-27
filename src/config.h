@@ -37,7 +37,8 @@
 #define COMMANDLINE_TRUE_VAL "true"
 #define COMMANDLINE_FALSE_VAL "false"
 
-#define VERSION "2.0-alpha"
+
+#include "build_config.h"
 
 /** Disk/cache file serving buffer */
 #define WRITE_BUFFER_LEN 8192

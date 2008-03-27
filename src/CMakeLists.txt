@@ -3,6 +3,9 @@ set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 find_package(Magick REQUIRED)
 find_package(Wand REQUIRED)
 
+set(CGISCALER_VERSION "2.0-alpha" CACHE STRING "Version of this program")
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/build_config.h.tpl ${CMAKE_CURRENT_SOURCE_DIR}/build_config.h)
+
 add_executable(cgiscaler cache.c  commandline.c  debug.c  file_utils.c
   geometry_math.c  main.c cgiscaler.c format_info.c  query_string.c  runtime_config.c  scaler.c
   serve.c)

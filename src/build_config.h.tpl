@@ -17,36 +17,7 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-/* This is test config file */
-
-//#ifndef TEST_CONFIG_H
-//#define TEST_CONFIG_H
-
-//#define DEBUG_SYNC
-
-/* Command-line configuration */
-#define COMMANDLINE_WIDTH_SWITCH "w"
-#define COMMANDLINE_HEIGHT_SWITCH "h"
-#define COMMANDLINE_STRICT_SWITCH "s"
-#define COMMANDLINE_LOWQ_SWITCH "wap"
-#define COMMANDLINE_NO_CACHE_SWITCH "nc"
-#define COMMANDLINE_NO_SERVE_SWITCH "ns"
-#define COMMANDLINE_NO_HEADERS_SWITCH "nh"
-
-#define COMMANDLINE_TRUE_VAL "true"
-#define COMMANDLINE_FALSE_VAL "false"
-
-#define IMAGE_TEST_FILE "quick_gimp_pattern_test.png"
-#define IMAGE_TEST_FILE_WIDTH 450
-#define IMAGE_TEST_FILE_HEIGHT 300
-
-#define TEST_OUT_MIME_TYPE "image/jpeg"
-#define TEST_OUT_FILE_EXT "jpg"
 
 
-#define WRITE_BUFFER_LEN 8192
+#define CGISCALER_VERSION  "${CGISCALER_VERSION}"
 
-#define DIRECTORY_DELIMITER "/"
-#define CGISCALER_VERSION "2.0-alpha"
-
-//#endif

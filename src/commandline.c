@@ -33,7 +33,7 @@
 extern char **scale_method_names;
 #endif
 
-const char *argp_program_version = "cgiscaler v" VERSION;
+const char *argp_program_version = "cgiscaler v" CGISCALER_VERSION;
 const char *argp_program_bug_address = "<jpastuszek@gmail.com>";
 		        
 /* Program documentation. */

@@ -44,7 +44,7 @@ enum scale_methods {
 	SM_FREE
 };
 
-/** Configuration for output data format */
+/** Configuration of output data format */
 struct output_config {
 	/** File name (relative path) received from CGI to produce output from */
 	char *file_name;

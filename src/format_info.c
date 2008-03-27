@@ -22,6 +22,7 @@
 #include <wand/MagickWand.h>
 #include <string.h>
 #include <ctype.h>
+#include <stdlib.h>
 #include "debug.h"
 
 /** Build in format, mime-type and file extension mapping */
