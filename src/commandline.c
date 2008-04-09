@@ -35,40 +35,42 @@ extern char **scale_method_names;
 
 const char *argp_program_version = "cgiscaler v" CGISCALER_VERSION;
 const char *argp_program_bug_address = "<jpastuszek@gmail.com>";
-		        
+
 /* Program documentation. */
-static char doc[] = "CGIScaler is an image thumbnailer that comunicates with a web server using CGI\nThis options will override build in defaults (shown in [])";
+static char doc[] = "CGIScaler is an image thumbnailer. It communicates with a web server using CGI\nThis options will override build in defaults (shown in []). Some of this options may be overridden by a query string.";
 
 #define STR(x) #x
 #define DEFAULT(x) " ["STR(x)"]"
 
 static struct argp_option options[] = {
-	{0, 0, 0, 0, "Output geometry"},
+	{0, 0, 0, 0, "Output geometry:\n"},
 	{"width",		'w', "INTEGER",	0, "Width of output image" DEFAULT(DEFAULT_WIDTH) },
 	{"height",		'h', "INTEGER",	0, "Height of output image" DEFAULT(DEFAULT_HEIGHT) },
 
-	{0, 0, 0, 0, "Simple scaling controls"},
+	{0, 0, 0, 0, "Simple scaling controls:\n"},
 #if DEFAULT_SCALE_METHOD == SM_FIT
-	{"strict-resize", 	's', 0,	0, "Do strict scaling (overwrites fit scaling)"},
+	{"strict-resize", 	's', 0,	0, "Do strict scaling (overwrites fit scaling)" DEFAULT(fit)},
 #else
-	{"fit-resize",		'f', 0,		0, "Do fit scaling (overwrites strict scaling)"},
+	{"fit-resize",		'f', 0,		0, "Do fit scaling (overwrites strict scaling)" DEFAULT(strict)},
 #endif
 	{"low-quality",		'l', 0,		0, "Produce more compressed output" DEFAULT(off)},
 
-	{0, 0, 0, 0, "Input and output"},
+	{0, 0, 0, 0, "Input and output:\n"},
 	{"media-dir",		'm', "DIRECTORY",	0, "Root directory of media store - all file paths are relative to this directory"},
-	{"cache-dir",		'c', "DIRECTORY",	0, "Root directory of cache store - all cached thumbnails will go here"},
+	{"cache-dir",		'c', "DIRECTORY",	0, "Root directory of cache store - all cached thumbnails will go there"},
 	{"in-file",		'i', "FILE",	0, "Use this file instead of one passed in PATH_INFO environment"},
 	//{"outfile",	'o', "FILE",	0, "Output to file instead of stdout"},
 
-	{0, 0, 0, 0, "General operation"},
-	{"no-server",		'S', 0,		0, "Do not serve the resoulting image"},
+	{0, 0, 0, 0, "General operation:\n"},
+	{"no-server",		'S', 0,		0, "Do not serve the resulting image"},
 	{"no-headers",		'H', 0,		0, "Do not serve HTTP headers"},
 	{"no-cache",		'C', 0,		0, "Do disable cache"},
 
-	{0, 0, 0, 0, "Error handling"},
+	{0, 0, 0, 0, "Error handling:\n"},
 	{"error-file",		'e', "FILE",	0, "Serve this file in case of error"},
 	{"error-message",	'M', "STRING",	0, "Error message to serve in case error file cannot be served"},
+
+	{0, 0, 0, 0, "Other options:"},
 	{ 0 }
 };
 
