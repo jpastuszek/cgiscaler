@@ -37,7 +37,7 @@ const char *argp_program_version = "cgiscaler v" CGISCALER_VERSION;
 const char *argp_program_bug_address = "<jpastuszek@gmail.com>";
 
 /* Program documentation. */
-static char doc[] = "CGIScaler is an image thumbnailer. It communicates with a web server using CGI\nThis options will override build in defaults (shown in []). Some of this options may be overridden by a query string.";
+static char doc[] = "CGIScaler is an image thumbnailer. It communicates with a web server using CGI\nThis options will override build in defaults (shown in []). Some of this options may be overridden by a CGI query string.";
 
 #define STR(x) #x
 #define DEFAULT(x) " ["STR(x)"]"
@@ -45,25 +45,38 @@ static char doc[] = "CGIScaler is an image thumbnailer. It communicates with a w
 static struct argp_option options[] = {
 	{0, 0, 0, 0, "Output geometry:\n"},
 	{"width",		'w', "INTEGER",	0, "Width of output image" DEFAULT(DEFAULT_WIDTH) },
-	{"height",		'h', "INTEGER",	0, "Height of output image" DEFAULT(DEFAULT_HEIGHT) },
+	{"height",	'h', "INTEGER",	0, "Height of output image" DEFAULT(DEFAULT_HEIGHT) },
 
-	{0, 0, 0, 0, "Simple scaling controls:\n"},
+	{0, 0, 0, 0, "Simple CGI query parameter names:\n"},
+	{"cgi-width",		'W', "STRING",	0, "String to match width parameter in CGI query string" DEFAULT(QUERY_WIDTH_PARAM)},
+	{"cgi-height",		'E', "STRING",		0, "String to match height parameter in CGI query string" DEFAULT(QUERY_HEIGHT_PARAM)},
+	{"cgi-strict",		'R', "STRING",		0, "String to match strict enable parameter in CGI query string" DEFAULT(QUERY_STRICT_PARAM)},
+	{"cgi-low-quality",	'L', "STRING",		0, "String to mach low quality enable parameter in CGI query string" DEFAULT(QUERY_LOWQ_PARAM)},
+
+	{0, 0, 0, 0, "Simple CGI query parameter values:\n"},
+	{"cgi-true",		'T', "STRING",		0, "String to mach true value in CGI query string" DEFAULT(QUERY_TRUE_VAL)},
+	{"cgi-false",		'F', "STRING",		0, "String to mach false value in CGI query string" DEFAULT(QUERY_FALSE_VAL)},
+
+	{0, 0, 0, 0, "Simple CGI query defaults:\n"},
 #if DEFAULT_SCALE_METHOD == SM_FIT
-	{"strict-resize", 	's', 0,	0, "Do strict scaling (overwrites fit scaling)" DEFAULT(fit)},
+	{"strict-resize", 	's', 0,		0, "Do strict scaling (overwrites fit scaling)" DEFAULT(fit)},
 #else
 	{"fit-resize",		'f', 0,		0, "Do fit scaling (overwrites strict scaling)" DEFAULT(strict)},
 #endif
-	{"low-quality",		'l', 0,		0, "Produce more compressed output" DEFAULT(off)},
+	{"low-quality",	'l', 0,		0, "Produce more compressed output" DEFAULT(off)},
+	{"file-name",		'i', "FILE",	0, "Use this file name if no file name passed in CGI query" DEFAULT(show error)},
+
+	{"low-quality-value",		'Q',	"INTEGER",	0, "Image quality (1-100) to use when low-quality is enabled" DEFAULT(LOWQ_QUALITY)},
+	{"normal-quality-value",	'N',	"INTEGER",	0, "Image quality (1-100) to use when low-quality is disabled" DEFAULT(DEFAULT_QUALITY)},
 
 	{0, 0, 0, 0, "Input and output:\n"},
 	{"media-dir",		'm', "DIRECTORY",	0, "Root directory of media store - all file paths are relative to this directory"},
 	{"cache-dir",		'c', "DIRECTORY",	0, "Root directory of cache store - all cached thumbnails will go there"},
-	{"in-file",		'i', "FILE",	0, "Use this file instead of one passed in PATH_INFO environment"},
 	//{"outfile",	'o', "FILE",	0, "Output to file instead of stdout"},
 
 	{0, 0, 0, 0, "General operation:\n"},
 	{"no-server",		'S', 0,		0, "Do not serve the resulting image"},
-	{"no-headers",		'H', 0,		0, "Do not serve HTTP headers"},
+	{"no-headers",	'H', 0,		0, "Do not serve HTTP headers"},
 	{"no-cache",		'C', 0,		0, "Do disable cache"},
 
 	{0, 0, 0, 0, "Error handling:\n"},
@@ -86,6 +99,35 @@ static error_t parse_opt (int key, char *arg, struct argp_state *state) {
 		case 'h':
 			output_config->size.h = atoi(arg);
 			break;
+
+
+		case 'W':
+			simple_query_string_config->query_width_param = strdup(arg);
+			break;
+		case 'E':
+			simple_query_string_config->query_height_param = strdup(arg);
+			break;
+		case 'R':
+			simple_query_string_config->query_strict_param = strdup(arg);
+			break;
+		case 'L':
+			simple_query_string_config->query_lowq_param = strdup(arg);
+			break;
+
+		case 'T':
+			simple_query_string_config->query_true_param = strdup(arg);
+			break;
+		case 'F':
+			simple_query_string_config->query_false_param = strdup(arg);
+			break;
+
+		case 'Q':
+			simple_query_string_config->low_quality_value = atoi(arg);
+			break;
+		case 'N':
+			simple_query_string_config->default_quality_value = atoi(arg);
+			break;
+
 		case 's':
 			output_config->scale_method = SM_STRICT;
 			break;

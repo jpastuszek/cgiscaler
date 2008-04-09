@@ -33,13 +33,13 @@
 #define DEFAULT_NO_HEADERS 0
 
 /* CGI Query parameter names */
-/** String to match with parameter in CGI query string */
+/** String to match width parameter in CGI query string */
 #define QUERY_WIDTH_PARAM "w"
 /** String to match height parameter in CGI query string */
 #define QUERY_HEIGHT_PARAM "h"
 /** String to match strict enable parameter in CGI query string */
 #define QUERY_STRICT_PARAM "s"
-/** String to mach log quality enable parameter in CGI query string */
+/** String to mach low quality enable parameter in CGI query string */
 #define QUERY_LOWQ_PARAM "wap"
 
 /* CGI Query true/false values: what string will match as true or false*/
