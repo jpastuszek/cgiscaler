@@ -61,14 +61,14 @@
 
 /** output format (ex. JPG, GIF, PNG) */
 #define OUT_FORMAT "JPG"
-#define OUT_FORMAT_EXTENSION "jpg"
+//#define OUT_FORMAT_EXTENSION "jpg"
 
 /** Path to error file (under MEDIA_PATH) that will be served in case of error */
 #define ERROR_FILE_PATH "error.jpg"
 /** Message that will be sent as plain text in case of error and no ERROR_FILE_PATH exists */
 #define ERROR_FAILBACK_MESSAGE "[Error and error image not found]\n"
 
-/** Mime-type that will be send in HTTP headers if corresponding to format/extension could not be found */
+/** Mime-type that will be send in HTTP headers if one corresponding to format/extension could not be found */
 #define FAIL_BACK_MIME_TYPE "image/jpeg"
 
 /** Possible re-size filters

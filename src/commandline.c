@@ -25,6 +25,7 @@
 #include "commandline.h"
 #include "runtime_config.h"
 #include "file_utils.h"
+#include "format_info.h"
 #include "config.h"
 #include "defaults.h"
 #include "debug.h"
@@ -44,44 +45,48 @@ static char doc[] = "CGIScaler is an image thumbnailer. It communicates with a w
 
 static struct argp_option options[] = {
 	{0, 0, 0, 0, "Output geometry:\n"},
-	{"width",		'w', "INTEGER",	0, "Width of output image" DEFAULT(DEFAULT_WIDTH) },
-	{"height",	'h', "INTEGER",	0, "Height of output image" DEFAULT(DEFAULT_HEIGHT) },
+	{"width",					'w',	"INTEGER",	0, "Width of output image" DEFAULT(DEFAULT_WIDTH) },
+	{"height",				'h',	"INTEGER",	0, "Height of output image" DEFAULT(DEFAULT_HEIGHT) },
+
+	{0, 0, 0, 0, "Output format:\n"},
+	{"out-format",			'O',	"STRING",	0, "Resulting thumbnail format (ex. JPG, GIF, PNG) " DEFAULT(OUT_FORMAT)},
+	{"failback-mime-type",		'b',	"STRING",	0, "Mime-type that will be send in HTTP headers if one corresponding to format/extension could not be found" DEFAULT(FAIL_BACK_MIME_TYPE)},
 
 	{0, 0, 0, 0, "Simple CGI query parameter names:\n"},
-	{"cgi-width",		'W', "STRING",	0, "String to match width parameter in CGI query string" DEFAULT(QUERY_WIDTH_PARAM)},
-	{"cgi-height",		'E', "STRING",		0, "String to match height parameter in CGI query string" DEFAULT(QUERY_HEIGHT_PARAM)},
-	{"cgi-strict",		'R', "STRING",		0, "String to match strict enable parameter in CGI query string" DEFAULT(QUERY_STRICT_PARAM)},
-	{"cgi-low-quality",	'L', "STRING",		0, "String to mach low quality enable parameter in CGI query string" DEFAULT(QUERY_LOWQ_PARAM)},
+	{"cgi-width",				'W',	"STRING",	0, "String to match width parameter in CGI query string" DEFAULT(QUERY_WIDTH_PARAM)},
+	{"cgi-height",				'E',	"STRING",	0, "String to match height parameter in CGI query string" DEFAULT(QUERY_HEIGHT_PARAM)},
+	{"cgi-strict",				'R',	"STRING",	0, "String to match strict enable parameter in CGI query string" DEFAULT(QUERY_STRICT_PARAM)},
+	{"cgi-low-quality",			'L',	"STRING",	0, "String to mach low quality enable parameter in CGI query string" DEFAULT(QUERY_LOWQ_PARAM)},
 
 	{0, 0, 0, 0, "Simple CGI query parameter values:\n"},
-	{"cgi-true",		'T', "STRING",		0, "String to mach true value in CGI query string" DEFAULT(QUERY_TRUE_VAL)},
-	{"cgi-false",		'F', "STRING",		0, "String to mach false value in CGI query string" DEFAULT(QUERY_FALSE_VAL)},
+	{"cgi-true",				'T',	"STRING",	0, "String to mach true value in CGI query string" DEFAULT(QUERY_TRUE_VAL)},
+	{"cgi-false",				'F',	"STRING",	0, "String to mach false value in CGI query string" DEFAULT(QUERY_FALSE_VAL)},
 
 	{0, 0, 0, 0, "Simple CGI query defaults:\n"},
 #if DEFAULT_SCALE_METHOD == SM_FIT
-	{"strict-resize", 	's', 0,		0, "Do strict scaling (overwrites fit scaling)" DEFAULT(fit)},
+	{"strict-resize", 			's',	0,			0, "Do strict scaling (overwrites fit scaling)" DEFAULT(fit)},
 #else
-	{"fit-resize",		'f', 0,		0, "Do fit scaling (overwrites strict scaling)" DEFAULT(strict)},
+	{"fit-resize",				'f',	0,			0, "Do fit scaling (overwrites strict scaling)" DEFAULT(strict)},
 #endif
-	{"low-quality",	'l', 0,		0, "Produce more compressed output" DEFAULT(off)},
-	{"file-name",		'i', "FILE",	0, "Use this file name if no file name passed in CGI query" DEFAULT(show error)},
+	{"low-quality",			'l',	0,			0, "Produce more compressed output" DEFAULT(off)},
+	{"file-name",				'i',	"FILE",		0, "Use this file name if no file name passed in CGI query" DEFAULT(show error)},
 
 	{"low-quality-value",		'Q',	"INTEGER",	0, "Image quality (1-100) to use when low-quality is enabled" DEFAULT(LOWQ_QUALITY)},
 	{"normal-quality-value",	'N',	"INTEGER",	0, "Image quality (1-100) to use when low-quality is disabled" DEFAULT(DEFAULT_QUALITY)},
 
 	{0, 0, 0, 0, "Input and output:\n"},
-	{"media-dir",		'm', "DIRECTORY",	0, "Root directory of media store - all file paths are relative to this directory"},
-	{"cache-dir",		'c', "DIRECTORY",	0, "Root directory of cache store - all cached thumbnails will go there"},
+	{"media-dir",				'm',	"DIRECTORY",	0, "Root directory of media store - all file paths are relative to this directory"},
+	{"cache-dir",				'c', 	"DIRECTORY",	0, "Root directory of cache store - all cached thumbnails will go there"},
 	//{"outfile",	'o', "FILE",	0, "Output to file instead of stdout"},
 
 	{0, 0, 0, 0, "General operation:\n"},
-	{"no-server",		'S', 0,		0, "Do not serve the resulting image"},
-	{"no-headers",	'H', 0,		0, "Do not serve HTTP headers"},
-	{"no-cache",		'C', 0,		0, "Do disable cache"},
+	{"no-server",				'S',	0,			0, "Do not serve the resulting image"},
+	{"no-headers",			'H',	0,			0, "Do not serve HTTP headers"},
+	{"no-cache",				'C',	0,			0, "Do disable cache"},
 
 	{0, 0, 0, 0, "Error handling:\n"},
-	{"error-file",		'e', "FILE",	0, "Serve this file in case of error"},
-	{"error-message",	'M', "STRING",	0, "Error message to serve in case error file cannot be served"},
+	{"error-file",				'e', "FILE",		0, "Serve this file in case of error"},
+	{"error-message",			'M', "STRING",	0, "Error message to serve in case error file cannot be served"},
 
 	{0, 0, 0, 0, "Other options:"},
 	{ 0 }
@@ -100,6 +105,12 @@ static error_t parse_opt (int key, char *arg, struct argp_state *state) {
 			output_config->size.h = atoi(arg);
 			break;
 
+		case 'O':
+			output_config->format = format_to_format_info(arg);
+			break;
+		case 'b':
+			output_config->fail_mime_type = strdup(arg);
+			break;
 
 		case 'W':
 			simple_query_string_config->query_width_param = strdup(arg);
