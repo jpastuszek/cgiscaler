@@ -517,6 +517,12 @@ MagickWand *crop(MagickWand *image, struct dimensions to_size, struct point posi
 		return 0;
 	}
 
+	status = MagickSetImagePage(image, to_size.w, to_size.h, 0, 0);
+	if (status == MagickFalse) {
+		debug(ERR, "Image crop failed while seting image page!");
+		return 0;
+	}
+
 	debug(PROF, "Crop took %.3f s",  timer_stop(&timeing));
 
 	return image;
