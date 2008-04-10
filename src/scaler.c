@@ -223,21 +223,21 @@ unsigned char *prepare_blob(MagickWand *image, int quality, size_t *blob_len,con
 	status = MagickSetFormat(image, format);
 	if (status == MagickFalse) {
 		debug(ERR,"Failed to set output Format");
-		DestroyMagickWand(image);
+		*blob_len = 0;
 		return 0;
 	}
 
 	status = MagickSetCompressionQuality(image, quality);
 	if (status == MagickFalse) {
 		debug(ERR,"Failed to set Compression Quality");
-		DestroyMagickWand(image);
+		*blob_len = 0;
 		return 0;
 	}
 	
 	blob = MagickGetImageBlob(image, blob_len);
 	if (!blob || !(*blob_len)) {
 		debug(ERR,"Failed to Get Image Blob");
-		DestroyMagickWand(image);
+		*blob_len = 0;
 		return 0;
 	}
 

@@ -190,6 +190,13 @@ static void test_prepare_blob() {
 	assert_equal(blob[1], 0xd8);
 
 	free_blob(blob);
+
+	/* try to use non existing format */
+	blob = prepare_blob(image, 70, &blob_len, "BOGO");
+	assert_equal(blob, 0);
+	assert_equal(blob_len, 0);
+
+	free_blob(blob);
 	free_image(image);
 }
 
