@@ -41,10 +41,14 @@ int cgiscaler(int argc, char *argv[]) {
 	/* allocate configuration with default values */
 	alloc_default_config();
 
-	debug_start(logging_config->log_file);
-
 	apply_commandline_config(argc, argv);
+
+	/* now we have all necesary options to start logging */
+	debug_start(logging_config->log_file);
+	dump_runtime_configuration();
+
 	apply_simple_query_string_config(getenv("PATH_INFO"), getenv("QUERY_STRING"));
+	dump_runtime_configuration();
 
 	/* some configuration error handling */
 	if (!output_config->file_name) {

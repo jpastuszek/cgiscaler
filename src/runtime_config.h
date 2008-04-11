@@ -187,3 +187,5 @@ void free_error_handling_config(struct error_handling_config *config);
 
 struct resource_limit_config* alloc_default_resource_limit_config();
 void free_resource_limit_config(struct resource_limit_config *config);
+
+void dump_runtime_configuration() ;

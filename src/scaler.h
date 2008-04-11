@@ -25,6 +25,18 @@
 #include "query_string.h"
 #include "geometry_math.h"
 
+#ifndef SCALER_H
+#define SCALER_H
+
+struct _resize_filters {
+	int value;
+	char *name;
+};
+
+#endif
+
+struct _resize_filters resize_filters[11];
+
 unsigned char *fit_resize_to_blob(media_fpath *media_file_path, struct dimensions resize_to, int quality, size_t *blob_len, const char *format);
 unsigned char *strict_resize_to_blob(media_fpath *media_file_path, struct dimensions resize_to, int quality, size_t *blob_len, const char *format) ;
 

@@ -23,6 +23,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <wand/MagickWand.h>
+#include "debug.h"
 #include "defaults.h"
 
 
@@ -282,4 +283,11 @@ struct resource_limit_config* alloc_default_resource_limit_config() {
 /** Frees memory resources allocated for configuration structure. */
 void free_resource_limit_config(struct resource_limit_config *config) {
 	free(config);
+}
+
+/** Dumps running configuration to the log file */
+void dump_runtime_configuration() {
+#ifdef DEBUG
+	debug(DEB, "Run-time config: file: '%s', size w: %d h: %d, scale method: %s quality: %d Operation coifig: no cache: %d, no serve: %d, no headers: %d", output_config->file_name ? output_config->file_name : "<null>", output_config->size.w, output_config->size.h, scale_method_names[output_config->scale_method], output_config->quality, operation_config->no_cache, operation_config->no_serve, operation_config->no_headers);
+#endif
 }

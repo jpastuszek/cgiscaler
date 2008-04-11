@@ -56,6 +56,24 @@ MagickWand *remove_transparency(MagickWand *image);
 /* TODO: Zero sized image will do original size? may by configurable? :D */
 /* TODO: Performance tests... profiler? :D */
 
+/** Structure that maps resize filters to their names */
+extern struct _resize_filters resize_filters[11] =
+{
+	{BesselFilter,		"BesselFilter"},
+	{BlackmanFilter, "BlackmanFilter"},
+	{BoxFilter, "BoxFilter"},
+	{CatromFilter, "CatromFilter"},
+	//{CubicGaussianFilter, "CubicGaussianFilter"},
+	{HanningFilter,"HanningFilter"},
+	{HermiteFilter, "HermiteFilter"},
+	{LanczosFilter, "LanczosFilter"},
+	{MitchellFilter, "MitchellFilter"},
+	//{PointQuandraticFilter, "PointQuandraticFilter"},
+	{SincFilter, "SincFilter"},
+	{TriangleFilter, "TriangleFilter"},
+	{-1,0}
+};
+
 /** Loads image, strips meta-data and sets it's default background color.
 * This function will load image from file, strip meta-data and if configured it will replace transparent pixels with solid color.
 * @param media_file_path path to image file to load
@@ -519,7 +537,7 @@ MagickWand *crop(MagickWand *image, struct dimensions to_size, struct point posi
 
 	status = MagickSetImagePage(image, to_size.w, to_size.h, 0, 0);
 	if (status == MagickFalse) {
-		debug(ERR, "Image crop failed while seting image page!");
+		debug(ERR, "Image crop failed while setting image page!");
 		return 0;
 	}
 
@@ -537,7 +555,6 @@ MagickWand *crop(MagickWand *image, struct dimensions to_size, struct point posi
 * @return 1 on success 0 on failure
 */
 int set_resource_limits(int disk, int map, int file, int memory, int area) {
-
 	MagickBooleanType status;
 
 	debug(DEB, "Setting Magick resource limit: disk %i, map %i, file %i, memory %i", disk, map, file, memory);

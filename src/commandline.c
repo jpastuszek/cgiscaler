@@ -26,6 +26,7 @@
 #include "runtime_config.h"
 #include "file_utils.h"
 #include "format_info.h"
+#include "scaler.h"
 #include "config.h"
 #include "defaults.h"
 #include "debug.h"
@@ -79,14 +80,23 @@ static struct argp_option options[] = {
 	{"cache-dir",				'c', 	"DIRECTORY",	0, "Root directory of cache store - all cached thumbnails will go there"},
 	//{"outfile",	'o', "FILE",	0, "Output to file instead of stdout"},
 
+	{0, 0, 0, 0, "Resize filtering:\n"},
+	{"scaling-filter",			'G', "STRING",		0, "Smoothing filter to use when resizing" DEFAULT(RESIZE_FILTER)},
+	{"blur-factor",			'B', "REAL",		0, "Blur factor where > 1 is blurry, < 1 is sharp" DEFAULT(RESIZE_SMOOTH_FACTOR)},
+
 	{0, 0, 0, 0, "General operation:\n"},
 	{"no-server",				'S',	0,			0, "Do not serve the resulting image"},
 	{"no-headers",			'H',	0,			0, "Do not serve HTTP headers"},
 	{"no-cache",				'C',	0,			0, "Do disable cache"},
 
 	{0, 0, 0, 0, "Error handling:\n"},
-	{"error-file",				'e', "FILE",		0, "Serve this file in case of error"},
-	{"error-message",			'M', "STRING",	0, "Error message to serve in case error file cannot be served"},
+	{"error-file",				'e', "FILE",		0, "Serve this file in case of error" DEFAULT(ERROR_FILE_PATH)},
+	{"error-message",			'M', "STRING",	0, "Error message to serve in case error file cannot be served" DEFAULT(ERROR_FAILBACK_MESSAGE)},
+
+#ifdef DEBUG
+	{0, 0, 0, 0, "Logging:\n"},
+	{"log-file",				'g', "STRING",		0, "Error message to serve in case error file cannot be served" DEFAULT(DEBUG_FILE)},
+#endif
 
 	{0, 0, 0, 0, "Other options:"},
 	{ 0 }
@@ -96,6 +106,8 @@ static struct argp_option options[] = {
 
 static error_t parse_opt (int key, char *arg, struct argp_state *state) {
 	char *file_name;
+	int i;
+
 	// struct arguments *arguments = state->input;
 	switch (key) {
 		case 'w':
@@ -163,6 +175,23 @@ static error_t parse_opt (int key, char *arg, struct argp_state *state) {
 		case 'c':
 			storage_config->cache_directory = strdup(arg);
 			break;
+
+		case 'G':
+			for (i = 0; resize_filters[i].name; i++) {
+				if (!strcmp(resize_filters[i].name, arg)) {
+					output_config->scaling_filter = resize_filters[i].value;
+					break;
+				}
+			}
+
+			if (! resize_filters[i].name) {
+				argp_error(state, "Unrecognized resiez filter '%s'", arg);
+			}
+			break;
+		case 'B':
+			output_config->blur_factor = atof(arg);
+			break;
+
 		case 'S':
 			operation_config->no_serve = 1;
 			break;
@@ -179,6 +208,12 @@ static error_t parse_opt (int key, char *arg, struct argp_state *state) {
 		case 'M':
 			error_handling_config->error_message = strdup(arg);
 			break;
+
+#ifdef DEBUG
+		case 'g':
+			logging_config->log_file = strdup(arg);
+			break;
+#endif
 
 		case ARGP_KEY_ARG:
 			// non taged arg
@@ -200,10 +235,5 @@ static struct argp argp = { options, parse_opt, 0, doc };
 */
 void apply_commandline_config(int argc, char *argv[]) {
 	argp_parse (&argp, argc, argv, 0, 0, 0);
-
-#ifdef DEBUG
-	debug(DEB, "Run-time config after command line: file: '%s', size w: %d h: %d, scale method: %s quality: %d Operation coifig: no cache: %d, no serve: %d, no headers: %d", output_config->file_name ? output_config->file_name : "<null>", output_config->size.w, output_config->size.h, scale_method_names[output_config->scale_method], output_config->quality, operation_config->no_cache, operation_config->no_serve, operation_config->no_headers);
-#endif
-	return;
 }
 

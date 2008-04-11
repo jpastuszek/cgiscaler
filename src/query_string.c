@@ -97,10 +97,6 @@ void apply_simple_query_string_config(char *file_name, char *query_string) {
 		free(lowq);
 	}
 
-#ifdef DEBUG
-	debug(DEB, "Run-time conifg after query string: file: '%s', size w: %d h: %d, scale method: %s quality: %d", output_config->file_name ? output_config->file_name : "<null>", output_config->size.w, output_config->size.h, scale_method_names[output_config->scale_method], output_config->quality);
-#endif
-
 	/* we don't free file_name as it is used in param structure and will be freed on free_output_config */
 }
 
