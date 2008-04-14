@@ -40,7 +40,7 @@ static void ignore_ctrl_c();
 static void allow_ctrl_c();
 static void stop();
 static void run_the_test_code(TestSuite *suite, UnitTest *test, TestReporter *reporter);
-static void tally_counter(const char *file, int line, int expected, int actual, void *abstract_reporter);
+/* static void tally_counter(const char *file, int line, int expected, int actual, void *abstract_reporter); */
 static void die(char *message, ...);
 static void do_nothing();
 
@@ -209,6 +209,7 @@ static void run_the_test_code(TestSuite *suite, UnitTest *test, TestReporter *re
 	tally_mocks(reporter);
 }
 
+/*
 static void tally_counter(const char *file, int line, int expected, int actual, void *abstract_reporter) {
     TestReporter *reporter = (TestReporter *)abstract_reporter;
     (*reporter->assert_true)(
@@ -220,6 +221,7 @@ static void tally_counter(const char *file, int line, int expected, int actual, 
             expected,
             actual);
 }
+*/
 
 static void die(char *message, ...) {
 	va_list arguments;

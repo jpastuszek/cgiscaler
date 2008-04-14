@@ -57,20 +57,20 @@ MagickWand *remove_transparency(MagickWand *image);
 /* TODO: Performance tests... profiler? :D */
 
 /** Structure that maps resize filters to their names */
-extern struct _resize_filters resize_filters[11] =
+struct _resize_filters resize_filters[11] =
 {
 	{BesselFilter,		"BesselFilter"},
-	{BlackmanFilter, "BlackmanFilter"},
-	{BoxFilter, "BoxFilter"},
-	{CatromFilter, "CatromFilter"},
+	{BlackmanFilter, 	"BlackmanFilter"},
+	{BoxFilter, 		"BoxFilter"},
+	{CatromFilter, 	"CatromFilter"},
 	//{CubicGaussianFilter, "CubicGaussianFilter"},
-	{HanningFilter,"HanningFilter"},
-	{HermiteFilter, "HermiteFilter"},
-	{LanczosFilter, "LanczosFilter"},
-	{MitchellFilter, "MitchellFilter"},
+	{HanningFilter,	"HanningFilter"},
+	{HermiteFilter, 	"HermiteFilter"},
+	{LanczosFilter, 	"LanczosFilter"},
+	{MitchellFilter, 	"MitchellFilter"},
 	//{PointQuandraticFilter, "PointQuandraticFilter"},
-	{SincFilter, "SincFilter"},
-	{TriangleFilter, "TriangleFilter"},
+	{SincFilter, 		"SincFilter"},
+	{TriangleFilter, 	"TriangleFilter"},
 	{-1,0}
 };
 

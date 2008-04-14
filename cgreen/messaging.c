@@ -1,6 +1,8 @@
 #include "messaging.h"
 #include <sys/msg.h>
 #include <stdlib.h>
+#include <sys/types.h>
+#include <unistd.h>
 
 static MessageQueue *queues = NULL;
 static int queue_count = 0;
