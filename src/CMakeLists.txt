@@ -4,6 +4,13 @@ find_package(Magick REQUIRED)
 find_package(Wand REQUIRED)
 
 set(CGISCALER_VERSION "2.0-alpha" CACHE STRING "Version of this program")
+option(DEBUG_SYNC FALSE CACHE BOOL "If set every log line will be flushed to disk (very slow)")
+if(DEBUG_SYNC STREQUAL "ON")
+  set(DEBUG_SYNC 1)
+else(DEBUG_SYNC STREQUAL "ON")
+   set(DEBUG_SYNC 0)
+endif(DEBUG_SYNC STREQUAL "ON")
+
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/build_config.h.tpl ${CMAKE_CURRENT_SOURCE_DIR}/build_config.h)
 
 add_executable(cgiscaler cache.c  commandline.c  debug.c  file_utils.c

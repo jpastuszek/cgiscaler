@@ -51,7 +51,7 @@ static struct argp_option options[] = {
 
 	{0, 0, 0, 0, "Output format:\n"},
 	{"out-format",			'O',	"STRING",	0, "Resulting thumbnail format (ex. JPG, GIF, PNG) " DEFAULT(OUT_FORMAT)},
-	{"failback-mime-type",		'b',	"STRING",	0, "Mime-type that will be send in HTTP headers if one corresponding to format/extension could not be found" DEFAULT(FAIL_BACK_MIME_TYPE)},
+	{"failback-mime-type",		'b',	"STRING",	0, "Mime-type that will be send in HTTP headers if one corresponding to format/extension could not be determined" DEFAULT(FAIL_BACK_MIME_TYPE)},
 
 	{0, 0, 0, 0, "Simple CGI query parameter names:\n"},
 	{"cgi-width",				'W',	"STRING",	0, "String to match width parameter in CGI query string" DEFAULT(QUERY_WIDTH_PARAM)},
@@ -69,7 +69,7 @@ static struct argp_option options[] = {
 #else
 	{"fit-resize",				'f',	0,			0, "Do fit scaling (overwrites strict scaling)" DEFAULT(strict)},
 #endif
-	{"low-quality",			'l',	0,			0, "Produce more compressed output" DEFAULT(off)},
+	{"low-quality",			'l',	0,			0, "Produce more compressed output" DEFAULT(unset)},
 	{"file-name",				'i',	"FILE",		0, "Use this file name if no file name passed in CGI query" DEFAULT(show error)},
 
 	{"low-quality-value",		'Q',	"INTEGER",	0, "Image quality (1-100) to use when low-quality is enabled" DEFAULT(LOWQ_QUALITY)},
@@ -85,10 +85,17 @@ static struct argp_option options[] = {
 	{"list-scaling-filter",		'Y', 0,			0, "List all possible smoothing filters"},
 	{"blur-factor",			'B', "REAL",		0, "Blur factor where > 1 is blurry, < 1 is sharp" DEFAULT(RESIZE_SMOOTH_FACTOR)},
 
+	{0, 0, 0, 0, "Transparent image handling:\n"},
+#ifdef REMOVE_TRANSPARENCY
+	{"no-remove-transparency",	'n', 0,			0, "Do not replace transparent image area" DEFAULT(set)},
+#else
+	{"remove-transparency",	't', 0,			0, "Replace transparent image area with configured colour" DEFAULT(unset)},
+#endif
+
 	{0, 0, 0, 0, "General operation:\n"},
-	{"no-server",				'S',	0,			0, "Do not serve the resulting image" DEFAULT(off)},
-	{"no-headers",			'H',	0,			0, "Do not serve HTTP headers" DEFAULT(off)},
-	{"no-cache",				'C',	0,			0, "Do disable cache" DEFAULT(off)},
+	{"no-server",				'S',	0,			0, "Do not serve the resulting image" DEFAULT(unset)},
+	{"no-headers",			'H',	0,			0, "Do not serve HTTP headers" DEFAULT(unset)},
+	{"no-cache",				'C',	0,			0, "Do disable cache" DEFAULT(unset)},
 
 	{0, 0, 0, 0, "Error handling:\n"},
 	{"error-file",				'e', "FILE",		0, "Serve this file in case of error" DEFAULT(ERROR_FILE_PATH)},
@@ -198,6 +205,16 @@ static error_t parse_opt (int key, char *arg, struct argp_state *state) {
 		case 'B':
 			output_config->blur_factor = atof(arg);
 			break;
+
+#ifdef REMOVE_TRANSPARENCY
+		case 'n':
+			output_config->remove_transparency = 0;
+			break;
+#else
+		case 't':
+			output_config->remove_transparency = 1;
+			break;
+#endif
 
 		case 'S':
 			operation_config->no_serve = 1;

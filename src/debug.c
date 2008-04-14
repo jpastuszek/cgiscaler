@@ -148,7 +148,7 @@ void debug(const char *level, const char *fmt, ...) {
 
 	free(full_msg);
 
-#ifdef DEBUG_SYNC
+#if DEBUG_SYNC == 1
 	fsync(debug_file_fd);
 #endif
 	free(msg);
