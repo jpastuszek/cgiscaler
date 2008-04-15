@@ -144,21 +144,16 @@ MagickWand *load_image(media_fpath *media_file_path, struct dimensions to_size) 
 		return 0;
 	}
 
-	if (output_config->remove_transparency) {
+	/* this will flip image with new image that has transparent areas colored */
+	if (output_config->remove_transparency)
 		image = remove_transparency(image);
-		if (!image) {
-			debug(ERR, "Removing transparency failed!");
-			DestroyMagickWand(image);
-			return 0;
-		}
-	}
 
 	return image;
 }
 
 /** If image has transparency/mate/alpha channel this function will replace transparent places with DEFAULT_BACKGROUND_COLOR.
 * @param image image to remove transparency from
-* @return image or 0 on failure
+* @return original image if no need of removal or on failure, processed image on success
 */
 MagickWand *remove_transparency(MagickWand *image) {
 	MagickBooleanType status;
@@ -168,8 +163,10 @@ MagickWand *remove_transparency(MagickWand *image) {
 
 
 	/* If image doesn't have alpha/transparency/mate channel we do nothing here */
-	if (MagickGetImageMatte(image) == MagickFalse)
+	if (MagickGetImageMatte(image) == MagickFalse) {
+		debug(DEB, "No need to remove transparency");
 		return image;
+	}
 
 	debug(DEB, "Removing transparency and colloring it to background color '%s'", output_config->transparency_replacement_color);
 	timer_start(&timeing);
@@ -178,21 +175,21 @@ MagickWand *remove_transparency(MagickWand *image) {
 	bg_color = NewPixelWand();
 	if (!bg_color) {
 		debug(ERR, "Creating new pixel wand failed!");
-		return 0;
+		return image;
 	}
 
 	status = PixelSetColor(bg_color, output_config->transparency_replacement_color);
 	if (status == MagickFalse) {
 		debug(ERR, "Failed to set Pixel Wand Color to '%s'", output_config->transparency_replacement_color);
 		DestroyPixelWand(bg_color);
-		return 0;
+		return image;
 	}
 
 	new_image = NewMagickWand();
 	if (!new_image) {
 		debug(ERR, "Creating new magick wand failed!");
 		DestroyPixelWand(bg_color);
-		return 0;
+		return image;
 	}
 
 	status = MagickNewImage(new_image, MagickGetImageWidth(image), MagickGetImageHeight(image), bg_color);
@@ -200,7 +197,7 @@ MagickWand *remove_transparency(MagickWand *image) {
 		debug(ERR, "Failed to create new image");
 		DestroyPixelWand(bg_color);
 		DestroyMagickWand(new_image);
-		return 0;
+		return image;
 	}
 
 	DestroyPixelWand(bg_color);
@@ -209,10 +206,9 @@ MagickWand *remove_transparency(MagickWand *image) {
 	if (status == MagickFalse) {
 		debug(ERR, "Composite image failed");
 		DestroyMagickWand(new_image);
-		return 0;
+		return image;
 	}
 
-	/* TODO: Use provided image to store result - now we are releasing original image... this may cause issues! */
 	DestroyMagickWand(image);
 	debug(PROF, "Removing transparency took %.3f s",  timer_stop(&timeing));
 

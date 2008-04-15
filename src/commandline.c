@@ -77,20 +77,21 @@ static struct argp_option options[] = {
 
 	{0, 0, 0, 0, "Input and output:\n"},
 	{"media-dir",				'm',	"DIRECTORY",	0, "Root directory of media store - all file paths are relative to this directory" DEFAULT(MEDIA_PATH)},
-	{"cache-dir",				'c', 	"DIRECTORY",	0, "Root directory of cache store - all cached thumbnails will go there" DEFAULT(CACHE_PATH)},
+	{"cache-dir",				'c',	"DIRECTORY",	0, "Root directory of cache store - all cached thumbnails will go there" DEFAULT(CACHE_PATH)},
 	//{"outfile",	'o', "FILE",	0, "Output to file instead of stdout"},
 
 	{0, 0, 0, 0, "Resize filtering:\n"},
-	{"scaling-filter",			'G', "STRING",		0, "Smoothing filter to use when resizing" DEFAULT(RESIZE_FILTER)},
-	{"list-scaling-filter",		'Y', 0,			0, "List all possible smoothing filters"},
-	{"blur-factor",			'B', "REAL",		0, "Blur factor where > 1 is blurry, < 1 is sharp" DEFAULT(RESIZE_SMOOTH_FACTOR)},
+	{"scaling-filter",			'G',	"STRING",	0, "Smoothing filter to use when resizing" DEFAULT(RESIZE_FILTER)},
+	{"list-scaling-filter",		'Y',	0,			0, "List all possible smoothing filters"},
+	{"blur-factor",			'B',	"REAL",		0, "Blur factor where > 1 is blurry, < 1 is sharp" DEFAULT(RESIZE_SMOOTH_FACTOR)},
 
 	{0, 0, 0, 0, "Transparent image handling:\n"},
 #ifdef REMOVE_TRANSPARENCY
-	{"no-remove-transparency",	'n', 0,			0, "Do not replace transparent image area" DEFAULT(set)},
+	{"no-remove-transparency",	'n',	0,			0, "Do not replace transparent image area" DEFAULT(set)},
 #else
-	{"remove-transparency",	't', 0,			0, "Replace transparent image area with configured colour" DEFAULT(unset)},
+	{"remove-transparency",	't',	0,			0, "Replace transparent image area with configured colour" DEFAULT(unset)},
 #endif
+	{"transparency-colour",		'u',	"STRING",	0, "Transparency replacement colour" DEFAULT(DEFAULT_BACKGROUND_COLOR)},
 
 	{0, 0, 0, 0, "General operation:\n"},
 	{"no-server",				'S',	0,			0, "Do not serve the resulting image" DEFAULT(unset)},
@@ -215,6 +216,9 @@ static error_t parse_opt (int key, char *arg, struct argp_state *state) {
 			output_config->remove_transparency = 1;
 			break;
 #endif
+		case 'u':
+			output_config->transparency_replacement_color = strdup(arg);
+			break;
 
 		case 'S':
 			operation_config->no_serve = 1;
