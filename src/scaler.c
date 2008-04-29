@@ -286,7 +286,6 @@ MagickWand *fit_resize(media_fpath *media_file_path, struct dimensions resize_to
 	image_size = get_image_size(image_ping);
 
 	/* we don't need our ping any more */
-	/* TODO: This is not releasing all the memory */
 	free_image(image_ping);
 
 	/* this will calculate target size for aspect ratio keeping resize method */
@@ -305,8 +304,9 @@ MagickWand *fit_resize(media_fpath *media_file_path, struct dimensions resize_to
 		return 0;
 	}
 
-	image = resize(image, resize_to);
-	if (!image) {
+	if (!resize(image, resize_to)) {
+		/* Freeing loaded image */
+		debug(ERR, "Image re-size failed in fit re-size");
 		DestroyMagickWand(image);
 		return 0;
 	}
@@ -380,15 +380,17 @@ MagickWand *strict_resize(media_fpath *media_file_path, struct dimensions resize
 	position.x = (image_size.w - crop_to.w) / 2;
 	position.y = (image_size.h - crop_to.h) / 2;
 
-	image = crop(image, crop_to, position);
-	if (!image) {
+	if (!crop(image, crop_to, position)) {
+		debug(ERR, "Image crop  failed in strict re-size");
+		/* Freeing loaded image */
 		DestroyMagickWand(image);
 		return 0;
 	}
 
-	image = resize(image, resize_to);
-	if (!image) {
-		DestroyMagickWand(image);	
+	if (!resize(image, resize_to)) {
+		debug(ERR, "Image re-size  failed in strict re-size");
+		/* Freeing loaded image */
+		DestroyMagickWand(image);
 		return 0;
 	}
 
@@ -481,10 +483,10 @@ int apply_pre_resize_factor(int orginal, int target) {
 * This function will resize image loosing it's aspect ratio to achieve required size.
 * @param image pointer to MagickWand containing image to resize
 * @param to_size dimensions of resulting image
-* @return image or 0 on failure
+* @return 1 on success or 0 on failure
 * @see crop()
 */
-MagickWand *resize(MagickWand *image, struct dimensions to_size) {
+short int resize(MagickWand *image, struct dimensions to_size) {
 	MagickBooleanType status;
 	struct timer timeing;
 	struct dimensions image_size;	
@@ -494,6 +496,8 @@ MagickWand *resize(MagickWand *image, struct dimensions to_size) {
 	image_size = get_image_size(image);
 
 	/* Fast pre resize */
+	//TODO: Test if pre-resize is needed
+	//TODO: Use standard magick resize function instead of this one as it is not available in older versions
 	status = MagickAdaptiveResizeImage(image, apply_pre_resize_factor(image_size.w, to_size.w), apply_pre_resize_factor(image_size.h, to_size.h));
 	if (status == MagickFalse) {
 		debug(ERR, "Adaptive resize failed!");
@@ -509,17 +513,17 @@ MagickWand *resize(MagickWand *image, struct dimensions to_size) {
 
 	debug(PROF, "Resize took %.3f s",  timer_stop(&timeing));
 
-	return image;
+	return 1;
 }
 
 /** Crops image to given dimensions starting at given position from left top corner.
 * @param image pointer to MagickWand containing image to crop
 * @param to_size dimensions to crop image to
 * @param position point from loft top corner to start crop from
-* @return image or 0
+* @return 0 on failure, 1 on success
 * @see resize()
 */
-MagickWand *crop(MagickWand *image, struct dimensions to_size, struct point position) {
+short int crop(MagickWand *image, struct dimensions to_size, struct point position) {
 	MagickBooleanType status;
 	struct timer timeing;
 
@@ -539,7 +543,7 @@ MagickWand *crop(MagickWand *image, struct dimensions to_size, struct point posi
 
 	debug(PROF, "Crop took %.3f s",  timer_stop(&timeing));
 
-	return image;
+	return 1;
 }
 
 /** Sets ImageMagick resource limit

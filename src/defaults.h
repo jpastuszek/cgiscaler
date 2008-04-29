@@ -61,7 +61,6 @@
 
 /** output format (ex. JPG, GIF, PNG) */
 #define OUT_FORMAT "JPG"
-//#define OUT_FORMAT_EXTENSION "jpg"
 
 /** Path to error file (under MEDIA_PATH) that will be served in case of error */
 #define ERROR_FILE_PATH "error.jpg"
@@ -93,12 +92,12 @@
 // BIG FAT WARNING: units of this valuse are library version dependant!!! test in debug first!
 /** Maximum number of open pixel cache files  */
 #define RESOURCE_LIMIT_FILE 8
-/** Maximum amount of disk space permitted for use by the pixel cache in GB */
+/** Maximum amount of disk space permitted for use by the pixel cache in bytes */
 #define RESOURCE_LIMIT_DISK 2*1024*1024
-/** Maximum amount of memory map to allocate for the pixel cache in MB - when this limit is exceeded, the image pixels are cached to disk */
+/** Maximum amount of memory map to allocate for the pixel cache in bytes - when this limit is exceeded, the image pixels are cached to disk */
 #define RESOURCE_LIMIT_MAP 0
-/** Maximum amount of memory to allocate for the pixel cache from the heap in MB - when this limit is exceeded, the image pixels are cached to memory-mapped disk */
+/** Maximum amount of memory to allocate for the pixel cache from the heap in bytes - when this limit is exceeded, the image pixels are cached to memory-mapped disk */
 #define RESOURCE_LIMIT_MEMORY 256*1024*1024
-/** Maximum amount of memory to allocate for image from in MB - images that exceed the area limit are cached to disk  */
+/** Maximum amount of memory to allocate for image from in bytes - images that exceed the area limit are cached to disk  */
 #define RESOURCE_LIMIT_AREA 256*1024*1024
 

@@ -52,7 +52,7 @@ unsigned char *prepare_blob(MagickWand *image, int quality, size_t *blob_len,con
 
 struct dimensions get_image_size(MagickWand *image);
 MagickWand *ping_image(media_fpath *media_file_path);
-MagickWand *resize(MagickWand *image, struct dimensions to_size);
-MagickWand *crop(MagickWand *image, struct dimensions to_size, struct point position);
+short int resize(MagickWand *image, struct dimensions to_size);
+short int crop(MagickWand *image, struct dimensions to_size, struct point position);
 
 int set_resource_limits(int disk, int map, int file, int memory, int area);

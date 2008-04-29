@@ -200,6 +200,20 @@ static void test_prepare_blob() {
 	free_image(image);
 }
 
+static void test_invalid_size() {
+	MagickWand *image;
+	struct dimensions size;
+
+	size.w = -100;
+	size.h = -200;
+	
+	image = fit_resize(IMAGE_TEST_FILE, size);
+	assert_equal(image, 0);
+
+	image = strict_resize(IMAGE_TEST_FILE, size);
+	assert_equal(image, 0);
+}
+
 
 /* setup and teardown */
 static void test_setup() {
@@ -224,6 +238,7 @@ int main(int argc, char **argv) {
 	add_test(cgiscaler_suite, test_resize_field_limiting);
 	add_test(cgiscaler_suite, test_remove_transparentcy);
 	add_test(cgiscaler_suite, test_prepare_blob);
+	add_test(cgiscaler_suite, test_invalid_size);
 
 	setup(cgiscaler_suite, test_setup);
 	teardown(cgiscaler_suite, test_teardown);

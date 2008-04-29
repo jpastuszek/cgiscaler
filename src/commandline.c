@@ -107,6 +107,14 @@ static struct argp_option options[] = {
 	{"log-file",				'g', "STRING",		0, "Error message to serve in case error file cannot be served" DEFAULT(DEBUG_FILE)},
 #endif
 
+	{0, 0, 0, 0, "Limits (units may vary between IM versions):\n"},
+	{"max-out-pixels",			'P',	"INTEGER",	0, "If image area (in pixels) will be grater than this limit it's size will be reduced proportionally" DEFAULT(MAX_PIXEL_NO)},
+	{"limit-files",				'U',	"INTEGER",	0, "Maximum number of open pixel cache files" DEFAULT(RESOURCE_LIMIT_FILE)},
+	{"limit-disk",				'D',	"INTEGER",	0, "Maximum amount of disk space permitted for use by the pixel cache in bytes" DEFAULT(RESOURCE_LIMIT_DISK)},
+	{"limit-map",				'A',	"INTEGER",	0, "Maximum amount of memory map to allocate for the pixel cache in bytes - when this limit is exceeded, the image pixels are cached to disk" DEFAULT(RESOURCE_LIMIT_MAP)},
+	{"limit-memory",			'K',	"INTEGER",	0, "Maximum amount of memory to allocate for the pixel cache from the heap in bytes - when this limit is exceeded, the image pixels are cached to memory-mapped disk" DEFAULT(RESOURCE_LIMIT_MEMORY)},
+	{"limit-area",				'J',	"INTEGER",	0, "Maximum amount of memory to allocate for image from in bytes - images that exceed the area limit are cached to disk" DEFAULT(RESOURCE_LIMIT_AREA)},
+
 	{0, 0, 0, 0, "Other options:"},
 	{ 0 }
 };
@@ -242,6 +250,27 @@ static error_t parse_opt (int key, char *arg, struct argp_state *state) {
 			logging_config->log_file = strdup(arg);
 			break;
 #endif
+
+
+		case 'P':
+			resource_limit_config->max_pixel_no = atoi(arg);
+			break;
+		case 'U':
+			resource_limit_config->file_limit = atoi(arg);
+			break;
+		case 'D':
+			resource_limit_config->disk_limit = atoi(arg);
+			break;
+		case 'A':
+			resource_limit_config->map_limit = atoi(arg);
+			break;
+		case 'K':
+			resource_limit_config->memory_limit = atoi(arg);
+			break;
+		case 'J':
+			resource_limit_config->area_limit = atoi(arg);
+			break;
+
 
 		case ARGP_KEY_ARG:
 			// non taged arg
