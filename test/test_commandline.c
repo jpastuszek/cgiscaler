@@ -26,6 +26,8 @@
 
 /* commandline.c tests */
 static void test_apply_commandline_config() {
+	alloc_default_config();
+
 	/* if I change this to use config defines... */
 	char *args1[] = { "test", "-w", "100", "-h", "200" };
 	char *args2[] = { "test", "-w", "100", "-s", "-S", "-i", "abc/e/f.jpg" };
@@ -83,23 +85,51 @@ static void test_apply_commandline_config() {
 	assert_equal(operation_config->no_cache, 1);
 	assert_equal(operation_config->no_serve, 1);
 	assert_equal(operation_config->no_headers, 1);
+
+	free_config();
+}
+
+static void test_output_geometry() {
+	char *good_args[] = {"test", "-h", "123", "-w", "666" };
+	int good_args_len = 5;
+
+	char *no_args[] = {};
+
+	char *some_args[] = {"test", "-w", "25"};
+	int some_args_len = 3;
+
+	alloc_default_config();
+
+	apply_commandline_config(good_args_len, good_args);
+	assert_equal(output_config->size.h, 123);
+	assert_equal(output_config->size.w, 666);
+
+	apply_commandline_config(0, no_args);
+	assert_equal(output_config->size.h, 123);
+	assert_equal(output_config->size.w, 666);
+
+	apply_commandline_config(some_args_len, some_args);
+	assert_equal(output_config->size.h, 123);
+	assert_equal(output_config->size.w, 25);
+
+	free_config();
 }
 
 /* setup and teardown */
 static void test_setup() {
-	alloc_default_config();
-	debug_start(logging_config->log_file);
+// No debugging possible in this test
+//	debug_start(logging_config->log_file);
 }
 
 static void test_teardown() {
-	free_config();
-	debug_stop();
+//	debug_stop();
 }
 
 int main(int argc, char **argv) {
 	TestSuite *commandline_suite = create_named_test_suite(__FILE__);
 
 	add_test(commandline_suite, test_apply_commandline_config);
+	add_test(commandline_suite, test_output_geometry);
 
 	setup(commandline_suite, test_setup);
 	teardown(commandline_suite, test_teardown);

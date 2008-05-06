@@ -3,3 +3,4 @@
 AUTOMAKE_OPTIONS = foreign 1.4
 
 SUBDIRS = cgreen src test
+INCLUDES = -I/usr/include/ImageMagick
