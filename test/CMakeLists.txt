@@ -27,6 +27,8 @@ add_executable(commandline
   debug.c
   file_utils.c
   format_info.c
+  scaler.c
+  geometry_math.c
   )
 target_link_libraries(commandline ${Magick_LIBRARY} ${Wand_LIBRARY}
   cgreen)

@@ -115,6 +115,9 @@ struct simple_query_string_config {
 	/** String to mach false value in CGI query string */
 	char *query_false_param;
 
+	/** If true low quality value will be used for output quality setting */
+	unsigned short int use_loq_quality;
+
 	/** Use this quality when low quality is enabled */
 	unsigned short int low_quality_value;
 

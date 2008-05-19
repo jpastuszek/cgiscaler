@@ -75,7 +75,7 @@ static struct argp_option options[] = {
 	{"low-quality-value",		'Q',	"INTEGER",	0, "Image quality (1-100) to use when low-quality is enabled" DEFAULT(LOWQ_QUALITY)},
 	{"normal-quality-value",	'N',	"INTEGER",	0, "Image quality (1-100) to use when low-quality is disabled" DEFAULT(DEFAULT_QUALITY)},
 
-	{0, 0, 0, 0, "Input and output:\n"},
+	{0, 0, 0, 0, "Storage\n"},
 	{"media-dir",				'm',	"DIRECTORY",	0, "Root directory of media store - all file paths are relative to this directory" DEFAULT(MEDIA_PATH)},
 	{"cache-dir",				'c',	"DIRECTORY",	0, "Root directory of cache store - all cached thumbnails will go there" DEFAULT(CACHE_PATH)},
 	//{"outfile",	'o', "FILE",	0, "Output to file instead of stdout"},
@@ -94,7 +94,7 @@ static struct argp_option options[] = {
 	{"transparency-colour",		'u',	"STRING",	0, "Transparency replacement colour" DEFAULT(DEFAULT_BACKGROUND_COLOR)},
 
 	{0, 0, 0, 0, "General operation:\n"},
-	{"no-server",				'S',	0,			0, "Do not serve the resulting image" DEFAULT(unset)},
+	{"no-serve",				'S',	0,			0, "Do not serve the resulting image" DEFAULT(unset)},
 	{"no-headers",			'H',	0,			0, "Do not serve HTTP headers" DEFAULT(unset)},
 	{"no-cache",				'C',	0,			0, "Do disable cache" DEFAULT(unset)},
 
@@ -161,13 +161,6 @@ static error_t parse_opt (int key, char *arg, struct argp_state *state) {
 			simple_query_string_config->query_false_param = strdup(arg);
 			break;
 
-		case 'Q':
-			simple_query_string_config->low_quality_value = atoi(arg);
-			break;
-		case 'N':
-			simple_query_string_config->default_quality_value = atoi(arg);
-			break;
-
 		case 's':
 			output_config->scale_method = SM_STRICT;
 			break;
@@ -175,6 +168,7 @@ static error_t parse_opt (int key, char *arg, struct argp_state *state) {
 			output_config->scale_method = SM_FIT;
 			break;
 		case 'l':
+			simple_query_string_config->use_loq_quality = 1;
 			output_config->quality = simple_query_string_config->low_quality_value;
 			break;
 		case 'i':
@@ -186,6 +180,16 @@ static error_t parse_opt (int key, char *arg, struct argp_state *state) {
 				output_config->file_name = file_name;
 			}
 			break;
+		case 'Q':
+			simple_query_string_config->low_quality_value = atoi(arg);
+			// Update output quality when value has changed
+			if (simple_query_string_config->use_loq_quality)
+				output_config->quality = simple_query_string_config->low_quality_value;
+			break;
+		case 'N':
+			simple_query_string_config->default_quality_value = atoi(arg);
+			break;
+
 		case 'm':
 			storage_config->media_directory = strdup(arg);
 			break;

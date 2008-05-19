@@ -59,7 +59,8 @@ cache_OBJECTS = $(am_cache_OBJECTS)
 cache_DEPENDENCIES = $(top_builddir)/cgreen/libcgreen.a
 am_commandline_OBJECTS = asserts.$(OBJEXT) commandline.$(OBJEXT) \
 	debug.$(OBJEXT) file_utils.$(OBJEXT) format_info.$(OBJEXT) \
-	runtime_config.$(OBJEXT) test_commandline.$(OBJEXT)
+	geometry_math.$(OBJEXT) runtime_config.$(OBJEXT) \
+	scaler.$(OBJEXT) test_commandline.$(OBJEXT)
 commandline_OBJECTS = $(am_commandline_OBJECTS)
 commandline_DEPENDENCIES = $(top_builddir)/cgreen/libcgreen.a
 am_file_utils_OBJECTS = asserts.$(OBJEXT) debug.$(OBJEXT) \
@@ -272,7 +273,7 @@ runtime_config_SOURCES = debug.c format_info.c runtime_config.c \
 
 runtime_config_LDADD = $(top_builddir)/cgreen/libcgreen.a
 commandline_SOURCES = asserts.c commandline.c debug.c file_utils.c \
-	format_info.c runtime_config.c test_commandline.c
+	format_info.c geometry_math.c runtime_config.c scaler.c test_commandline.c
 
 commandline_LDADD = $(top_builddir)/cgreen/libcgreen.a
 scaler_SOURCES = asserts.c debug.c file_utils.c format_info.c geometry_math.c \

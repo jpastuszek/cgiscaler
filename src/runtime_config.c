@@ -179,6 +179,7 @@ struct simple_query_string_config* alloc_default_simple_query_string_config() {
 	config->query_true_param = strdup(QUERY_TRUE_VAL);
 	config->query_false_param = strdup(QUERY_FALSE_VAL);
 
+	config->use_loq_quality = 0;
 	config->low_quality_value = LOWQ_QUALITY;
 	config->default_quality_value = DEFAULT_QUALITY;
 

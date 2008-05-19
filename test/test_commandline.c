@@ -23,6 +23,7 @@
 #include "defaults.h"
 #include "debug.h"
 #include "commandline.h"
+#include "scaler.h"
 
 /* commandline.c tests */
 static void test_apply_commandline_config() {
@@ -115,6 +116,175 @@ static void test_output_geometry() {
 	free_config();
 }
 
+static void test_output_format() {
+	char *good_args[] = {"test", "--out-format", "JPG", "--failback-mime-type", "image/gif" };
+	int good_args_len = 5;
+
+	alloc_default_config();
+
+	apply_commandline_config(good_args_len, good_args);
+	assert_string_equal(output_config->format->format, "JPG");
+	assert_string_equal(output_config->format->mime_type, "image/jpeg");
+	assert_string_equal(output_config->fail_mime_type, "image/gif");
+
+	free_config();
+}
+
+static void test_simple_cgi_query_parameters() {
+	char *good_args[] = {"test", "--cgi-width", "width", "--cgi-height", "height", "--cgi-strict", "str", "--cgi-low-quality", "lq" };
+	int good_args_len = 9;
+
+	alloc_default_config();
+
+	apply_commandline_config(good_args_len, good_args);
+	assert_string_equal(simple_query_string_config->query_width_param, "width");
+	assert_string_equal(simple_query_string_config->query_height_param, "height");
+	assert_string_equal(simple_query_string_config->query_strict_param, "str");
+	assert_string_equal(simple_query_string_config->query_lowq_param, "lq");
+
+	free_config();
+}
+
+static void test_simple_cgi_query_values() {
+	char *good_args[] = {"test", "--cgi-true", "yes", "--cgi-false", "no"};
+	int good_args_len = 5;
+
+	alloc_default_config();
+
+	apply_commandline_config(good_args_len, good_args);
+	assert_string_equal(simple_query_string_config->query_true_param, "yes");
+	assert_string_equal(simple_query_string_config->query_false_param, "no");
+
+	free_config();
+}
+
+static void test_simple_cgi_query_defaults() {
+	char *good_args[] = {"test", "--strict-resize", "--low-quality", "--file-name", "test/car.gif", "--low-quality-value", "33", "--normal-quality-value", "77" };
+	int good_args_len =9;
+
+	char *good_args_lq[] = {"test", "--strict-resize",  "--file-name", "test/car.gif", "--low-quality-value", "22", "--normal-quality-value", "77", "--low-quality"};
+
+	alloc_default_config();
+
+	apply_commandline_config(good_args_len, good_args);
+	assert_equal(output_config->scale_method, SM_STRICT);
+	assert_equal(output_config->quality, simple_query_string_config->low_quality_value);
+	assert_string_equal(output_config->file_name, "test/car.gif");
+	assert_equal(simple_query_string_config->low_quality_value, 33);
+	assert_equal(simple_query_string_config->default_quality_value, 77);
+
+	free_config();
+
+	alloc_default_config();
+
+	apply_commandline_config(good_args_len, good_args_lq);
+	assert_equal(output_config->quality, simple_query_string_config->low_quality_value);
+	assert_equal(simple_query_string_config->low_quality_value, 22);
+
+	free_config();
+}
+
+static void test_storage() {
+	char *good_args[] = {"test", "--media-dir", "/blah/bleh", "--cache-dir", "/waga/chigi"};
+	int good_args_len = 5;
+
+	alloc_default_config();
+
+	apply_commandline_config(good_args_len, good_args);
+	assert_string_equal(storage_config->media_directory, "/blah/bleh");
+	assert_string_equal(storage_config->cache_directory, "/waga/chigi");
+
+	free_config();
+}
+
+static void test_resize_filters() {
+	char *good_args[] = {"test", "--scaling-filter", "BoxFilter", "--blur-factor", "0.5"};
+	int good_args_len = 5;
+
+	alloc_default_config();
+
+	apply_commandline_config(good_args_len, good_args);
+	assert_equal(output_config->scaling_filter, BoxFilter);
+	assert_equal(output_config->blur_factor, 0.5);
+
+	free_config();
+}
+
+static void test_transparent_image_handling() {
+	char *good_args[] = {"test", "--no-remove-transparency", "--transparency-colour", "#abcdef"};
+	int good_args_len = 4;
+
+	alloc_default_config();
+
+	assert_equal(output_config->remove_transparency, 1);
+
+	apply_commandline_config(good_args_len, good_args);
+	assert_equal(output_config->remove_transparency, 0);
+	assert_string_equal(output_config->transparency_replacement_color, "#abcdef");
+
+	free_config();
+}
+
+static void test_general_operation() {
+	char *good_args[] = {"test", "--no-serve", "--no-headers", "--no-cache"};
+	int good_args_len = 4;
+
+	alloc_default_config();
+
+	assert_equal(operation_config->no_serve, 0);
+	assert_equal(operation_config->no_headers, 0);
+	assert_equal(operation_config->no_cache, 0);
+
+	apply_commandline_config(good_args_len, good_args);
+	assert_equal(operation_config->no_serve, 1);
+	assert_equal(operation_config->no_headers, 1);
+	assert_equal(operation_config->no_cache, 1);
+
+	free_config();
+}
+
+static void test_error_handling() {
+	char *good_args[] = {"test", "--error-file", "photos/error_file.tiff", "--error-message", "404: not found"};
+	int good_args_len = 5;
+
+	alloc_default_config();
+
+	apply_commandline_config(good_args_len, good_args);
+	assert_string_equal(error_handling_config->error_image_file, "photos/error_file.tiff");
+	assert_string_equal(error_handling_config->error_message, "404: not found");
+
+	free_config();
+}
+
+static void test_logging() {
+	char *good_args[] = {"test", "--log-file", "logs/scaler.log"};
+	int good_args_len = 3;
+
+	alloc_default_config();
+
+	apply_commandline_config(good_args_len, good_args);
+	assert_string_equal(logging_config->log_file, "logs/scaler.log");
+
+	free_config();
+}
+
+static void test_limits() {
+	char *good_args[] = {"test", "--max-out-pixels", "761", "--limit-files", "79", "--limit-disk", "696", "--limit-map", "273", "--limit-memory", "298", "--limit-area", "35"};
+	int good_args_len = 13;
+
+	alloc_default_config();
+
+	apply_commandline_config(good_args_len, good_args);
+	assert_equal(resource_limit_config->max_pixel_no,  761);
+	assert_equal(resource_limit_config->file_limit,  79);
+	assert_equal(resource_limit_config->disk_limit,  696);
+	assert_equal(resource_limit_config->map_limit,  273);
+	assert_equal(resource_limit_config->memory_limit,  298);
+	assert_equal(resource_limit_config->area_limit,  35);
+
+	free_config();
+}
+
 /* setup and teardown */
 static void test_setup() {
 // No debugging possible in this test
@@ -130,6 +300,17 @@ int main(int argc, char **argv) {
 
 	add_test(commandline_suite, test_apply_commandline_config);
 	add_test(commandline_suite, test_output_geometry);
+	add_test(commandline_suite, test_output_format);
+	add_test(commandline_suite, test_simple_cgi_query_parameters);
+	add_test(commandline_suite, test_simple_cgi_query_values);
+	add_test(commandline_suite, test_simple_cgi_query_defaults);
+	add_test(commandline_suite, test_storage);
+	add_test(commandline_suite, test_resize_filters);
+	add_test(commandline_suite, test_transparent_image_handling);
+	add_test(commandline_suite, test_general_operation);
+	add_test(commandline_suite, test_error_handling);
+	add_test(commandline_suite, test_logging);
+	add_test(commandline_suite, test_limits);
 
 	setup(commandline_suite, test_setup);
 	teardown(commandline_suite, test_teardown);

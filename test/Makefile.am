@@ -21,7 +21,7 @@ runtime_config_SOURCES = debug.c format_info.c runtime_config.c \
 	test_runtime_config.c
 runtime_config_LDADD = $(top_builddir)/cgreen/libcgreen.a
 commandline_SOURCES = asserts.c commandline.c debug.c file_utils.c \
-	format_info.c runtime_config.c test_commandline.c
+	format_info.c geometry_math.c runtime_config.c scaler.c test_commandline.c
 commandline_LDADD = $(top_builddir)/cgreen/libcgreen.a
 scaler_SOURCES = asserts.c debug.c file_utils.c format_info.c geometry_math.c \
 	runtime_config.c scaler.c test_scaler.c
