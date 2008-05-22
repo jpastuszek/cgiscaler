@@ -135,29 +135,45 @@ static error_t parse_opt (int key, char *arg, struct argp_state *state) {
 			break;
 
 		case 'O':
+			if (output_config->format)
+				free_format_info(output_config->format);
 			output_config->format = format_to_format_info(arg);
 			break;
 		case 'b':
+			if (output_config->fail_mime_type)
+				free(output_config->fail_mime_type);
 			output_config->fail_mime_type = strdup(arg);
 			break;
 
 		case 'W':
+			if (simple_query_string_config->query_width_param)
+				free(simple_query_string_config->query_width_param);
 			simple_query_string_config->query_width_param = strdup(arg);
 			break;
 		case 'E':
+			if (simple_query_string_config->query_height_param)
+				free(simple_query_string_config->query_height_param);
 			simple_query_string_config->query_height_param = strdup(arg);
 			break;
 		case 'R':
+			if (simple_query_string_config->query_strict_param)
+				free(simple_query_string_config->query_strict_param);
 			simple_query_string_config->query_strict_param = strdup(arg);
 			break;
 		case 'L':
+			if (simple_query_string_config->query_lowq_param)
+				free(simple_query_string_config->query_lowq_param);
 			simple_query_string_config->query_lowq_param = strdup(arg);
 			break;
 
 		case 'T':
+			if (simple_query_string_config->query_true_param)
+				free(simple_query_string_config->query_true_param);
 			simple_query_string_config->query_true_param = strdup(arg);
 			break;
 		case 'F':
+			if (simple_query_string_config->query_false_param)
+				free(simple_query_string_config->query_false_param);
 			simple_query_string_config->query_false_param = strdup(arg);
 			break;
 
@@ -191,9 +207,13 @@ static error_t parse_opt (int key, char *arg, struct argp_state *state) {
 			break;
 
 		case 'm':
+			if (storage_config->media_directory)
+				free(storage_config->media_directory);
 			storage_config->media_directory = strdup(arg);
 			break;
 		case 'c':
+			if (storage_config->cache_directory)
+				free(storage_config->cache_directory);
 			storage_config->cache_directory = strdup(arg);
 			break;
 
@@ -229,6 +249,8 @@ static error_t parse_opt (int key, char *arg, struct argp_state *state) {
 			break;
 #endif
 		case 'u':
+			if (output_config->transparency_replacement_color)
+				free(output_config->transparency_replacement_color);
 			output_config->transparency_replacement_color = strdup(arg);
 			break;
 
@@ -243,14 +265,20 @@ static error_t parse_opt (int key, char *arg, struct argp_state *state) {
 			break;
 
 		case 'e':
+			if (error_handling_config->error_image_file)
+				free(error_handling_config->error_image_file);
 			error_handling_config->error_image_file = strdup(arg);
 			break;
 		case 'M':
+			if (error_handling_config->error_message)
+				free(error_handling_config->error_message);
 			error_handling_config->error_message = strdup(arg);
 			break;
 
 #ifdef DEBUG
 		case 'g':
+			if (logging_config->log_file)
+				free(logging_config->log_file);
 			logging_config->log_file = strdup(arg);
 			break;
 #endif
