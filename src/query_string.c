@@ -122,6 +122,7 @@ char *get_query_string_param(char *query_string, char *param_name) {
 
 	start_query_string = query_string;
 
+	//TODO: use of strsep(3) may simplify this
 	while(1) {
 		until_equal = index(query_string, '=');
 		if (!until_equal)

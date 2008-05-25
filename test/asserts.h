@@ -26,7 +26,11 @@ void assert_file_exists(char *file_path);
 void assert_file_not_exists(char *file_path);
 void assert_file_size(char *file_path, off_t size);
 
-void assert_byte_read(int fd, ssize_t bytes) ;
+void assert_byte_read(int fd, ssize_t bytes);
+
+unsigned int test_read_contains(int fd, char *str);
+#define assert_read_contains(fd, str) assert_true_with_message(test_read_contains(fd, str), "String [%s] not found in data stream", str)
+
 void asser_byte_read_in_range(int fd, ssize_t min, ssize_t max);
 
 void assert_jpg_byte_read(int fd, ssize_t bytes);

@@ -149,7 +149,7 @@ static void test_serve_from_cache_file() {
 	assert_headers_read(stdout_fd);
 	assert_byte_read(stdout_fd, 3000);
 
-	finish_fork(stdout_fd);
+	finish_fork_with_stdout_capture(stdout_fd);
 
 	/* cleaning up test file */
 	assert_not_equal(-1, unlink(absolute_cache_file_path));
@@ -169,7 +169,7 @@ static void test_serve_from_cache_file() {
 
 	assert_byte_read(stdout_fd, 3000);
 
-	finish_fork(stdout_fd);
+	finish_fork_with_stdout_capture(stdout_fd);
 
 	/* cleaning up test file */
 	assert_not_equal(-1, unlink(absolute_cache_file_path));
@@ -188,7 +188,7 @@ static void test_serve_from_cache_file() {
 		exit(0);
 	}
 
-	finish_fork(stdout_fd);
+	finish_fork_with_stdout_capture(stdout_fd);
 
 	/* there should be no cache file as it should be removed */
 	assert_file_not_exists(absolute_cache_file_path);
@@ -205,7 +205,7 @@ static void test_serve_from_cache_file() {
 		exit(0);
 	}
 
-	finish_fork(stdout_fd);
+	finish_fork_with_stdout_capture(stdout_fd);
 
 	free_fpath(absolute_cache_file_path);
 	free_fpath(cache_file_path);
@@ -227,7 +227,7 @@ static void test_serve_from_cache_file() {
 		exit(0);
 	}
 
-	finish_fork(stdout_fd);
+	finish_fork_with_stdout_capture(stdout_fd);
 
 	/* there should be no cache file as it should be removed */
 	assert_file_not_exists(absolute_cache_file_path);

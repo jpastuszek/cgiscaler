@@ -46,17 +46,15 @@ static void test_serve_from_file() {
 	if (!fork_with_stdout_capture(&stdout_fd)) {
 		operation_config->no_headers = 0;
 		status = serve_from_file(absolute_media_file_path, output_config->format->mime_type);
-		if (!status) {
-			restore_stdout();
+		if (!status)
 			assert_true_with_message(0, "serve_from_file failed");
-		}
 		exit(0);
 	}
 
 	assert_headers_read(stdout_fd);
 	assert_byte_read(stdout_fd, get_file_size(absolute_media_file_path));
 
-	finish_fork(stdout_fd);
+	finish_fork_with_stdout_capture(stdout_fd);
 	free_fpath(absolute_media_file_path);
 
 	/* real file, no headers*/
@@ -65,30 +63,26 @@ static void test_serve_from_file() {
 	if (!fork_with_stdout_capture(&stdout_fd)) {
 		operation_config->no_headers = 1;
 		status = serve_from_file(absolute_media_file_path, output_config->format->mime_type);
-		if (!status) {
-			restore_stdout();
+		if (!status)
 			assert_true_with_message(0, "serve_from_file failed");
-		}
 		exit(0);
 	}
 
 	assert_byte_read(stdout_fd, get_file_size(absolute_media_file_path));
 
-	finish_fork(stdout_fd);
+	finish_fork_with_stdout_capture(stdout_fd);
 	free_fpath(absolute_media_file_path);
 
 	/* bogus file */
 	if (!fork_with_stdout_capture(&stdout_fd)) {
 		operation_config->no_headers = 0;
 		status = serve_from_file("bogo_file_name.jpg", output_config->format->mime_type);
-		if (status) {
-			restore_stdout();
+		if (status)
 			assert_true_with_message(0, "serve_from_file failed");
-		}
 		exit(0);
 	}
 	
-	finish_fork(stdout_fd);
+	finish_fork_with_stdout_capture(stdout_fd);
 }
 
 static void test_serve_from_blob() {
@@ -108,7 +102,7 @@ static void test_serve_from_blob() {
 	assert_headers_read(stdout_fd);
 	assert_byte_read(stdout_fd, 31666);
 
-	finish_fork(stdout_fd);
+	finish_fork_with_stdout_capture(stdout_fd);
 
 	if (!fork_with_stdout_capture(&stdout_fd)) {
 		operation_config->no_headers = 1;
@@ -118,7 +112,7 @@ static void test_serve_from_blob() {
 
 	assert_byte_read(stdout_fd, 31666);
 
-	finish_fork(stdout_fd);
+	finish_fork_with_stdout_capture(stdout_fd);
 
 	free(blob);
 }
@@ -139,7 +133,7 @@ static void test_serve_error() {
 	assert_headers_read(stdout_fd);
 	assert_byte_read(stdout_fd, get_file_size(absolute_media_file_path));
 
-	finish_fork(stdout_fd);
+	finish_fork_with_stdout_capture(stdout_fd);
 
 	if (!fork_with_stdout_capture(&stdout_fd)) {
 		operation_config->no_headers = 1;
@@ -149,7 +143,7 @@ static void test_serve_error() {
 
 	assert_byte_read(stdout_fd, get_file_size(absolute_media_file_path));
 
-	finish_fork(stdout_fd);
+	finish_fork_with_stdout_capture(stdout_fd);
 
 
 	free_fpath(absolute_media_file_path);
@@ -167,7 +161,7 @@ static void test_serve_error_message() {
 	assert_headers_read(stdout_fd);
 	assert_byte_read(stdout_fd, strlen(error_handling_config->error_message));
 
-	finish_fork(stdout_fd);
+	finish_fork_with_stdout_capture(stdout_fd);
 
 	if (!fork_with_stdout_capture(&stdout_fd)) {
 		operation_config->no_headers = 1;
@@ -178,7 +172,7 @@ static void test_serve_error_message() {
 
 	assert_byte_read(stdout_fd, strlen(error_handling_config->error_message));
 
-	finish_fork(stdout_fd);
+	finish_fork_with_stdout_capture(stdout_fd);
 
 }
 

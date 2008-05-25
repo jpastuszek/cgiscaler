@@ -18,6 +18,8 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-void restore_stdout();
- int fork_with_stdout_capture(int *stdout_fd);
- void finish_fork(int stdout_fd);
+int fork_with_stdout_capture(int *stdout_fd);
+void finish_fork_with_stdout_capture(int stdout_fd);
+
+int fork_with_stdout_and_stderr_capture(int *stdout_fd, int *stderr_fd);
+void finish_fork_with_stdout_and_stderr_capture(int stdout_fd, int stderr_fd);

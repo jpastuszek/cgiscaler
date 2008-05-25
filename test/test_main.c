@@ -55,7 +55,7 @@ static void test_error() {
 	assert_headers_read(stdout_fd);
 	assert_byte_read(stdout_fd, get_file_size(absolute_media_file_path));
 
-	finish_fork(stdout_fd);
+	finish_fork_with_stdout_capture(stdout_fd);
 
 	if (!fork_with_stdout_capture(&stdout_fd)) {
 		cgiscaler(4, argv_nh);
@@ -64,7 +64,7 @@ static void test_error() {
 
 	assert_byte_read(stdout_fd, get_file_size(absolute_media_file_path));
 
-	finish_fork(stdout_fd);
+	finish_fork_with_stdout_capture(stdout_fd);
 
 	free_fpath(absolute_media_file_path);
 }
@@ -93,7 +93,7 @@ static void test_without_cached() {
 	/* We cannot know what size it will have after scale */
 	assert_jpg_byte_read_in_range(stdout_fd, 1000, get_file_size(absolute_media_file_path));
 
-	finish_fork(stdout_fd);
+	finish_fork_with_stdout_capture(stdout_fd);
 
 	/* real file, no headers */
 	if (!fork_with_stdout_capture(&stdout_fd)) {
@@ -104,7 +104,7 @@ static void test_without_cached() {
 	/* We cannot know what size it will have after scale */
 	assert_jpg_byte_read_in_range(stdout_fd, 1000, get_file_size(absolute_media_file_path));
 
-	finish_fork(stdout_fd);
+	finish_fork_with_stdout_capture(stdout_fd);
 
 	/* clean up */
 	free_fpath(absolute_media_file_path);
@@ -115,7 +115,7 @@ static void test_without_cached() {
 		exit(0);
 	}
 	
-	finish_fork(stdout_fd);
+	finish_fork_with_stdout_capture(stdout_fd);
 
 	/* get rid of the cache file */
 	storage_config = alloc_default_storage_config();
@@ -147,11 +147,10 @@ static void test_no_cache_no_file_name_given() {
 	assert_headers_read(stdout_fd);
 	assert_byte_read(stdout_fd, get_file_size(absolute_media_file_path));
 
-	finish_fork(stdout_fd);
+	finish_fork_with_stdout_capture(stdout_fd);
 
 	free_fpath(absolute_media_file_path);
 }
-
 
 static void test_from_cache() {
 	int stdout_fd;
@@ -179,7 +178,7 @@ static void test_from_cache() {
 	/* We cannot know what size it will have after scale */
 	assert_jpg_byte_read_in_range(stdout_fd, 1000, get_file_size(absolute_media_file_path));
 
-	finish_fork(stdout_fd);
+	finish_fork_with_stdout_capture(stdout_fd);
 
 	/* real file - now we should have the cache file*/
 	assert_file_exists(absolute_cach_file_path);
@@ -193,7 +192,7 @@ static void test_from_cache() {
 	/* We cannot know what size it will have after scale */
 	assert_jpg_byte_read_in_range(stdout_fd, 1000, get_file_size(absolute_media_file_path));
 
-	finish_fork(stdout_fd);
+	finish_fork_with_stdout_capture(stdout_fd);
 
 	/* get rid of the cache file */
 	assert_not_equal(unlink(absolute_cach_file_path), -1);
@@ -203,25 +202,28 @@ static void test_from_cache() {
 	free_fpath(absolute_cach_file_path);
 }
 
-// TODO: this test has no sense after swiched to Argp for cmdline parsing
+/** We check if program will give an error message for unrecognized argument. **/
 static void test_bad_param() {
 	int stdout_fd;
+	int stderr_fd;
+
 	abs_fpath *absolute_media_file_path;
-	char *argv_nc[] = {"test" };
+	char *argv_nc[] = {"test", "----fdas" };
+	int argc_nc = 2;
 
 	storage_config = alloc_default_storage_config();
 	absolute_media_file_path = create_absolute_media_file_path(ERROR_FILE_PATH);
 	free_storage_config(storage_config);
 
-	if (!fork_with_stdout_capture(&stdout_fd)) {
-		cgiscaler(1, argv_nc);
+	if (!fork_with_stdout_and_stderr_capture(&stdout_fd, &stderr_fd)) {
+		cgiscaler(argc_nc, argv_nc);
 		exit(0);
 	}
 
-	assert_headers_read(stdout_fd);
-	assert_byte_read(stdout_fd, get_file_size(absolute_media_file_path));
+	/* Here we just check if stderr mentions our bad parameter as the message it self may be locale dependant */
+	assert_read_contains(stderr_fd, "----fdas");
 
-	finish_fork(stdout_fd);
+	finish_fork_with_stdout_and_stderr_capture(stdout_fd, stderr_fd);
 
 	free_fpath(absolute_media_file_path);
 }
@@ -252,7 +254,7 @@ static void test_no_cache () {
 	/* We cannot know what size it will have after scale */
 	assert_jpg_byte_read_in_range(stdout_fd, 1000, get_file_size(absolute_media_file_path));
 
-	finish_fork(stdout_fd);
+	finish_fork_with_stdout_capture(stdout_fd);
 
 	/* cache file should not be there */
 	assert_file_not_exists(absolute_cach_file_path);
@@ -286,7 +288,7 @@ static void test_no_heders() {
 
 	/* We cannot know what size it will have after scale */	assert_jpg_byte_read_in_range(stdout_fd, 1000, get_file_size(absolute_media_file_path));
 
-	finish_fork(stdout_fd);
+	finish_fork_with_stdout_capture(stdout_fd);
 
 	/* get rid of the cache file */
 	assert_not_equal(unlink(absolute_cach_file_path), -1);
@@ -321,7 +323,7 @@ static void test_no_server() {
 	/* We cannot know what size it will have after scale */	
 	assert_byte_read(stdout_fd, 0);
 
-	finish_fork(stdout_fd);
+	finish_fork_with_stdout_capture(stdout_fd);
 
 	/* get rid of the cache file */
 	assert_not_equal(unlink(absolute_cach_file_path), -1);
@@ -355,7 +357,7 @@ static void test_no_serve_no_cache_no_header() {
 	/* We cannot know what size it will have after scale */	
 	assert_byte_read(stdout_fd, 0);
 
-	finish_fork(stdout_fd);
+	finish_fork_with_stdout_capture(stdout_fd);
 
 	assert_file_not_exists(absolute_cach_file_path);
 

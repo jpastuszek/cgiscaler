@@ -22,6 +22,7 @@
 #include <fcntl.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <string.h>
 
 #include "asserts.h"
 #include "../cgreen/cgreen.h"
@@ -87,6 +88,78 @@ size_t data_read(int fd) {
 	
 	return btotal;
 }
+
+/** Read all data from file descriptor.
+* Read data until EOF from file descriptor and store it in newly allocated memory.
+* @param fd file discriptor to read from
+* @param len will be set to amount of data read/length of returned buffer
+* @return allocated buffer containing all read data or 0 on failure
+**/
+unsigned char *data_read_all(int fd, unsigned int *len) {
+	int bread;
+	unsigned int btotal;
+	
+	unsigned int buf_len = 1024;
+	unsigned char buf[1024];
+
+	unsigned char *store = 0;
+
+	btotal = 0;
+
+	while (1) {
+		bread = read(fd, buf, buf_len);
+		if (bread == -1) {
+			assert_true_with_message(0, "read from fd [%d] failed", fd);
+			return 0;
+		}
+
+		if (bread == 0)
+			break;
+
+		//assert_true_with_message(0, "Debug: realloc size %d", btotal + bread);
+		store = realloc(store, btotal + bread);
+		memcpy(store + btotal, buf, bread);
+
+		btotal += bread;
+	}
+
+	*len = btotal;
+	return store;
+}
+
+/** Tests if data read from file descriptor contains given string.
+* @param fd file descriptor to read from
+* @param str stirng to be found in read data
+* @return true if found, false if not found
+**/
+unsigned int test_read_contains(int fd, char *str) {
+	char *data;
+	unsigned int len;
+	unsigned int str_len;
+	int i;
+
+	data = (char *) data_read_all(fd, &len);
+	if (!data)
+		return 0;
+
+	data = realloc(data, len + 1);
+	data[len] = '\0';
+
+	//assert_true_with_message(0, "data [%d] [%s]", len, data);
+
+	str_len = strlen(str);
+	for (i = 0; i < len; i++) {
+		if (!strncmp(data + i, str, str_len)) {
+			free(data);
+			return 1;
+		}
+	}
+
+	free(data);
+
+	return 0;
+}
+
 
 size_t assert_jpg_data_read(int fd) {
 	int bread;
