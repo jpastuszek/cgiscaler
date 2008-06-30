@@ -53,8 +53,8 @@ exit(-1); \
 
 MagickWand *remove_transparency(MagickWand *image);
 
-/* TODO: Zero sized image will do original size? may by configurable? :D */
-/* TODO: Performance tests... profiler? :D */
+//TODO: Zero sized image will do original size? may by configurable? :D
+//TODO: Performance tests... profiler? :D
 
 /** Structure that maps resize filters to their names */
 struct _resize_filters resize_filters[11] =
@@ -264,7 +264,7 @@ void free_blob(unsigned char *blob) {
 	MagickRelinquishMemory(blob);
 }
 
-/* TODO: implement non aspect ratio keeping re-size */
+//TODO: implement non aspect ratio keeping re-size
 /** Re-sizes image without loosing it's aspect ratio by fitting image in specified dimensions.
 * Re-size the image to resize_to dimensions keeping aspect ration and fitting into resize_to dimensions effectively using resize_to width and height as the limits.
 * @param media_file_path path to file that stores input image
@@ -470,13 +470,38 @@ MagickWand *ping_image(media_fpath *media_file_path) {
 	return image;
 }
 
-/* TODO: implement something better... */
+//TODO: implement something better...
 /** Calcuates pre resize size values. */
 int apply_pre_resize_factor(int orginal, int target) {
 	if (target * 5 > orginal)
 		return orginal;
 
 	return target * 5;
+}
+
+/** Tries to pre-scale image using fastest scaling method.
+* This will pre-scale image so high quality scaler can work on reduced data set.
+**/
+short int do_pre_scale_if_necessary(MagickWand *image, struct dimensions to_size) {
+	MagickBooleanType status;
+	struct dimensions image_size;
+	struct dimensions image_prescale_size;
+
+	image_size = get_image_size(image);
+
+	/* Try to figure out to what size to do pre-scaling using fast scaling method - this normally be only usefull for big non JPEG images */
+	image_prescale_size.w = apply_pre_resize_factor(image_size.w, to_size.w);
+	image_prescale_size.h = apply_pre_resize_factor(image_size.h, to_size.h);
+
+	if (image_prescale_size.w != image_size.w || image_prescale_size.h != image_size.h) {
+		debug(INFO, "Using fast pre-scale");
+
+		status = MagickSampleImage(image, image_prescale_size.w, image_prescale_size.h);
+		if (status == MagickFalse)
+			return 0;
+	}
+
+	return 1;
 }
 
 /** Resize image to given dimensions.
@@ -489,20 +514,11 @@ int apply_pre_resize_factor(int orginal, int target) {
 short int resize(MagickWand *image, struct dimensions to_size) {
 	MagickBooleanType status;
 	struct timer timeing;
-	struct dimensions image_size;	
 
 	timer_start(&timeing);
 
-	image_size = get_image_size(image);
-
-	/* Fast pre resize */
-	//TODO: Test if pre-resize is needed
-	//TODO: Use standard magick resize function instead of this one as it is not available in older versions
-	status = MagickAdaptiveResizeImage(image, apply_pre_resize_factor(image_size.w, to_size.w), apply_pre_resize_factor(image_size.h, to_size.h));
-	if (status == MagickFalse) {
-		debug(ERR, "Adaptive resize failed!");
-		return 0;
-	}
+	if (! do_pre_scale_if_necessary(image, to_size))
+		debug(WARN, "Fast pre-scale failed...");
 
 	/* Full filtered resize */
 	status = MagickResizeImage(image, to_size.w, to_size.h, output_config->scaling_filter, output_config->blur_factor);

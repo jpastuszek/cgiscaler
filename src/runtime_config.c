@@ -144,7 +144,6 @@ struct logging_config *alloc_default_logging_config() {
 	if (!config)
 		exit(66);
 
-	//TODO: Rename constant and related to "LOG_FILE"
 	config->log_file = strdup(LOG_FILE);
 	//TODO: Implement log levels
 	config->log_level = 0;

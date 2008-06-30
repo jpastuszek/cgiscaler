@@ -33,7 +33,7 @@ extern struct simple_query_string_config *simple_query_string_config;
 extern char **scale_method_names;
 #endif
 
-/* TODO: %xx in query string decoding... no need for filename (apache) */
+//TODO: %xx in query string decoding... no need for filename (apache)
 /** Apply configuration changes by reading provided CGI query string and file name.
 * @param file_name path to file to update runtime configuration with
 * @param query_string string to parse - should be in CGI format
