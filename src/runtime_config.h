@@ -94,7 +94,6 @@ struct operation_config {
 struct logging_config {
 	/** Path to log file */
 	char *log_file;
-
 	/** Log level to filter log entries */
 	unsigned short int log_level;
 };

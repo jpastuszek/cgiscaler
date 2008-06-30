@@ -94,7 +94,7 @@ static void test_output_geometry() {
 	char *good_args[] = {"test", "-h", "123", "-w", "666" };
 	int good_args_len = 5;
 
-	char *no_args[] = {};
+	char *no_args[] = {"test"};
 
 	char *some_args[] = {"test", "-w", "25"};
 	int some_args_len = 3;
@@ -105,7 +105,7 @@ static void test_output_geometry() {
 	assert_equal(output_config->size.h, 123);
 	assert_equal(output_config->size.w, 666);
 
-	apply_commandline_config(0, no_args);
+	apply_commandline_config(1, no_args);
 	assert_equal(output_config->size.h, 123);
 	assert_equal(output_config->size.w, 666);
 
@@ -257,6 +257,7 @@ static void test_error_handling() {
 }
 
 static void test_logging() {
+#ifdef DEBUG
 	char *good_args[] = {"test", "--log-file", "logs/scaler.log"};
 	int good_args_len = 3;
 
@@ -266,6 +267,7 @@ static void test_logging() {
 	assert_string_equal(logging_config->log_file, "logs/scaler.log");
 
 	free_config();
+#endif
 }
 
 static void test_limits() {

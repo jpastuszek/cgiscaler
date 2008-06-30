@@ -156,6 +156,7 @@ struct logging_config *alloc_default_logging_config() {
 void free_logging_config(struct logging_config *config) {
 	if (config->log_file)
 		free(config->log_file);
+
 	free(config);
 }
 

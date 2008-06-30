@@ -99,12 +99,12 @@ static struct argp_option options[] = {
 	{"no-cache",				'C',	0,			0, "Do disable cache" DEFAULT(unset)},
 
 	{0, 0, 0, 0, "Error handling:\n"},
-	{"error-file",				'e', "FILE",		0, "Serve this file in case of error" DEFAULT(ERROR_FILE_PATH)},
+	{"error-file",				'e', "FILE",		0, "Serve this file in case of an error" DEFAULT(ERROR_FILE_PATH)},
 	{"error-message",			'M', "STRING",	0, "Error message to serve in case error file cannot be served" DEFAULT(ERROR_FAILBACK_MESSAGE)},
 
 #ifdef DEBUG
 	{0, 0, 0, 0, "Logging:\n"},
-	{"log-file",				'g', "STRING",		0, "Error message to serve in case error file cannot be served" DEFAULT(DEBUG_FILE)},
+	{"log-file",				'g', "STRING",		0, "Messages will be logged to this file" DEFAULT(DEBUG_FILE)},
 #endif
 
 	{0, 0, 0, 0, "Limits (units may vary between IM versions):\n"},
@@ -282,7 +282,6 @@ static error_t parse_opt (int key, char *arg, struct argp_state *state) {
 			logging_config->log_file = strdup(arg);
 			break;
 #endif
-
 
 		case 'P':
 			resource_limit_config->max_pixel_no = atoi(arg);
