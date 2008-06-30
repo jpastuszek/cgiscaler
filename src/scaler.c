@@ -515,6 +515,11 @@ short int resize(MagickWand *image, struct dimensions to_size) {
 	MagickBooleanType status;
 	struct timer timeing;
 
+	if (to_size.w <= 0 || to_size.h <= 0) {
+		debug(ERR, "Requested invalid image size: %ux%u", to_size.w, to_size.h);
+		return 0;
+	}
+
 	timer_start(&timeing);
 
 	if (! do_pre_scale_if_necessary(image, to_size))
@@ -542,6 +547,11 @@ short int resize(MagickWand *image, struct dimensions to_size) {
 short int crop(MagickWand *image, struct dimensions to_size, struct point position) {
 	MagickBooleanType status;
 	struct timer timeing;
+
+	if (to_size.w <= 0 || to_size.h <= 0) {
+		debug(ERR, "Requested invalid image size: %ux%u", to_size.w, to_size.h);
+		return 0;
+	}
 
 	timer_start(&timeing);
 
