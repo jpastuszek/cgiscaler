@@ -43,10 +43,10 @@ static void test_apply_commandline_config() {
 	assert_equal(output_config->size.w, 100);
 	assert_equal(output_config->size.h, 200);
 	assert_equal(output_config->scale_method, DEFAULT_STRICT);
-	assert_equal(output_config->quality, DEFAULT_QUALITY);
-	assert_equal(operation_config->no_cache, DEFAULT_NO_CACHE);
-	assert_equal(operation_config->no_serve, DEFAULT_NO_SERVE);
-	assert_equal(operation_config->no_headers, DEFAULT_NO_HEADERS);
+	assert_equal(output_config->quality, NORMAL_QUALITY_VALUE);
+	assert_equal(operation_config->no_cache, NO_CACHE);
+	assert_equal(operation_config->no_serve, NO_SERVE);
+	assert_equal(operation_config->no_headers, NO_HEADERS);
 
 	free_operation_config(operation_config);
 	free_output_config(output_config);
@@ -58,9 +58,9 @@ static void test_apply_commandline_config() {
 
 	assert_string_equal(output_config->file_name, "abc/e/f.jpg");
 	assert_equal(output_config->size.w, 100);
-	assert_equal(output_config->size.h, DEFAULT_HEIGHT);
+	assert_equal(output_config->size.h, HEIGHT);
 	assert_equal(output_config->scale_method, SM_STRICT);
-	assert_equal(output_config->quality, DEFAULT_QUALITY);
+	assert_equal(output_config->quality, NORMAL_QUALITY_VALUE);
 	assert_equal(operation_config->no_cache, 0);
 	assert_equal(operation_config->no_serve, 1);
 	assert_equal(operation_config->no_headers, 0);
@@ -71,7 +71,7 @@ static void test_apply_commandline_config() {
 	assert_equal(output_config->size.w, 100);
 	assert_equal(output_config->size.h, 100);
 	assert_equal(output_config->scale_method, SM_STRICT);
-	assert_equal(output_config->quality, DEFAULT_QUALITY);
+	assert_equal(output_config->quality, NORMAL_QUALITY_VALUE);
 	assert_equal(operation_config->no_cache, 0);
 	assert_equal(operation_config->no_serve, 1);
 	assert_equal(operation_config->no_headers, 0);
@@ -82,7 +82,7 @@ static void test_apply_commandline_config() {
 	assert_equal(output_config->size.w, 100);
 	assert_equal(output_config->size.h, 100);
 	assert_equal(output_config->scale_method, SM_STRICT);
-	assert_equal(output_config->quality, LOWQ_QUALITY);
+	assert_equal(output_config->quality, LOW_QUALITY_VALUE);
 	assert_equal(operation_config->no_cache, 1);
 	assert_equal(operation_config->no_serve, 1);
 	assert_equal(operation_config->no_headers, 1);

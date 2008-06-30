@@ -151,7 +151,7 @@ MagickWand *load_image(media_fpath *media_file_path, struct dimensions to_size) 
 	return image;
 }
 
-/** If image has transparency/mate/alpha channel this function will replace transparent places with DEFAULT_BACKGROUND_COLOR.
+/** If image has transparency/mate/alpha channel this function will replace transparent places with TRANSPARENCY_COLOUR.
 * @param image image to remove transparency from
 * @return original image if no need of removal or on failure, processed image on success
 */
@@ -171,7 +171,7 @@ MagickWand *remove_transparency(MagickWand *image) {
 	debug(DEB, "Removing transparency and colloring it to background color '%s'", output_config->transparency_replacement_color);
 	timer_start(&timeing);
 
-	/* Set background to DEFAULT_BACKGROUND_COLOR - in case of transparent gifs or png */
+	/* Set background to TRANSPARENCY_COLOUR - in case of transparent gifs or png */
 	bg_color = NewPixelWand();
 	if (!bg_color) {
 		debug(ERR, "Creating new pixel wand failed!");
@@ -291,7 +291,7 @@ MagickWand *fit_resize(media_fpath *media_file_path, struct dimensions resize_to
 	/* this will calculate target size for aspect ratio keeping resize method */
 	resize_to = resize_to_fit_in(image_size, resize_to);
 
-	/* we are reducing requested thumbnail resolution to MAX_PIXEL_NO */
+	/* we are reducing requested thumbnail resolution to MAX_OUT_PIXELS */
 	resize_to = reduce_filed(resize_to, resource_limit_config->max_pixel_no);
 
 	load_size = resize_to;
@@ -358,7 +358,7 @@ MagickWand *strict_resize(media_fpath *media_file_path, struct dimensions resize
 	struct dimensions crop_to;
 	struct point position;
 
-	/* we are reducing requested thumbnail resolution to MAX_PIXEL_NO */
+	/* we are reducing requested thumbnail resolution to MAX_OUT_PIXELS */
 	resize_to = reduce_filed(resize_to, resource_limit_config->max_pixel_no);
 
 	load_size = resize_to;

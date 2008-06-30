@@ -162,7 +162,7 @@ static void test_remove_transparentcy() {
 	/* we assert that we don't have transparent pixel */
 	assert_image_pixel_alpha(image, 10, 10, 1.0);
 	debug(DEB, "### Transparency color: %s", output_config->transparency_replacement_color);
-	/* and color is DEFAULT_BACKGROUND_COLOR_MAGICK_STR */
+	/* and color is TRANSPARENCY_COLOUR_MAGICK_STR */
 	assert_image_pixel_color(image, 10, 10, output_config->transparency_replacement_color);
 
 	free_image(image);

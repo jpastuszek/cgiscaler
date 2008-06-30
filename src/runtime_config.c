@@ -73,15 +73,15 @@ struct output_config *alloc_default_output_config() {
 	config->format = format_to_format_info(OUT_FORMAT);
 	config->fail_mime_type = strdup(FAIL_BACK_MIME_TYPE);
 
-	config->size.w = DEFAULT_WIDTH;
-	config->size.h = DEFAULT_HEIGHT;
+	config->size.w = WIDTH;
+	config->size.h = HEIGHT;
 
-	config->quality = DEFAULT_QUALITY;
+	config->quality = NORMAL_QUALITY_VALUE;
 
-	config->scale_method = DEFAULT_SCALE_METHOD;
+	config->scale_method = SCALE_METHOD;
 
-	config->scaling_filter = RESIZE_FILTER;
-	config->blur_factor = RESIZE_SMOOTH_FACTOR;
+	config->scaling_filter = SCALING_FILTER;
+	config->blur_factor = BLUR_FACTOR;
 
 #ifdef REMOVE_TRANSPARENCY
 	config->remove_transparency = 1;
@@ -89,7 +89,7 @@ struct output_config *alloc_default_output_config() {
 	config->remove_transparency = 0;
 #endif
 
-	config->transparency_replacement_color = strdup(DEFAULT_BACKGROUND_COLOR);
+	config->transparency_replacement_color = strdup(TRANSPARENCY_COLOUR);
 
 	return config;
 }
@@ -121,9 +121,9 @@ struct operation_config *alloc_default_operation_config() {
 
 	config->query_string_mode = QSM_SIMPLE;
 
-	config->no_cache = DEFAULT_NO_CACHE;
-	config->no_serve = DEFAULT_NO_SERVE;
-	config->no_headers = DEFAULT_NO_HEADERS;
+	config->no_cache = NO_CACHE;
+	config->no_serve = NO_SERVE;
+	config->no_headers = NO_HEADERS;
 
 	return config;	
 }
@@ -145,7 +145,7 @@ struct logging_config *alloc_default_logging_config() {
 		exit(66);
 
 	//TODO: Rename constant and related to "LOG_FILE"
-	config->log_file = strdup(DEBUG_FILE);
+	config->log_file = strdup(LOG_FILE);
 	//TODO: Implement log levels
 	config->log_level = 0;
 
@@ -172,17 +172,17 @@ struct simple_query_string_config* alloc_default_simple_query_string_config() {
 	if (!config)
 		exit(66);
 
-	config->query_width_param = strdup(QUERY_WIDTH_PARAM);
-	config->query_height_param = strdup(QUERY_HEIGHT_PARAM);
-	config->query_strict_param = strdup(QUERY_STRICT_PARAM);
-	config->query_lowq_param = strdup(QUERY_LOWQ_PARAM);
+	config->query_width_param = strdup(CGI_WIDTH);
+	config->query_height_param = strdup(CGI_HEIGHT);
+	config->query_strict_param = strdup(CGI_STRICT);
+	config->query_lowq_param = strdup(CGI_LOW_QUALITY);
 
-	config->query_true_param = strdup(QUERY_TRUE_VAL);
-	config->query_false_param = strdup(QUERY_FALSE_VAL);
+	config->query_true_param = strdup(CGI_TRUE);
+	config->query_false_param = strdup(CGI_FALSE);
 
 	config->use_loq_quality = 0;
-	config->low_quality_value = LOWQ_QUALITY;
-	config->default_quality_value = DEFAULT_QUALITY;
+	config->low_quality_value = LOW_QUALITY_VALUE;
+	config->default_quality_value = NORMAL_QUALITY_VALUE;
 
 	return config;
 }
@@ -217,8 +217,8 @@ struct storage_config* alloc_default_storage_config() {
 	if (!config)
 		exit(66);
 
-	config->media_directory = strdup(MEDIA_PATH);
-	config->cache_directory = strdup(CACHE_PATH);
+	config->media_directory = strdup(MEDIA_DIR);
+	config->cache_directory = strdup(CACHE_DIR);
 
 	return config;
 }
@@ -244,8 +244,8 @@ struct error_handling_config* alloc_default_error_handling_config() {
 	if (!config)
 		exit(66);
 
-	config->error_image_file = strdup(ERROR_FILE_PATH);
-	config->error_message = strdup(ERROR_FAILBACK_MESSAGE);
+	config->error_image_file = strdup(ERROR_FILE);
+	config->error_message = strdup(ERROR_MESSAGE);
 
 	return config;
 }
@@ -271,13 +271,13 @@ struct resource_limit_config* alloc_default_resource_limit_config() {
 	if (!config)
 		exit(66);
 
-	config->max_pixel_no = MAX_PIXEL_NO;
+	config->max_pixel_no = MAX_OUT_PIXELS;
 
-	config->file_limit = RESOURCE_LIMIT_FILE;
-	config->disk_limit = RESOURCE_LIMIT_DISK;
-	config->map_limit = RESOURCE_LIMIT_MAP;
-	config->memory_limit = RESOURCE_LIMIT_MEMORY;
-	config->area_limit = RESOURCE_LIMIT_AREA;
+	config->file_limit = LIMIT_FILES;
+	config->disk_limit = LIMIT_DISK;
+	config->map_limit = LIMIT_MAP;
+	config->memory_limit = LIMIT_MEMORY;
+	config->area_limit = LIMIT_AREA;
 
 	return config;
 }
