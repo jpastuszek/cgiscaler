@@ -1,93 +1,92 @@
-Installation
-==================
-= Linux:
+CGIScaler Installation
+======================
+Jakub Pastuszek <jpastuszek@gmail.com>
+v2.0, June 2008
 
-Configure source tree:
-  ./configure
+Installation using CCMake
+-------------------------
 
-Edit configuration to match your needs:
-  vi src/config.h
+Untar and go to your source directory
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------------------
+tar xjf CGIScaler-<varsion>.tar.bz2
+cd CGIScaler-<version>
+-----------------------------------
 
-Build:
-  make
+Configure with CCMake
+~~~~~~~~~~~~~~~~~~~~~
+--------
+ccmake .
+--------
+Make sure that _ImageMagick_ include dir and libs are correct.
+Also remember to set *CMAKE_BUILD_TYPE* field (us arrow key to navigate, enter to change field - there are some tips at the bottom of the window)
 
-Run unit tests
-  tests/test
+Build
+~~~~~
+----
+make
+----
 
-= Solaris:
+Copy binary to your installaction directory
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The binary could be found in *src* directory and called *cgiscaler* by default.
 
-Set up environment:
-  export PATH=/usr/bin:/usr/sbin:/usr/ccs/bin:/usr/sfw/bin
-  export LD_LIBRARY_PATH=/usr/local/lib/64:/usr/local/lib:/usr/lib:$LD_LIBRARY_PATH
+Create new bash script in your cgi-bin directory
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Use something like that:
+-------------------------------------
+#!/bin/sh
 
-Configure source tree:
-  32 bit ImageMagick:
-    ./configure
-  64 bit ImageMagick:
-    CFLAGS="-m64" LDFLAGS="-m64" GNUMAKE=gmake ./configure
+<path_to_cgiscaler_binary> <switches>
+-------------------------------------
+This way you can configure CGIScaler runtime (see *--help* switch first)
 
-Edit configuration to match your needs:
-  vi src/config.h
-
-Build:
-  make
-
-Run unit tests
-  tests/test  
+You can optionally prelink your executable (it will load faster)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------------------------
+prelink --random <path_to_cgiscaler_binary>
+-------------------------------------------
 
 Apache Configuration
-===================
+--------------------
 
-Without sudo support:
-  Add something this to your vhost/httpd.conf to serve your thumbnails under http://your.domain/photo/:
-    ScriptAlias "/photo" "/var/www/localhost/cgi-bin/cgiscaler"
+Add something this to your *vhost/httpd.conf* to serve your thumbnails under _http://your.domain/photo/_
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------------------------------------------
+ScriptAlias "/photo" "/var/www/localhost/cgi-bin/cgiscaler"
+-----------------------------------------------------------
 
-  Copy executable src/cgiscaler to your Apache cgi-bin directory:
-    cp src/cgiscaler /var/www/localhost/cgi-bin
+Non standard library path (usefull with own IM builds or Solaris + 64bit build)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Add SetEnv to your config, e.x.:
+-----------------------------------------------------------------------------------
+SetEnv LD_LIBRARY_PATH "/usr/local/lib/64:/usr/local/lib:/usr/lib:$LD_LIBRARY_PATH"
+-----------------------------------------------------------------------------------
 
-  Prelink with libraries if prelink available:
-    prelink --random /var/www/localhost/cgi-bin/cgiscaler
-
-  Reload Apache:
-    /etc/init.d/apache reload
-
-With sudo support:
-  To use sudo you need to add something like this to your Apache config:
-    SuexecUserGroup "kazuya" "users"
-  Then add:
-    ScriptAlias "/photo" "/var/www/localhost/cgi-bin/scaler/cgiscaler"
-
-  You will need to create new directory under _apache root_ directory (ex. scaler) and make it owned by sudo user and group:
-    mkdir /var/www/localhost/cgi-bin/scaler
-    chown kazuya:users /var/www/localhost/cgi-bin/scaler
-
-  Copy executable src/cgiscaler to your Apache cgi-bin/scaler directory:
-    cp src/cgiscaler /var/www/localhost/cgi-bin/scaler
-    chown kazuya:users /var/www/localhost/cgi-bin/scaler/cgiscaler
-
-  Prelink with libraries if prelink available:
-    prelink --random /var/www/localhost/cgi-bin/scaler/cgiscaler
-
-  Reload Apache:
-    /etc/init.d/apache reload
-
-Non standard library path (usefull with own IM builds or Solaris + 64bit build):
-  Add SetEnv to your config, e.x.:
-    SetEnv LD_LIBRARY_PATH "/usr/local/lib/64:/usr/local/lib:/usr/lib:$LD_LIBRARY_PATH"
+Reload Apache
+~~~~~~~~~~~~~
+-------------------------
+/etc/init.d/apache reload
+-------------------------
 
 Try it!
-
+~~~~~~~
+Hit:
+---------------------------------------------------
 http://your.domain/photo/some_image.jpg?w=122&h=200
-
+---------------------------------------------------
 
 Performance tips
-===================
+----------------
 
 Build IM with Q8
+~~~~~~~~~~~~~~~~
    ImageMagick can be built witch different quantum depths.
    For thumbnailing purposes there is no need to use quantum depth > 8.
    Bigger quantym depth = higher memory usage, lower speed (more data transferred)
 
 For some performance test you can use:
-  httperf --server scaler --num-conn 1000 --ra 200 --timeout 50 --uri=/photo/quick_gimp_pattern_test.png?w=222
-
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+------------------------------------------------------------------------------------------------------------
+httperf --server scaler --num-conn 1000 --ra 200 --timeout 50 --uri=/photo/quick_gimp_pattern_test.png?w=222
+------------------------------------------------------------------------------------------------------------
