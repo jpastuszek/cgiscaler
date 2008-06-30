@@ -19,5 +19,5 @@
  ***************************************************************************/
 
 
-#define CGISCALER_VERSION  "2.0-beta-svn"
+#define CGISCALER_VERSION  "2.0-beta2"
 #define DEBUG_SYNC  0
