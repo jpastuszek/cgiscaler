@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007 by Jakub Pastuszek   *
+ *   Copyright (C) 2007, 2008, 2008 by Jakub Pastuszek   *
  *   jpastuszek@gmail.com   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -88,7 +88,7 @@ int cgiscaler(int argc, char *argv[]) {
 			}
 		} else {
 			/* check cache only */
-			if (check_if_cached(output_config->file_name, cache_file_path) == CACHE_OK) {
+			if (check_if_cached(output_config->file_name, cache_file_path) == BIT_CACHE_OK) {
 				if (!operation_config->no_cache)
 					free_fpath(cache_file_path);
 
