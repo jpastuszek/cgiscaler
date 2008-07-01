@@ -1,0 +1,11 @@
+#!/bin/bash -x
+
+NAME=`basename \`pwd\``
+
+make clean
+make distclean
+
+cd ..
+
+tar cvjf $NAME.tar.bz2 --exclude="doc" --exclude="CMakeCache.txt" --exclude=".git" --exclude=".svn" --exclude="CMakeFiles" --exclude="*~" --exclude="autom4te.cache" --exclude="debug" $NAME
+

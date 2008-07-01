@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007 by Jakub Pastuszek   *
+ *   Copyright (C) 2007, 2008, 2008 by Jakub Pastuszek   *
  *   jpastuszek@gmail.com   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -38,10 +38,10 @@ void remove_cache_file(cache_fpath *cache_file_path);
 * @param media_file_path path to original media file
 * @param cache_file_path path to cache file
 * @return Returns bit-mask:
-*	NO_ORIG original file does not exist
-*	NO_CACHE cache file does not exist
-*	MTIME_DIFFER original file mtime differs from cache file mtime or
-*	CACHE_OK original file mtime is same as cache file mtime
+*	BIT_NO_ORIG original file does not exist
+*	BIT_NO_CACHE cache file does not exist
+*	BIT_MTIME_DIFFER original file mtime differs from cache file mtime or
+*	BIT_CACHE_OK original file mtime is same as cache file mtime
 */
 int check_if_cached(media_fpath *media_file_path, media_fpath *cache_file_path) {
 	int orginal_mtime, cache_mtime;
@@ -57,18 +57,18 @@ int check_if_cached(media_fpath *media_file_path, media_fpath *cache_file_path) 
 	debug(DEB,"Original media mtime: %d, Cache mtime: %d", orginal_mtime, cache_mtime);
 
 	if (!cache_mtime && !orginal_mtime)
-		return NO_ORIG | NO_CACHE;
+		return BIT_NO_ORIG | BIT_NO_CACHE;
 	
 	if (cache_mtime && !orginal_mtime)
-		return NO_ORIG;
+		return BIT_NO_ORIG;
 
 	if (!cache_mtime && orginal_mtime)
-		return NO_CACHE;
+		return BIT_NO_CACHE;
 
 	if (cache_mtime != orginal_mtime)
-		return MTIME_DIFFER;
+		return BIT_MTIME_DIFFER;
 
-	return CACHE_OK;
+	return BIT_CACHE_OK;
 }
 
 /** Writes data to cache file making sure mtime is updated accordingly.
@@ -139,14 +139,14 @@ O C M
 
 	switch (check_if_cached(media_file_path, cache_file_path)) {
 		/* we don't have cache file or both... returning */
-		case NO_CACHE:
-		case NO_CACHE | NO_ORIG:
+		case BIT_NO_CACHE:
+		case BIT_NO_CACHE | BIT_NO_ORIG:
 			debug(DEB, "No cache file");
 			return 0;
 
 		/* we don't have orig or cache file old... remove cache file and return */
-		case NO_ORIG:
-		case MTIME_DIFFER:
+		case BIT_NO_ORIG:
+		case BIT_MTIME_DIFFER:
 			debug(DEB, "No original or mtime with original differ");
 			remove_cache_file(cache_file_path);
 			return 0;

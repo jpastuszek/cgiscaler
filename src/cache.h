@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007 by Jakub Pastuszek   *
+ *   Copyright (C) 2007, 2008, 2008 by Jakub Pastuszek   *
  *   jpastuszek@gmail.com   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -21,10 +21,10 @@
 #include "query_string.h"
 #include "file_utils.h"
 
-#define NO_ORIG 1
-#define NO_CACHE 2
-#define MTIME_DIFFER 4
-#define CACHE_OK 0
+#define BIT_NO_ORIG 1
+#define BIT_NO_CACHE 2
+#define BIT_MTIME_DIFFER 4
+#define BIT_CACHE_OK 0
 
 int check_if_cached(media_fpath *media_file_path, media_fpath *cache_file_path);
 

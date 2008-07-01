@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007 by Jakub Pastuszek   *
+ *   Copyright (C) 2007, 2008 by Jakub Pastuszek   *
  *   jpastuszek@gmail.com   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -38,9 +38,9 @@ static void test_alloc_default_output_config() {
 	assert_string_equal(output_config->format->format, OUT_FORMAT);
 	assert_string_equal(output_config->format->mime_type, TEST_OUT_MIME_TYPE);
 	assert_string_equal(output_config->format->file_ext, TEST_OUT_FILE_EXT);
-	assert_equal(output_config->size.w, DEFAULT_WIDTH);
-	assert_equal(output_config->size.h, DEFAULT_HEIGHT);
-	assert_equal(output_config->quality, DEFAULT_QUALITY);
+	assert_equal(output_config->size.w, WIDTH);
+	assert_equal(output_config->size.h, HEIGHT);
+	assert_equal(output_config->quality, NORMAL_QUALITY_VALUE);
 	assert_equal(output_config->scale_method, DEFAULT_STRICT);
 
 
@@ -54,16 +54,16 @@ static void test_alloc_default_output_config() {
 
 	operation_config = alloc_default_operation_config();
 
-	assert_equal(operation_config->no_cache, DEFAULT_NO_CACHE);
-	assert_equal(operation_config->no_serve, DEFAULT_NO_SERVE);
-	assert_equal(operation_config->no_headers, DEFAULT_NO_HEADERS);
+	assert_equal(operation_config->no_cache, NO_CACHE);
+	assert_equal(operation_config->no_serve, NO_SERVE);
+	assert_equal(operation_config->no_headers, NO_HEADERS);
 
 	free_operation_config(operation_config);
 }
 
 /* setup and teardown */
 static void test_setup() {
-	debug_start(DEBUG_FILE);
+	debug_start(LOG_FILE);
 }
 
 static void test_teardown() {
