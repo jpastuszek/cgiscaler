@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007 by Jakub Pastuszek   *
+ *   Copyright (C) 2007, 2008, 2008 by Jakub Pastuszek   *
  *   jpastuszek@gmail.com   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -23,18 +23,6 @@
 //#define TEST_CONFIG_H
 
 //#define DEBUG_SYNC
-
-/* Command-line configuration */
-#define COMMANDLINE_WIDTH_SWITCH "w"
-#define COMMANDLINE_HEIGHT_SWITCH "h"
-#define COMMANDLINE_STRICT_SWITCH "s"
-#define COMMANDLINE_LOWQ_SWITCH "wap"
-#define COMMANDLINE_NO_CACHE_SWITCH "nc"
-#define COMMANDLINE_NO_SERVE_SWITCH "ns"
-#define COMMANDLINE_NO_HEADERS_SWITCH "nh"
-
-#define COMMANDLINE_TRUE_VAL "true"
-#define COMMANDLINE_FALSE_VAL "false"
 
 #define IMAGE_TEST_FILE "quick_gimp_pattern_test.png"
 #define IMAGE_TEST_FILE_WIDTH 450

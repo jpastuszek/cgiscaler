@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007 by Jakub Pastuszek   *
+ *   Copyright (C) 2007, 2008 by Jakub Pastuszek   *
  *   jpastuszek@gmail.com   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -44,7 +44,7 @@ static void test_error() {
 	char *argv_nh[] = {"test", "-H", "-i", "bogo/bogo.jpg"};
 
 	storage_config = alloc_default_storage_config();
-	absolute_media_file_path = create_absolute_media_file_path(ERROR_FILE_PATH);
+	absolute_media_file_path = create_absolute_media_file_path(ERROR_FILE);
 	free_storage_config(storage_config);
 
 	if (!fork_with_stdout_capture(&stdout_fd)) {
@@ -119,7 +119,7 @@ static void test_without_cached() {
 
 	/* get rid of the cache file */
 	storage_config = alloc_default_storage_config();
-	cache_file_path = create_cache_file_path(IMAGE_TEST_FILE, OUT_FORMAT_EXTENSION, DEFAULT_WIDTH, DEFAULT_HEIGHT, DEFAULT_STRICT, DEFAULT_QUALITY);
+	cache_file_path = create_cache_file_path(IMAGE_TEST_FILE, OUT_FORMAT_EXTENSION, WIDTH, HEIGHT, DEFAULT_STRICT, NORMAL_QUALITY_VALUE);
 	absolute_cach_file_path = create_absolute_cache_file_path(cache_file_path);
 	free_storage_config(storage_config);
 
@@ -136,7 +136,7 @@ static void test_no_cache_no_file_name_given() {
 	char *argv_nc[] = {"test", "-C"};
 
 	storage_config = alloc_default_storage_config();
-	absolute_media_file_path = create_absolute_media_file_path(ERROR_FILE_PATH);
+	absolute_media_file_path = create_absolute_media_file_path(ERROR_FILE);
 	free_storage_config(storage_config);
 
 	if (!fork_with_stdout_capture(&stdout_fd)) {
@@ -161,7 +161,7 @@ static void test_from_cache() {
 
 	storage_config = alloc_default_storage_config();
 	absolute_media_file_path = create_absolute_media_file_path(IMAGE_TEST_FILE);
-	cache_file_path = create_cache_file_path(IMAGE_TEST_FILE, OUT_FORMAT_EXTENSION, DEFAULT_WIDTH, DEFAULT_HEIGHT, DEFAULT_STRICT, DEFAULT_QUALITY);
+	cache_file_path = create_cache_file_path(IMAGE_TEST_FILE, OUT_FORMAT_EXTENSION, WIDTH, HEIGHT, DEFAULT_STRICT, NORMAL_QUALITY_VALUE);
 	absolute_cach_file_path = create_absolute_cache_file_path(cache_file_path);
 	free_fpath(cache_file_path);
 	free_storage_config(storage_config);
@@ -212,7 +212,7 @@ static void test_bad_param() {
 	int argc_nc = 2;
 
 	storage_config = alloc_default_storage_config();
-	absolute_media_file_path = create_absolute_media_file_path(ERROR_FILE_PATH);
+	absolute_media_file_path = create_absolute_media_file_path(ERROR_FILE);
 	free_storage_config(storage_config);
 
 	if (!fork_with_stdout_and_stderr_capture(&stdout_fd, &stderr_fd)) {
@@ -238,7 +238,7 @@ static void test_no_cache () {
 
 	storage_config = alloc_default_storage_config();
 	absolute_media_file_path = create_absolute_media_file_path(IMAGE_TEST_FILE);
-	cache_file_path = create_cache_file_path(IMAGE_TEST_FILE, OUT_FORMAT_EXTENSION, DEFAULT_WIDTH, DEFAULT_HEIGHT, DEFAULT_STRICT, DEFAULT_QUALITY);
+	cache_file_path = create_cache_file_path(IMAGE_TEST_FILE, OUT_FORMAT_EXTENSION, WIDTH, HEIGHT, DEFAULT_STRICT, NORMAL_QUALITY_VALUE);
 	absolute_cach_file_path = create_absolute_cache_file_path(cache_file_path);
 	free_storage_config(storage_config);
 
@@ -274,7 +274,7 @@ static void test_no_heders() {
 
 	storage_config = alloc_default_storage_config();
 	absolute_media_file_path = create_absolute_media_file_path(IMAGE_TEST_FILE);
-	cache_file_path = create_cache_file_path(IMAGE_TEST_FILE, OUT_FORMAT_EXTENSION, DEFAULT_WIDTH, DEFAULT_HEIGHT, DEFAULT_STRICT, DEFAULT_QUALITY);
+	cache_file_path = create_cache_file_path(IMAGE_TEST_FILE, OUT_FORMAT_EXTENSION, WIDTH, HEIGHT, DEFAULT_STRICT, NORMAL_QUALITY_VALUE);
 	absolute_cach_file_path = create_absolute_cache_file_path(cache_file_path);
 	free_storage_config(storage_config);
 
@@ -308,7 +308,7 @@ static void test_no_server() {
 
 	storage_config = alloc_default_storage_config();
 	absolute_media_file_path = create_absolute_media_file_path(IMAGE_TEST_FILE);
-	cache_file_path = create_cache_file_path(IMAGE_TEST_FILE, OUT_FORMAT_EXTENSION, DEFAULT_WIDTH, DEFAULT_HEIGHT, DEFAULT_STRICT, DEFAULT_QUALITY);
+	cache_file_path = create_cache_file_path(IMAGE_TEST_FILE, OUT_FORMAT_EXTENSION, WIDTH, HEIGHT, DEFAULT_STRICT, NORMAL_QUALITY_VALUE);
 	absolute_cach_file_path = create_absolute_cache_file_path(cache_file_path);
 	free_storage_config(storage_config);
 
@@ -342,7 +342,7 @@ static void test_no_serve_no_cache_no_header() {
 	char *argv[] = {"test", "-S", "-C", "-H", "-i", IMAGE_TEST_FILE};
 
 	storage_config = alloc_default_storage_config();
-	cache_file_path = create_cache_file_path(IMAGE_TEST_FILE, OUT_FORMAT_EXTENSION, DEFAULT_WIDTH, DEFAULT_HEIGHT, DEFAULT_STRICT, DEFAULT_QUALITY);
+	cache_file_path = create_cache_file_path(IMAGE_TEST_FILE, OUT_FORMAT_EXTENSION, WIDTH, HEIGHT, DEFAULT_STRICT, NORMAL_QUALITY_VALUE);
 	absolute_cach_file_path = create_absolute_cache_file_path(cache_file_path);
 	free_storage_config(storage_config);
 
@@ -369,7 +369,7 @@ static void test_no_serve_no_cache_no_header() {
 
 /* setup and teardown */
 static void test_setup() {
-	//debug_start(DEBUG_FILE);
+	//debug_start(LOG_FILE);
 }
 
 static void test_teardown() {
