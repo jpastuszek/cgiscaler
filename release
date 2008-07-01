@@ -1,9 +1,12 @@
-#!/bin/bash -x
+#!/bin/bash
 
 NAME=`basename \`pwd\``
 
+echo "Cleaning up..."
 make clean
 make distclean
+find -name '*~' | xargs rm
+svn st | egrep '^\?' | grep -v .git | awk '{print $2}' | xargs rm -R
 
 echo "Generating AsciiDoc..."
 asciidoc INSTALL
