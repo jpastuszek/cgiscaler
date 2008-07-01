@@ -5,7 +5,9 @@ NAME=`basename \`pwd\``
 make clean
 make distclean
 
+echo "Generating AsciiDoc..."
 asciidoc INSTALL
+asciidoc PERFORMANCE
 
 cd ..
 

@@ -112,7 +112,7 @@ int cgiscaler(int argc, char *argv[]) {
 		resource_limit_config->area_limit
 	);
 
-	// TODO: Implement SM_FREE support
+	//TODO: Implement SM_FREE support
 	if (output_config->scale_method == SM_STRICT)
 		blob = strict_resize_to_blob(output_config->file_name, output_config->size, output_config->quality, &blob_len, output_config->format->format);
 	else
