@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007 by Jakub Pastuszek   *
+ *   Copyright (C) 2007, 2008 by Jakub Pastuszek   *
  *   jpastuszek@gmail.com   *
  *	                                                                 *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -94,7 +94,6 @@ struct operation_config {
 struct logging_config {
 	/** Path to log file */
 	char *log_file;
-
 	/** Log level to filter log entries */
 	unsigned short int log_level;
 };

@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007 by Jakub Pastuszek   *
+ *   Copyright (C) 2007, 2008 by Jakub Pastuszek   *
  *   jpastuszek@gmail.com   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -43,10 +43,10 @@ static void test_apply_commandline_config() {
 	assert_equal(output_config->size.w, 100);
 	assert_equal(output_config->size.h, 200);
 	assert_equal(output_config->scale_method, DEFAULT_STRICT);
-	assert_equal(output_config->quality, DEFAULT_QUALITY);
-	assert_equal(operation_config->no_cache, DEFAULT_NO_CACHE);
-	assert_equal(operation_config->no_serve, DEFAULT_NO_SERVE);
-	assert_equal(operation_config->no_headers, DEFAULT_NO_HEADERS);
+	assert_equal(output_config->quality, NORMAL_QUALITY_VALUE);
+	assert_equal(operation_config->no_cache, NO_CACHE);
+	assert_equal(operation_config->no_serve, NO_SERVE);
+	assert_equal(operation_config->no_headers, NO_HEADERS);
 
 	free_operation_config(operation_config);
 	free_output_config(output_config);
@@ -58,9 +58,9 @@ static void test_apply_commandline_config() {
 
 	assert_string_equal(output_config->file_name, "abc/e/f.jpg");
 	assert_equal(output_config->size.w, 100);
-	assert_equal(output_config->size.h, DEFAULT_HEIGHT);
+	assert_equal(output_config->size.h, HEIGHT);
 	assert_equal(output_config->scale_method, SM_STRICT);
-	assert_equal(output_config->quality, DEFAULT_QUALITY);
+	assert_equal(output_config->quality, NORMAL_QUALITY_VALUE);
 	assert_equal(operation_config->no_cache, 0);
 	assert_equal(operation_config->no_serve, 1);
 	assert_equal(operation_config->no_headers, 0);
@@ -71,7 +71,7 @@ static void test_apply_commandline_config() {
 	assert_equal(output_config->size.w, 100);
 	assert_equal(output_config->size.h, 100);
 	assert_equal(output_config->scale_method, SM_STRICT);
-	assert_equal(output_config->quality, DEFAULT_QUALITY);
+	assert_equal(output_config->quality, NORMAL_QUALITY_VALUE);
 	assert_equal(operation_config->no_cache, 0);
 	assert_equal(operation_config->no_serve, 1);
 	assert_equal(operation_config->no_headers, 0);
@@ -82,7 +82,7 @@ static void test_apply_commandline_config() {
 	assert_equal(output_config->size.w, 100);
 	assert_equal(output_config->size.h, 100);
 	assert_equal(output_config->scale_method, SM_STRICT);
-	assert_equal(output_config->quality, LOWQ_QUALITY);
+	assert_equal(output_config->quality, LOW_QUALITY_VALUE);
 	assert_equal(operation_config->no_cache, 1);
 	assert_equal(operation_config->no_serve, 1);
 	assert_equal(operation_config->no_headers, 1);
@@ -94,7 +94,7 @@ static void test_output_geometry() {
 	char *good_args[] = {"test", "-h", "123", "-w", "666" };
 	int good_args_len = 5;
 
-	char *no_args[] = {};
+	char *no_args[] = {"test"};
 
 	char *some_args[] = {"test", "-w", "25"};
 	int some_args_len = 3;
@@ -105,7 +105,7 @@ static void test_output_geometry() {
 	assert_equal(output_config->size.h, 123);
 	assert_equal(output_config->size.w, 666);
 
-	apply_commandline_config(0, no_args);
+	apply_commandline_config(1, no_args);
 	assert_equal(output_config->size.h, 123);
 	assert_equal(output_config->size.w, 666);
 
@@ -257,6 +257,7 @@ static void test_error_handling() {
 }
 
 static void test_logging() {
+#ifdef DEBUG
 	char *good_args[] = {"test", "--log-file", "logs/scaler.log"};
 	int good_args_len = 3;
 
@@ -266,6 +267,7 @@ static void test_logging() {
 	assert_string_equal(logging_config->log_file, "logs/scaler.log");
 
 	free_config();
+#endif
 }
 
 static void test_limits() {

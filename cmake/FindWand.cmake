@@ -1,16 +1,21 @@
 # - Find the ImageMagick MagickWand libs
 #
 
-FIND_PATH(Wand_INCLUDE_DIR MagickWand.h /usr/include/wand)
-
 FIND_LIBRARY(Wand_LIBRARY
     NAMES Wand
     PATHS /usr/lib /usr/local/lib
 )
 
-IF (Wand_INCLUDE_DIR AND Wand_LIBRARY)
+IF (NOT Wand_LIBRARY)
+  FIND_LIBRARY(Wand_LIBRARY
+        NAMES MagickWand
+        PATHS /usr/lib /usr/local/lib
+  )
+ENDIF (NOT Wand_LIBRARY)
+
+IF (Wand_LIBRARY)
    SET(Wand_FOUND TRUE)
-ENDIF (Wand_INCLUDE_DIR AND Wand_LIBRARY)
+ENDIF (Wand_LIBRARY)
 
 IF (Wand_FOUND)
    IF (NOT Wand_FIND_QUIETLY)

@@ -1,12 +1,23 @@
 # - Find the ImageMagick Core libs
 #
 
-FIND_PATH(Magick_INCLUDE_DIR ImageMagick.h /usr/include/magick)
+FIND_PATH(Magick_INCLUDE_DIR ImageMagick.h /usr/include /usr/include/ImageMagick /usr/include /usr/local/include)
+
+IF (NOT Magick_INCLUDE_DIR)
+  FIND_PATH(Magick_INCLUDE_DIR magick/ImageMagick.h /usr/include /usr/include/ImageMagick /usr/include /usr/local/include)
+ENDIF (NOT Magick_INCLUDE_DIR)
 
 FIND_LIBRARY(Magick_LIBRARY
     NAMES Magick
     PATHS /usr/lib /usr/local/lib
 )
+
+IF (NOT Magick_FOUND)
+  FIND_LIBRARY(Magick_LIBRARY
+        NAMES MagickCore
+        PATHS /usr/lib /usr/local/lib
+  )
+ENDIF (NOT Magick_FOUND)
 
 IF (Magick_INCLUDE_DIR AND Magick_LIBRARY)
    SET(Magick_FOUND TRUE)

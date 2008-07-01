@@ -1,16 +1,15 @@
 
 TODO:
- - full command line parametrisation
- - help for command line
  - change int to bool when int used as one
  - run through profiler again
 
-Ideas (for v2.0):
+Ideas (for v3.0):
  - aspect keep strength: 0 - no aspect keeping i.e. distorted, 100 - keep the aspect not changed i.e original aspect
  - hash tokens to hash the url/parameters along with shared secret to prevent changing of parameters from browser
  - timeout tokens; in combination with hash tokens could be used to set time limit of request validity
  - controllable quality and format (mime-type) form query string; needs hash tokens first
  - better logging: log level controll
+ - use FastCGI
 
 Future Ideas:
  - automatic cache size controll; for e.x. always leave 5% free space on cache partition by removing oldest entries

@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007 by Jakub Pastuszek   *
+ *   Copyright (C) 2007, 2008 by Jakub Pastuszek   *
  *   jpastuszek@gmail.com   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -281,7 +281,7 @@ char *color_to_hex(unsigned int r,unsigned  int g,unsigned  int b) {
 	return str;
 }
 
-/* TODO: Two variants of strings returned by IM... no support for IM build with Q16/Q32... may return components > 255 */
+//TODO: Two variants of strings returned by IM... no support for IM build with Q16/Q32... may return components > 255
 char *im_color_string_to_hex(char *str) {
 	int r, g, b;
 	char *formats[] = {"rgb%d,%d,%d", "rgb(%d,%d,%d)", 0};

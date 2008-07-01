@@ -1,4 +1,19 @@
-CGIscaler release notes:
+CGIScaler release notes:
+
+- Final Release v2.0
+	Additions/Improvements:
+		- rebuild internal configuration frame work
+		- fully configurable using commandline switches
+		- updated documentation
+		- refactoried code base
+		- ImageMagick resource limiting
+		- CMake building system
+		- Doxygen documentation
+		- migrated some documents to AsciiDoc format
+	Known Issues:
+		- autotools build chain may not detect ImageMagick installation properly
+	Backward Compatibility:
+		- configuration has changed dramatically
 
 - Final Release v1.0
 	Bug Fixes:
