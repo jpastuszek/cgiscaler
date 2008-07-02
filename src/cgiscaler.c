@@ -25,8 +25,9 @@ extern struct output_config *output_config;
 extern struct operation_config *operation_config;
 extern struct logging_config *logging_config;
 
+//TODO: refactore this 'if' mess
 int cgiscaler(int argc, char *argv[]) {
-	cache_fpath *cache_file_path;
+	cache_fpath *cache_file_path = 0; /* setting to zero to quite the compiler */
 	unsigned char *blob;
 	size_t blob_len;
 	struct timer run_timing;
@@ -132,7 +133,8 @@ int cgiscaler(int argc, char *argv[]) {
 
 	/* image processing is done */
 	if (!operation_config->no_serve) {
-		serve_from_blob(blob, blob_len, output_config->format->mime_type);
+		if (! serve_from_blob(blob, blob_len, output_config->format->mime_type))
+			debug(ERR, "Failed serving from blob!");
 		debug(PROF, "Served after %.3f s",  timer_stop(&serve_timing));
 	}
 

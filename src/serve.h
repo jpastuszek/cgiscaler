@@ -22,7 +22,7 @@
 #include "file_utils.h"
 
 int serve_from_file(abs_fpath *absolute_file_path, char *mime_type);
-void serve_from_blob(unsigned char *blob, size_t blob_len, char *mime_type);
+int serve_from_blob(unsigned char *blob, size_t blob_len, char *mime_type);
 
 void serve_error();
 void serve_error_message();
