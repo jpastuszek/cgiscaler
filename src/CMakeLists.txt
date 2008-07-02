@@ -27,3 +27,6 @@ if(Doxygen_FOUND)
     add_custom_command(TARGET cgiscaler POST_BUILD COMMAND doxygen ${PROJECT_SOURCE_DIR}/doxygen.conf WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
   endif(MAKE_DOXYGEN_DOCUMENTATION)
 endif(Doxygen_FOUND)
+
+
+INSTALL(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/cgiscaler DESTINATION libexec)
