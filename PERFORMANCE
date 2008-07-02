@@ -1,0 +1,117 @@
+CGIScaler Performance Tests
+===========================
+Jakub Pastuszek <jpastuszek@gmail.com>
+v2.0, June 2008
+
+
+This document describes performance test done on CGIScaler v2.0 implementation.
+
+System Setup
+------------
+
+.OS:
+  FedoraCore 8
+
+.HTTP Server:
+  Apache/2.2.6
+
+.CPU:
+  1 VCPU (Xen)
+
+.RAM:
+  2 GB (Xen)
+
+Results with *CGIScaler-2.0*
+----------------------------
+
+Major condition: empty cache
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.Total requests:
+  2000
+
+.Ramp-up period:
+  500 (at point of overload)
+
+.Resoults
+`-----------------`--------------------------
+Throughput        2k3 [requests/min] (39.7/s)
+Avarage           107 [ms]
+Deviation         246 [ms]
+Median            22 [ms]
+---------------------------------------------
+
+Smooth and stable operation. O% of failures.
+
+1250 bytes avg response size.
+
+Major condition: full cache
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.Total requests:
+  2000
+
+.Ramp-up period:
+  140 (at point of server overload)
+
+.Resoults
+`-----------------`---------------------------
+Throughput        7k5 [requests/min] (126.2/s)
+Avarage           69 [ms]
+Deviation         104 [ms]
+Median            37 [ms]
+----------------------------------------------
+
+Several small peaks.
+
+JMagick version
+---------------
+
+Major condition: empty cache
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.Total requests:
+  2000
+
+.Ramp-up period:
+  800 (at point of overload)
+
+.Resoults
+`-----------------`--------------------------
+Throughput        1k5 [requests/min] (24.8/s)
+Avarage           454 [ms]
+Deviation         745 [ms]
+Median            102 [ms]
+---------------------------------------------
+
+Wavy graph, with smooth peaks. 0.10% of failures.
+
+Major condition: full cache
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.Total requests:
+  2000
+
+.Ramp-up period:
+  6 (at best throughput, point of test tool overload)
+
+.Resoults
+`-----------------`--------------------------
+Throughput        32k [requests/min] (~533/s)
+Avarage           366 [ms]
+Deviation         803 [ms]
+Median            80 [ms]
+---------------------------------------------
+
+Wavy and jumpy graph. JMeter was at the edge of performance. 0% of failures.
+
+Conclusion
+----------
+
+CGIScaler is 34% faster in scaling and caching.
+Java version is 76%+ faster in serving from cache.
+Java version can serve more requests that JMeter is capable of firring.
+
+Poor performance of CGIScaler in serving from cache may be caused by need of starting a process
+per request while Java is pooling its threads and reusing them. This should be resolved by future evolution of CGIScaler in to FastCGI daemon.
+

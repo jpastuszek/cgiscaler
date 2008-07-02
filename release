@@ -1,0 +1,18 @@
+#!/bin/bash
+
+NAME=`basename \`pwd\``
+
+echo "Cleaning up..."
+make clean
+make distclean
+find -name '*~' | xargs rm
+svn st | egrep '^\?' | grep -v .git | awk '{print $2}' | xargs rm -R
+
+echo "Generating AsciiDoc..."
+asciidoc INSTALL
+asciidoc PERFORMANCE
+
+cd ..
+
+tar cvjf $NAME.tar.bz2 --exclude="doc" --exclude="CMakeCache.txt" --exclude=".git" --exclude=".svn" --exclude="CMakeFiles" --exclude="*~" --exclude="autom4te.cache" --exclude="debug" $NAME
+

@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007 by Jakub Pastuszek   *
+ *   Copyright (C) 2007, 2008 by Jakub Pastuszek   *
  *   jpastuszek@gmail.com   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -19,6 +19,23 @@
  ***************************************************************************/
 
 #include "cgiscaler.h"
+
+
+/*! \mainpage CGIScaler Source Documentation
+ *
+ * \section intro_sec Introduction
+ *
+ * Fast, small, ImageMagick(R) based CGI image scaler for any web based application requiring intensive thumbnailing written in C.
+ *
+ * \section about About This Document
+ *
+ * This document is generated from in-source documentation and can be used to interactively browse the code base.
+ * \section installation Installation and release documentation
+ *
+ * For installation see INSTALL document.
+ * For release notes see RELEASE_NOTES document.
+ *
+ */
 
 int main(int argc, char *argv[])
 {

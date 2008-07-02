@@ -1,4 +1,28 @@
-CGIscaler release notes:
+CGIScaler release notes:
+
+- Bugfix Release v2.0.1
+	Bug Fixes:
+		- suppressed some compiler warnings
+		- fixed buffer overflow in file untiles test
+	Additions/Improvements:
+		- now you can use 'make install' with cmake
+		- small document updates
+		- minor code refactorisation
+
+- Final Release v2.0
+	Additions/Improvements:
+		- rebuild internal configuration frame work
+		- fully configurable using commandline switches
+		- updated documentation
+		- refactoried code base
+		- ImageMagick resource limiting
+		- CMake building system
+		- Doxygen documentation
+		- migrated some documents to AsciiDoc format
+	Known Issues:
+		- autotools build chain may not detect ImageMagick installation properly
+	Backward Compatibility:
+		- configuration has changed dramatically
 
 - Final Release v1.0
 	Bug Fixes:

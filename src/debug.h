@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007 by Jakub Pastuszek   *
+ *   Copyright (C) 2007, 2008, 2008 by Jakub Pastuszek   *
  *   jpastuszek@gmail.com   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -41,6 +41,7 @@ void debug_stop();
 int get_debug_file_fd();
 void debug(const char *level, const char *fmt, ...);
 
+/** Structure to keep start and stop time for performance timer operation. */
 struct timer {
 #ifdef DEBUG
 	double start;

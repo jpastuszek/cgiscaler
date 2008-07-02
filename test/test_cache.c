@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007 by Jakub Pastuszek   *
+ *   Copyright (C) 2007, 2008 by Jakub Pastuszek   *
  *   jpastuszek@gmail.com   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -45,13 +45,13 @@ static void test_if_cached() {
 	cache_file_path = create_cache_file_path("bogo.jpg", output_config->format->file_ext, 0, 0, 0, 0);
 	absolute_cach_file_path = create_absolute_cache_file_path(cache_file_path);
 
-	assert_equal(check_if_cached("bogo.jpg", cache_file_path), NO_ORIG | NO_CACHE);
+	assert_equal(check_if_cached("bogo.jpg", cache_file_path), BIT_NO_ORIG | BIT_NO_CACHE);
 
 	/* creating test file */
-	test_fd = open(absolute_cach_file_path, O_CREAT|O_WRONLY|O_TRUNC);
+	test_fd = open(absolute_cach_file_path, O_CREAT|O_WRONLY|O_TRUNC, 0766);
 	assert_not_equal(test_fd, -1);
 	close(test_fd);
-	assert_equal(check_if_cached("bogo.jpg", cache_file_path), NO_ORIG);
+	assert_equal(check_if_cached("bogo.jpg", cache_file_path), BIT_NO_ORIG);
 
 	/* cleaning up test file */
 	assert_not_equal(unlink(absolute_cach_file_path), -1);
@@ -64,20 +64,20 @@ static void test_if_cached() {
 	absolute_cach_file_path = create_absolute_cache_file_path(cache_file_path);
 	absolute_media_file_path = create_absolute_media_file_path(IMAGE_TEST_FILE);
 
-	assert_equal(check_if_cached(IMAGE_TEST_FILE, cache_file_path), NO_CACHE);
+	assert_equal(check_if_cached(IMAGE_TEST_FILE, cache_file_path), BIT_NO_CACHE);
 
 	/* creating test file */
-	test_fd = open(absolute_cach_file_path, O_CREAT|O_WRONLY|O_TRUNC);
+	test_fd = open(absolute_cach_file_path, O_CREAT|O_WRONLY|O_TRUNC, 0766);
 	assert_not_equal(test_fd, -1);
 	close(test_fd);
 
-	assert_equal(check_if_cached(IMAGE_TEST_FILE, cache_file_path), MTIME_DIFFER);
+	assert_equal(check_if_cached(IMAGE_TEST_FILE, cache_file_path), BIT_MTIME_DIFFER);
 
 	/* now we will set mtime to match original file */
 	time_buf.actime = time_buf.modtime = get_file_mtime(absolute_media_file_path);
 	assert_not_equal(utime(absolute_cach_file_path, &time_buf), -1);
 
-	assert_equal(check_if_cached(IMAGE_TEST_FILE, cache_file_path), CACHE_OK);
+	assert_equal(check_if_cached(IMAGE_TEST_FILE, cache_file_path), BIT_CACHE_OK);
 
 	/* cleaning up test file */
 	assert_not_equal(unlink(absolute_cach_file_path), -1);

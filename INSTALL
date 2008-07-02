@@ -1,93 +1,99 @@
-Installation
-==================
-= Linux:
+CGIScaler Installation
+======================
+Jakub Pastuszek <jpastuszek@gmail.com>
+v2.0.1, June 2008
 
-Configure source tree:
-  ./configure
+Installation using CCMake
+-------------------------
 
-Edit configuration to match your needs:
-  vi src/config.h
+Untar and go to your source directory
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------------------
+tar xjf CGIScaler-<varsion>.tar.bz2
+cd CGIScaler-<version>
+-----------------------------------
 
-Build:
-  make
+Configure with CCMake
+~~~~~~~~~~~~~~~~~~~~~
+-------------------------------------------------------------------
+cmake . -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX:PATH=/usr
+-------------------------------------------------------------------
 
-Run unit tests
-  tests/test
+OR for interactive interface
 
-= Solaris:
+--------------------------------------------------------------------
+ccmake . -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX:PATH=/usr
+--------------------------------------------------------------------
 
-Set up environment:
-  export PATH=/usr/bin:/usr/sbin:/usr/ccs/bin:/usr/sfw/bin
-  export LD_LIBRARY_PATH=/usr/local/lib/64:/usr/local/lib:/usr/lib:$LD_LIBRARY_PATH
+Make sure that ImageMagick include directory and libraries are correct (us arrow key to navigate, enter to change field - there are some tips at the bottom of the window).
 
-Configure source tree:
-  32 bit ImageMagick:
-    ./configure
-  64 bit ImageMagick:
-    CFLAGS="-m64" LDFLAGS="-m64" GNUMAKE=gmake ./configure
+Build & Install
+~~~~~~~~~~~~~~~
+-----------------
+make
+sudo make install
+-----------------
 
-Edit configuration to match your needs:
-  vi src/config.h
+The binary will be installed in */usr/libexec* and will be named *cgiscaler*.
 
-Build:
-  make
+Create new shell script in your www/cgi-bin directory
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Replace *<switches>* with your options (see *\-\-help* all switch first).
+---------------------------------
+#!/bin/sh
 
-Run unit tests
-  tests/test  
+/usr/libexec/cgiscaler <switches>
+---------------------------------
+
+You can optionally *prelink* your executable (it will load faster)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+--------------------------------------------
+sudo prelink --random /usr/libexec/cgiscaler
+--------------------------------------------
 
 Apache Configuration
-===================
+--------------------
 
-Without sudo support:
-  Add something this to your vhost/httpd.conf to serve your thumbnails under http://your.domain/photo/:
-    ScriptAlias "/photo" "/var/www/localhost/cgi-bin/cgiscaler"
+Update your vhost/httpd.conf
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+To serve your thumbnails under *http://your.domain/thumbnails/* you can put this line:
+----------------------------------------------------------------
+ScriptAlias "/thumbnails" "/var/www/localhost/cgi-bin/cgiscaler"
+----------------------------------------------------------------
 
-  Copy executable src/cgiscaler to your Apache cgi-bin directory:
-    cp src/cgiscaler /var/www/localhost/cgi-bin
+Non standard library path
+~~~~~~~~~~~~~~~~~~~~~~~~~
+If you are using your own ImageMagick builds or Solaris + 64bit build add *SetEnv* to your config, for example:
+-----------------------------------------------------------------------------------
+SetEnv LD_LIBRARY_PATH "/usr/local/lib/64:/usr/local/lib:/usr/lib:$LD_LIBRARY_PATH"
+-----------------------------------------------------------------------------------
 
-  Prelink with libraries if prelink available:
-    prelink --random /var/www/localhost/cgi-bin/cgiscaler
-
-  Reload Apache:
-    /etc/init.d/apache reload
-
-With sudo support:
-  To use sudo you need to add something like this to your Apache config:
-    SuexecUserGroup "kazuya" "users"
-  Then add:
-    ScriptAlias "/photo" "/var/www/localhost/cgi-bin/scaler/cgiscaler"
-
-  You will need to create new directory under _apache root_ directory (ex. scaler) and make it owned by sudo user and group:
-    mkdir /var/www/localhost/cgi-bin/scaler
-    chown kazuya:users /var/www/localhost/cgi-bin/scaler
-
-  Copy executable src/cgiscaler to your Apache cgi-bin/scaler directory:
-    cp src/cgiscaler /var/www/localhost/cgi-bin/scaler
-    chown kazuya:users /var/www/localhost/cgi-bin/scaler/cgiscaler
-
-  Prelink with libraries if prelink available:
-    prelink --random /var/www/localhost/cgi-bin/scaler/cgiscaler
-
-  Reload Apache:
-    /etc/init.d/apache reload
-
-Non standard library path (usefull with own IM builds or Solaris + 64bit build):
-  Add SetEnv to your config, e.x.:
-    SetEnv LD_LIBRARY_PATH "/usr/local/lib/64:/usr/local/lib:/usr/lib:$LD_LIBRARY_PATH"
+Reload Apache
+~~~~~~~~~~~~~
+------------------------
+/etc/init.d/httpd reload
+------------------------
 
 Try it!
-
-http://your.domain/photo/some_image.jpg?w=122&h=200
-
+~~~~~~~
+URL should look like this (by default):
+---------------------------------------------------
+http://your.domain/thumbnails/some_image.jpg?w=122&h=200
+---------------------------------------------------
 
 Performance tips
-===================
+----------------
 
 Build IM with Q8
-   ImageMagick can be built witch different quantum depths.
-   For thumbnailing purposes there is no need to use quantum depth > 8.
-   Bigger quantym depth = higher memory usage, lower speed (more data transferred)
+~~~~~~~~~~~~~~~~
+ImageMagick can be built witch different quantum depths.
+For thumbnailing purposes there is no need to use quantum depth > 8.
+Bigger quantum depth = higher memory usage, lower throughput (more data transferred, bigger work set)
 
-For some performance test you can use:
-  httperf --server scaler --num-conn 1000 --ra 200 --timeout 50 --uri=/photo/quick_gimp_pattern_test.png?w=222
-
+Simple performance test
+~~~~~~~~~~~~~~~~~~~~~~~
+Use *httpref* to perform simple performance test. Source distribution also contain example *JMeter* test.
+See *PERFORMANCE* document for some numbers.
+---------------------------------------------------------------------------------------------------
+httperf --server scaler --num-conn 1000 --ra 200 --timeout 50 --uri=/thumbails/some_image.jpg?w=222
+---------------------------------------------------------------------------------------------------

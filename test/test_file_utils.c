@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007 by Jakub Pastuszek   *
+ *   Copyright (C) 2007, 2008 by Jakub Pastuszek   *
  *   jpastuszek@gmail.com   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -38,7 +38,7 @@ static void test_create_cache_file_path() {
 
 	cache_file = create_cache_file_path("test.jpg", output_config->format->file_ext, 23, 12, 1, 32);
 
-	snprintf(compare_file_path, 256, "%s-23-12-1-32.%s", "test.jpg", output_config->format->file_ext);
+	snprintf(compare_file_path, 255, "%s-23-12-1-32.%s", "test.jpg", output_config->format->file_ext);
 	assert_string_equal(cache_file, compare_file_path);
 
 	free_fpath(cache_file);
@@ -53,7 +53,7 @@ static void test_create_absolute_media_file_path() {
 	file_path = create_absolute_media_file_path("test.jpg");
 	assert_not_equal(file_path, 0);
 
-	snprintf(compare_file_path, 256, "%s/%s", storage_config->media_directory, "test.jpg");
+	snprintf(compare_file_path, 255, "%s/%s", storage_config->media_directory, "test.jpg");
 	assert_string_equal(file_path, compare_file_path);
 
 	free_fpath(file_path);
@@ -67,7 +67,7 @@ static void test_create_absolute_cache_file_path() {
 	file_path = create_absolute_cache_file_path("test.jpg");
 	assert_not_equal(file_path, 0);
 
-	snprintf(compare_file_path, 256, "%s/%s", storage_config->cache_directory, "test.jpg");
+	snprintf(compare_file_path, 255, "%s/%s", storage_config->cache_directory, "test.jpg");
 	assert_string_equal(file_path, compare_file_path);
 
 	free_fpath(file_path);

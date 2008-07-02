@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007 by Jakub Pastuszek   *
+ *   Copyright (C) 2007, 2008 by Jakub Pastuszek   *
  *   jpastuszek@gmail.com   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -22,21 +22,6 @@
 //#define DEBUG
 /* sync every line written to debug file... slow */
 //#define DEBUG_SYNC
-
-
-/** Command-line configuration */
-#define COMMANDLINE_HELP_SWITCH "help"
-#define COMMANDLINE_WIDTH_SWITCH "w"
-#define COMMANDLINE_HEIGHT_SWITCH "h"
-#define COMMANDLINE_STRICT_SWITCH "s"
-#define COMMANDLINE_LOWQ_SWITCH "wap"
-#define COMMANDLINE_NO_CACHE_SWITCH "nc"
-#define COMMANDLINE_NO_SERVE_SWITCH "ns"
-#define COMMANDLINE_NO_HEADERS_SWITCH "nh"
-
-#define COMMANDLINE_TRUE_VAL "true"
-#define COMMANDLINE_FALSE_VAL "false"
-
 
 #include "build_config.h"
 

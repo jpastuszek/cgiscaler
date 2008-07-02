@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007 by Jakub Pastuszek   *
+ *   Copyright (C) 2007, 2008, 2008 by Jakub Pastuszek   *
  *   jpastuszek@gmail.com   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -25,8 +25,9 @@ extern struct output_config *output_config;
 extern struct operation_config *operation_config;
 extern struct logging_config *logging_config;
 
+//TODO: refactore this 'if' mess
 int cgiscaler(int argc, char *argv[]) {
-	cache_fpath *cache_file_path;
+	cache_fpath *cache_file_path = 0; /* setting to zero to quite the compiler */
 	unsigned char *blob;
 	size_t blob_len;
 	struct timer run_timing;
@@ -88,7 +89,7 @@ int cgiscaler(int argc, char *argv[]) {
 			}
 		} else {
 			/* check cache only */
-			if (check_if_cached(output_config->file_name, cache_file_path) == CACHE_OK) {
+			if (check_if_cached(output_config->file_name, cache_file_path) == BIT_CACHE_OK) {
 				if (!operation_config->no_cache)
 					free_fpath(cache_file_path);
 
@@ -112,7 +113,7 @@ int cgiscaler(int argc, char *argv[]) {
 		resource_limit_config->area_limit
 	);
 
-	// TODO: Implement SM_FREE support
+	//TODO: Implement SM_FREE support
 	if (output_config->scale_method == SM_STRICT)
 		blob = strict_resize_to_blob(output_config->file_name, output_config->size, output_config->quality, &blob_len, output_config->format->format);
 	else
@@ -132,7 +133,8 @@ int cgiscaler(int argc, char *argv[]) {
 
 	/* image processing is done */
 	if (!operation_config->no_serve) {
-		serve_from_blob(blob, blob_len, output_config->format->mime_type);
+		if (! serve_from_blob(blob, blob_len, output_config->format->mime_type))
+			debug(ERR, "Failed serving from blob!");
 		debug(PROF, "Served after %.3f s",  timer_stop(&serve_timing));
 	}
 
