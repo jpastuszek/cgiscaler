@@ -48,7 +48,7 @@ static void test_if_cached() {
 	assert_equal(check_if_cached("bogo.jpg", cache_file_path), BIT_NO_ORIG | BIT_NO_CACHE);
 
 	/* creating test file */
-	test_fd = open(absolute_cach_file_path, O_CREAT|O_WRONLY|O_TRUNC);
+	test_fd = open(absolute_cach_file_path, O_CREAT|O_WRONLY|O_TRUNC, 0766);
 	assert_not_equal(test_fd, -1);
 	close(test_fd);
 	assert_equal(check_if_cached("bogo.jpg", cache_file_path), BIT_NO_ORIG);
@@ -67,7 +67,7 @@ static void test_if_cached() {
 	assert_equal(check_if_cached(IMAGE_TEST_FILE, cache_file_path), BIT_NO_CACHE);
 
 	/* creating test file */
-	test_fd = open(absolute_cach_file_path, O_CREAT|O_WRONLY|O_TRUNC);
+	test_fd = open(absolute_cach_file_path, O_CREAT|O_WRONLY|O_TRUNC, 0766);
 	assert_not_equal(test_fd, -1);
 	close(test_fd);
 
