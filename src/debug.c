@@ -77,7 +77,7 @@ int get_debug_file_fd() {
 
 void debug(const char *level, const char *fmt, ...) {
 #ifdef DEBUG
-	int size = 40, msg_len, full_msg_len, full_msg_buff_len = 80;
+	int size = 40, msg_len, full_msg_len, full_msg_buff_len = 80, bytes_written, total_bytes_written;
 	char *msg, *new_msg;
 	char *full_msg;
 	va_list ap;
@@ -144,8 +144,20 @@ void debug(const char *level, const char *fmt, ...) {
 			exit(66);
 	}
 
-	write(debug_file_fd, full_msg, full_msg_len);
+	/* now we pump it out */
+	bytes_written = 0;
+	total_bytes_written = 0;
+	do {
+		bytes_written = write(debug_file_fd, full_msg + total_bytes_written, full_msg_len - total_bytes_written);
+		if (bytes_written == -1) {
+			/* shit happens... we continue */
+			goto end;
+		}
 
+		total_bytes_written += bytes_written;
+	} while(total_bytes_written < full_msg_len);
+
+	end:
 	free(full_msg);
 
 #if DEBUG_SYNC == 1
