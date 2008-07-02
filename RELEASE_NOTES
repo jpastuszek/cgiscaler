@@ -1,5 +1,14 @@
 CGIScaler release notes:
 
+- Bugfix Release v2.0.1
+	Bug Fixes:
+		- suppressed some compiler warnings
+		- fixed buffer overflow in file untiles test
+	Additions/Improvements:
+		- now you can use 'make install' with cmake
+		- small document updates
+		- minor code refactorisation
+
 - Final Release v2.0
 	Additions/Improvements:
 		- rebuild internal configuration frame work

@@ -1,7 +1,7 @@
 CGIScaler Installation
 ======================
 Jakub Pastuszek <jpastuszek@gmail.com>
-v2.0, June 2008
+v2.0.1, June 2008
 
 Installation using CCMake
 -------------------------
@@ -15,65 +15,70 @@ cd CGIScaler-<version>
 
 Configure with CCMake
 ~~~~~~~~~~~~~~~~~~~~~
---------
-ccmake .
---------
-Make sure that _ImageMagick_ include dir and libs are correct.
-Also remember to set *CMAKE_BUILD_TYPE* field (us arrow key to navigate, enter to change field - there are some tips at the bottom of the window)
+-------------------------------------------------------------------
+cmake . -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX:PATH=/usr
+-------------------------------------------------------------------
 
-Build
-~~~~~
-----
+OR for interactive interface
+
+--------------------------------------------------------------------
+ccmake . -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX:PATH=/usr
+--------------------------------------------------------------------
+
+Make sure that ImageMagick include directory and libraries are correct (us arrow key to navigate, enter to change field - there are some tips at the bottom of the window).
+
+Build & Install
+~~~~~~~~~~~~~~~
+-----------------
 make
-----
+sudo make install
+-----------------
 
-Copy binary to your installaction directory
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-The binary could be found in *src* directory and called *cgiscaler* by default.
+The binary will be installed in */usr/libexec* and will be named *cgiscaler*.
 
-Create new bash script in your cgi-bin directory
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Use something like that:
--------------------------------------
+Create new shell script in your www/cgi-bin directory
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Replace *<switches>* with your options (see *\-\-help* all switch first).
+---------------------------------
 #!/bin/sh
 
-<path_to_cgiscaler_binary> <switches>
--------------------------------------
-This way you can configure CGIScaler runtime (see *--help* switch first)
+/usr/libexec/cgiscaler <switches>
+---------------------------------
 
-You can optionally prelink your executable (it will load faster)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
--------------------------------------------
-prelink --random <path_to_cgiscaler_binary>
--------------------------------------------
+You can optionally *prelink* your executable (it will load faster)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+--------------------------------------------
+sudo prelink --random /usr/libexec/cgiscaler
+--------------------------------------------
 
 Apache Configuration
 --------------------
 
-Add something this to your *vhost/httpd.conf* to serve your thumbnails under _http://your.domain/photo/_
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
------------------------------------------------------------
-ScriptAlias "/photo" "/var/www/localhost/cgi-bin/cgiscaler"
------------------------------------------------------------
+Update your vhost/httpd.conf
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+To serve your thumbnails under *http://your.domain/thumbnails/* you can put this line:
+----------------------------------------------------------------
+ScriptAlias "/thumbnails" "/var/www/localhost/cgi-bin/cgiscaler"
+----------------------------------------------------------------
 
-Non standard library path (usefull with own IM builds or Solaris + 64bit build)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Add SetEnv to your config, e.x.:
+Non standard library path
+~~~~~~~~~~~~~~~~~~~~~~~~~
+If you are using your own ImageMagick builds or Solaris + 64bit build add *SetEnv* to your config, for example:
 -----------------------------------------------------------------------------------
 SetEnv LD_LIBRARY_PATH "/usr/local/lib/64:/usr/local/lib:/usr/lib:$LD_LIBRARY_PATH"
 -----------------------------------------------------------------------------------
 
 Reload Apache
 ~~~~~~~~~~~~~
--------------------------
-/etc/init.d/apache reload
--------------------------
+------------------------
+/etc/init.d/httpd reload
+------------------------
 
 Try it!
 ~~~~~~~
-Hit:
+URL should look like this (by default):
 ---------------------------------------------------
-http://your.domain/photo/some_image.jpg?w=122&h=200
+http://your.domain/thumbnails/some_image.jpg?w=122&h=200
 ---------------------------------------------------
 
 Performance tips
@@ -81,12 +86,14 @@ Performance tips
 
 Build IM with Q8
 ~~~~~~~~~~~~~~~~
-   ImageMagick can be built witch different quantum depths.
-   For thumbnailing purposes there is no need to use quantum depth > 8.
-   Bigger quantym depth = higher memory usage, lower speed (more data transferred, bigger work set)
+ImageMagick can be built witch different quantum depths.
+For thumbnailing purposes there is no need to use quantum depth > 8.
+Bigger quantum depth = higher memory usage, lower throughput (more data transferred, bigger work set)
 
-For some performance test you can use:
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-------------------------------------------------------------------------------------------------------------
-httperf --server scaler --num-conn 1000 --ra 200 --timeout 50 --uri=/photo/quick_gimp_pattern_test.png?w=222
-------------------------------------------------------------------------------------------------------------
+Simple performance test
+~~~~~~~~~~~~~~~~~~~~~~~
+Use *httpref* to perform simple performance test. Source distribution also contain example *JMeter* test.
+See *PERFORMANCE* document for some numbers.
+---------------------------------------------------------------------------------------------------
+httperf --server scaler --num-conn 1000 --ra 200 --timeout 50 --uri=/thumbails/some_image.jpg?w=222
+---------------------------------------------------------------------------------------------------

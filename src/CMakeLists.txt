@@ -3,7 +3,6 @@ set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 find_package(Magick REQUIRED)
 find_package(Wand REQUIRED)
 
-set(CGISCALER_VERSION "2.0" CACHE STRING "Version of this program")
 option(DEBUG_SYNC FALSE CACHE BOOL "If set every log line will be flushed to disk (very slow)")
 if(DEBUG_SYNC STREQUAL "ON")
   set(DEBUG_SYNC 1)
