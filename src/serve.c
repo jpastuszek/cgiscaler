@@ -129,7 +129,7 @@ int serve_from_file(abs_fpath *absolute_file_path, char *mime_type) {
 		if (bytes_read == -1) {
 			debug(ERR,"Failed reading file: %s", strerror(errno));
 			free(mime_type);
-			exit(10);
+			return(0);
 		}
 
 		/* all done */
@@ -158,7 +158,7 @@ int serve_from_file(abs_fpath *absolute_file_path, char *mime_type) {
 				close(file);
 				free(buffer);
 				free(mime_type);
-				exit(10);
+				return 0;
 			}
 			bytes_read -= bytes_written;
 			total_bytes_written += bytes_written;
@@ -179,7 +179,7 @@ int serve_from_file(abs_fpath *absolute_file_path, char *mime_type) {
 * @param mime_type mime type to include in HTTP headers
 * @see serve_from_file()
 */
-void serve_from_blob(unsigned char *blob, size_t blob_len, char *mime_type) {
+int serve_from_blob(unsigned char *blob, size_t blob_len, char *mime_type) {
 	size_t bytes_written;
 	size_t total_blob_written;
 
@@ -199,7 +199,7 @@ void serve_from_blob(unsigned char *blob, size_t blob_len, char *mime_type) {
 		debug(DEB, "%d bytes written", bytes_written);
 		if (bytes_written == -1) {
 			debug(ERR, "Error writing to stdout %s", strerror(errno));
-			exit(10);
+			return 0;
 		}
 		
 		total_blob_written += bytes_written;
@@ -208,6 +208,8 @@ void serve_from_blob(unsigned char *blob, size_t blob_len, char *mime_type) {
 			break;
 		/* fsync(1); - this will only work on fs files not stdout */
 	}
+
+	return 1;
 }
 
 /** This function will try to serve error image but if it does not exist we will fail back to error message.

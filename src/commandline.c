@@ -234,6 +234,8 @@ static error_t parse_opt (int key, char *arg, struct argp_state *state) {
 			for (i = 0; resize_filters[i].name; i++) {
 				printf("\t%s\n", resize_filters[i].name);
 			}
+
+			//TODO: exit should be performed from cgiscaler.c... not here
 			exit(0);
 		case 'B':
 			output_config->blur_factor = atof(arg);
