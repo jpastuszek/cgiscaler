@@ -25,7 +25,7 @@ commandline_SOURCES = asserts.c commandline.c debug.c file_utils.c \
 commandline_LDADD = $(top_builddir)/cgreen/libcgreen.a
 scaler_SOURCES = asserts.c debug.c file_utils.c format_info.c geometry_math.c \
 	runtime_config.c scaler.c test_scaler.c
-AM_CFLAGS = -Wall -lMagickCore -lMagickWand
+AM_CFLAGS = -Wall `Wand-config --libs`
 scaler_LDADD = $(top_builddir)/cgreen/libcgreen.a
 query_string_SOURCES = debug.c file_utils.c format_info.c query_string.c \
 	runtime_config.c test_query_string.c
@@ -37,4 +37,4 @@ main_SOURCES = asserts.c cache.c cgiscaler.c commandline.c debug.c file_utils.c 
 bin_SCRIPTS = memory_test unit_test
 format_info_SOURCES = debug.c format_info.c runtime_config.c test_format_info.c
 format_info_LDADD = $(top_builddir)/cgreen/libcgreen.a
-INCLUDES = -I/usr/include/ImageMagick
+INCLUDES = `Wand-config --cflags`

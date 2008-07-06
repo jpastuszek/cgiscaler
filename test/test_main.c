@@ -166,7 +166,7 @@ static void test_from_cache() {
 	free_fpath(cache_file_path);
 	free_storage_config(storage_config);
 
-	/* real file  - no cache file yet */
+	/* real file - no cache file yet */
 	assert_file_not_exists(absolute_cach_file_path);
 
 	if (!fork_with_stdout_capture(&stdout_fd)) {
@@ -286,7 +286,8 @@ static void test_no_heders() {
 		exit(0);
 	}
 
-	/* We cannot know what size it will have after scale */	assert_jpg_byte_read_in_range(stdout_fd, 1000, get_file_size(absolute_media_file_path));
+	/* We cannot know what size it will have after being scaled */
+	assert_jpg_byte_read_in_range(stdout_fd, 1000, get_file_size(absolute_media_file_path));
 
 	finish_fork_with_stdout_capture(stdout_fd);
 
@@ -334,7 +335,6 @@ static void test_no_server() {
 	free_fpath(cache_file_path);	
 }
 
-// TODO: This test will not work with usage printed out to stderr...
 static void test_no_serve_no_cache_no_header() {
 	int stdout_fd;
 	cache_fpath *cache_file_path;
@@ -365,7 +365,6 @@ static void test_no_serve_no_cache_no_header() {
 	free_fpath(absolute_cach_file_path);
 	free_fpath(cache_file_path);
 }
-
 
 /* setup and teardown */
 static void test_setup() {

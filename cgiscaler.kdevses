@@ -13,23 +13,23 @@
   </kdevdebugger>
   <kdevfilelist>
    <projectview name="BUGS" >
-    <file line="73" url="file:///home/kazuya/Projects/cgiscaler/CGIScaler/src/defaults.h" col="46" encoding="" />
-    <file line="1" url="file:///home/kazuya/Projects/cgiscaler/CGIScaler/src/runtime_config.h" col="23" encoding="" />
-    <file line="162" url="file:///home/kazuya/Projects/cgiscaler/CGIScaler/src/runtime_config.c" col="0" encoding="" />
-    <file line="327" url="file:///home/kazuya/Projects/cgiscaler/CGIScaler/src/commandline.c" col="0" encoding="" />
-    <file line="97" url="file:///home/kazuya/Projects/cgiscaler/CGIScaler/test/test_defaults.h" col="0" encoding="" />
-    <file line="171" url="file:///home/kazuya/Projects/cgiscaler/CGIScaler/test/test_query_string.c" col="0" encoding="" />
-    <file line="0" url="file:///home/kazuya/Projects/cgiscaler/CGIScaler/src/cache.h" col="42" encoding="" />
-    <file line="23" url="file:///home/kazuya/Projects/cgiscaler/CGIScaler/src/cache.c" col="22" encoding="" />
-    <file line="47" url="file:///home/kazuya/Projects/cgiscaler/CGIScaler/test/test_cache.c" col="0" encoding="" />
-    <file line="0" url="file:///home/kazuya/Projects/cgiscaler/CGIScaler/src/serve.c" col="0" encoding="" />
-    <file line="31" url="file:///home/kazuya/Projects/cgiscaler/CGIScaler/test/test_config.h" col="0" encoding="" />
-    <file line="56" url="file:///home/kazuya/Projects/cgiscaler/CGIScaler/test/test_runtime_config.c" col="0" encoding="" />
-    <file line="114" url="file:///home/kazuya/Projects/cgiscaler/CGIScaler/src/cgiscaler.c" col="0" encoding="" />
-    <file line="55" url="file:///home/kazuya/Projects/cgiscaler/CGIScaler/src/scaler.c" col="0" encoding="" />
-    <file line="283" url="file:///home/kazuya/Projects/cgiscaler/CGIScaler/test/asserts.c" col="117" encoding="" />
-    <file line="124" url="file:///home/kazuya/Projects/cgiscaler/CGIScaler/src/query_string.c" col="6" encoding="" />
-    <file line="16" url="file:///home/kazuya/Projects/cgiscaler/CGIScaler/TODO" col="95" encoding="" />
+    <file line="73" url="src/defaults.h" col="46" encoding="" />
+    <file line="1" url="src/runtime_config.h" col="23" encoding="" />
+    <file line="162" url="src/runtime_config.c" col="0" encoding="" />
+    <file line="327" url="src/commandline.c" col="0" encoding="" />
+    <file line="97" url="test/test_defaults.h" col="0" encoding="" />
+    <file line="171" url="test/test_query_string.c" col="0" encoding="" />
+    <file line="0" url="src/cache.h" col="42" encoding="" />
+    <file line="23" url="src/cache.c" col="22" encoding="" />
+    <file line="47" url="test/test_cache.c" col="0" encoding="" />
+    <file line="0" url="src/serve.c" col="0" encoding="" />
+    <file line="31" url="test/test_config.h" col="0" encoding="" />
+    <file line="56" url="test/test_runtime_config.c" col="0" encoding="" />
+    <file line="114" url="src/cgiscaler.c" col="0" encoding="" />
+    <file line="55" url="src/scaler.c" col="0" encoding="" />
+    <file line="283" url="test/asserts.c" col="117" encoding="" />
+    <file line="124" url="src/query_string.c" col="6" encoding="" />
+    <file line="16" url="TODO" col="95" encoding="" />
    </projectview>
    <defaultview name="" />
   </kdevfilelist>
