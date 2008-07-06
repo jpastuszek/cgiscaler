@@ -212,8 +212,90 @@ static void test_invalid_size() {
 
 	image = strict_resize(IMAGE_TEST_FILE, size);
 	assert_equal(image, 0);
+
+
+	size.w = 0;
+	size.h = 0;
+	
+	image = fit_resize(IMAGE_TEST_FILE, size);
+	assert_equal(image, 0);
+
+	image = strict_resize(IMAGE_TEST_FILE, size);
+	assert_equal(image, 0);
+
+
+	size.w = -100;
+	size.h = 0;
+	
+	image = fit_resize(IMAGE_TEST_FILE, size);
+	assert_equal(image, 0);
+
+	image = strict_resize(IMAGE_TEST_FILE, size);
+	assert_equal(image, 0);
+
+
+	size.w = 0;
+	size.h = -100;
+	
+	image = fit_resize(IMAGE_TEST_FILE, size);
+	assert_equal(image, 0);
+
+	image = strict_resize(IMAGE_TEST_FILE, size);
+	assert_equal(image, 0);
+
+
+	size.w = 100;
+	size.h = -100;
+	
+	image = fit_resize(IMAGE_TEST_FILE, size);
+	assert_equal(image, 0);
+
+	image = strict_resize(IMAGE_TEST_FILE, size);
+	assert_equal(image, 0);
+
+
+	size.w = -100;
+	size.h = 100;
+	
+	image = fit_resize(IMAGE_TEST_FILE, size);
+	assert_equal(image, 0);
+
+	image = strict_resize(IMAGE_TEST_FILE, size);
+	assert_equal(image, 0);
 }
 
+static void test_zero_size() {
+	MagickWand *image;
+	struct dimensions size, img;
+
+	size.w = 0;
+	size.h = 200;
+	
+	image = fit_resize(IMAGE_TEST_FILE, size);
+	assert_not_equal(image, 0);
+
+	img = get_image_size(image);
+
+	/* image should be scaled up to defined height */
+	assert_not_equal(img.w, 0);
+	assert_equal(img.h, size.h);
+
+	free_image(image);
+
+	size.w = 100;
+	size.h = 0;
+	
+	image = fit_resize(IMAGE_TEST_FILE, size);
+	assert_not_equal(image, 0);
+
+	img = get_image_size(image);
+
+	/* image should be scaled up to defined width */
+	assert_not_equal(img.h, 0);
+	assert_equal(img.w, size.w);
+
+	free_image(image);
+}
 
 /* setup and teardown */
 static void test_setup() {
@@ -239,6 +321,7 @@ int main(int argc, char **argv) {
 	add_test(cgiscaler_suite, test_remove_transparentcy);
 	add_test(cgiscaler_suite, test_prepare_blob);
 	add_test(cgiscaler_suite, test_invalid_size);
+	add_test(cgiscaler_suite, test_zero_size);
 
 	setup(cgiscaler_suite, test_setup);
 	teardown(cgiscaler_suite, test_teardown);

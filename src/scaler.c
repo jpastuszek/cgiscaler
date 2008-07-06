@@ -36,6 +36,7 @@
 #include <errno.h>
 #endif
 
+#define INFINIT_SIZE 0x0FFFFFFF
 
 #define ThrowWandException(wand) \
 { \
@@ -53,24 +54,23 @@ exit(-1); \
 
 MagickWand *remove_transparency(MagickWand *image);
 
-//TODO: Zero sized image will do original size? may by configurable? :D
 //TODO: Performance tests... profiler? :D
 
 /** Structure that maps resize filters to their names */
 struct _resize_filters resize_filters[11] =
 {
 	{BesselFilter,		"BesselFilter"},
-	{BlackmanFilter, 	"BlackmanFilter"},
-	{BoxFilter, 		"BoxFilter"},
-	{CatromFilter, 	"CatromFilter"},
+	{BlackmanFilter,	"BlackmanFilter"},
+	{BoxFilter,		"BoxFilter"},
+	{CatromFilter,		"CatromFilter"},
 	//{CubicGaussianFilter, "CubicGaussianFilter"},
-	{HanningFilter,	"HanningFilter"},
-	{HermiteFilter, 	"HermiteFilter"},
-	{LanczosFilter, 	"LanczosFilter"},
-	{MitchellFilter, 	"MitchellFilter"},
+	{HanningFilter,		"HanningFilter"},
+	{HermiteFilter,		"HermiteFilter"},
+	{LanczosFilter,		"LanczosFilter"},
+	{MitchellFilter,	"MitchellFilter"},
 	//{PointQuandraticFilter, "PointQuandraticFilter"},
-	{SincFilter, 		"SincFilter"},
-	{TriangleFilter, 	"TriangleFilter"},
+	{SincFilter,		"SincFilter"},
+	{TriangleFilter,	"TriangleFilter"},
 	{-1,0}
 };
 
@@ -278,6 +278,24 @@ MagickWand *fit_resize(media_fpath *media_file_path, struct dimensions resize_to
 	struct dimensions image_size;
 	struct dimensions load_size;
 
+	debug(INFO, "Fit resize to: %dx%d", resize_to.w, resize_to.h);
+
+	if (resize_to.w < 0 || resize_to.h < 0) {
+		debug(ERR, "Requested invalid image size: %dx%d", resize_to.w, resize_to.h);
+		return 0;
+	}
+
+	if (resize_to.w == 0 && resize_to.h == 0) {
+		debug(ERR, "Requested invalid image size: 0x0");
+		return 0;
+	}
+
+	if (resize_to.w == 0)
+		resize_to.w = INFINIT_SIZE;
+
+	if (resize_to.h == 0)
+		resize_to.h = INFINIT_SIZE;
+
 	/* this will ping the image to get it's size */
 	image_ping = ping_image(media_file_path);
 	if (!image_ping)
@@ -357,6 +375,13 @@ MagickWand *strict_resize(media_fpath *media_file_path, struct dimensions resize
 	struct dimensions load_size;
 	struct dimensions crop_to;
 	struct point position;
+
+	debug(INFO, "Strict resize to: %dx%d", resize_to.w, resize_to.h);
+
+	if (resize_to.w <= 0 || resize_to.h <= 0) {
+		debug(ERR, "Requested invalid image size: %dx%d", resize_to.w, resize_to.h);
+		return 0;
+	}
 
 	/* we are reducing requested thumbnail resolution to MAX_OUT_PIXELS */
 	resize_to = reduce_filed(resize_to, resource_limit_config->max_pixel_no);
@@ -516,7 +541,7 @@ short int resize(MagickWand *image, struct dimensions to_size) {
 	struct timer timeing;
 
 	if (to_size.w <= 0 || to_size.h <= 0) {
-		debug(ERR, "Requested invalid image size: %ux%u", to_size.w, to_size.h);
+		debug(ERR, "Requested invalid image size: %dx%d", to_size.w, to_size.h);
 		return 0;
 	}
 
