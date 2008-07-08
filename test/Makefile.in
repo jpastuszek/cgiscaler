@@ -541,7 +541,7 @@ main_LDADD = $(top_builddir)/cgreen/libcgreen.a $(top_builddir)/lib/libgnu.la li
 format_info_SOURCES = debug.c format_info.c runtime_config.c test_format_info.c
 format_info_LDADD = $(top_builddir)/cgreen/libcgreen.a $(top_builddir)/lib/libgnu.la
 bin_SCRIPTS = memory_test unit_test
-INCLUDES = -I/usr/local/include -I$(top_builddir)/lib
+INCLUDES = -I$(top_builddir)/lib
 AM_CFLAGS = -Wall -I$(top_srcdir)/lib
 all: all-am
 
@@ -556,9 +556,9 @@ $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu  test/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign  test/Makefile'; \
 	cd $(top_srcdir) && \
-	  $(AUTOMAKE) --gnu  test/Makefile
+	  $(AUTOMAKE) --foreign  test/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \

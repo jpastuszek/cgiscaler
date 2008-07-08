@@ -4,8 +4,8 @@ noinst_HEADERS = asserts.h cache.h cgiscaler.h commandline.h debug.h defaults.h 
 								         file_utils.h format_info.h geometry_math.h query_string.h runtime_config.h scaler.h \
 												         serve.h stdio_capture.h test_config.h test_defaults.h
 
-bin_PROGRAMS = cache commandline file_utils format_info geometry_math main \
-							         query_string runtime_config scaler serve
+noinst_PROGRAMS = cache commandline file_utils format_info geometry_math main \
+											 query_string runtime_config scaler serve
 
 noinst_LIBRARIES = libasserts.a
 
@@ -55,7 +55,7 @@ format_info_LDADD = $(top_builddir)/cgreen/libcgreen.a $(top_builddir)/lib/libgn
 
 bin_SCRIPTS = memory_test unit_test
 
-INCLUDES = -I/usr/local/include -I$(top_builddir)/lib
+INCLUDES = -I$(top_builddir)/lib
 
 AM_CFLAGS = -Wall -I$(top_srcdir)/lib
 

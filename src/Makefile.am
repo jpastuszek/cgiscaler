@@ -1,5 +1,5 @@
 # set the include path found by configure
-INCLUDES = -I/usr/local/include -I$(top_builddir)/lib
+INCLUDES = -I$(top_builddir)/lib
 
 # the library search path.
 cgiscalerdir = /usr/local/libexec

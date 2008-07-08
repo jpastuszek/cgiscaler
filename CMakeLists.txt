@@ -1,5 +1,5 @@
 project(CGIScaler)
-set(CGISCALER_VERSION "2.0.1" CACHE STRING "Version of this program")
+set(CGISCALER_VERSION "2.1" CACHE STRING "Version of this program")
 
 add_subdirectory(src)
 add_subdirectory(cgreen)

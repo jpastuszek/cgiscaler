@@ -312,7 +312,7 @@ static error_t parse_opt (int key, char *arg, struct argp_state *state) {
 			break;
 		case ARGP_KEY_END:
 			//TODO: Fix argp library to free this up at exit...
-			free(state->name);
+			//free(state->name);
 			// done
 			break;
 		default:

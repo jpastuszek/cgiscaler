@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.62)
-AC_INIT(cgiscaler, 2.0, Jakub Pastuszek <jpastuszek@gmail.com>)
+AC_INIT(cgiscaler, 2.1, Jakub Pastuszek <jpastuszek@gmail.com>)
 AC_CONFIG_SRCDIR([link-warning.h])
 AC_CONFIG_HEADERS([config.h])
 
