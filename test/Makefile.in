@@ -16,6 +16,7 @@
 
 
 
+
 VPATH = @srcdir@
 pkgdatadir = $(datadir)/@PACKAGE@
 pkglibdir = $(libdir)/@PACKAGE@
@@ -42,52 +43,87 @@ subdir = test
 DIST_COMMON = $(noinst_HEADERS) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/configure.in
+am__aclocal_m4_deps = $(top_srcdir)/libltdl/acinclude.m4 \
+	$(top_srcdir)/m4/alloca.m4 $(top_srcdir)/m4/argp.m4 \
+	$(top_srcdir)/m4/dirname.m4 $(top_srcdir)/m4/dos.m4 \
+	$(top_srcdir)/m4/double-slash-root.m4 \
+	$(top_srcdir)/m4/eoverflow.m4 $(top_srcdir)/m4/error.m4 \
+	$(top_srcdir)/m4/exitfail.m4 $(top_srcdir)/m4/extensions.m4 \
+	$(top_srcdir)/m4/float_h.m4 $(top_srcdir)/m4/getopt.m4 \
+	$(top_srcdir)/m4/gnulib-common.m4 \
+	$(top_srcdir)/m4/gnulib-comp.m4 \
+	$(top_srcdir)/m4/include_next.m4 $(top_srcdir)/m4/inline.m4 \
+	$(top_srcdir)/m4/intmax_t.m4 $(top_srcdir)/m4/inttypes_h.m4 \
+	$(top_srcdir)/m4/longlong.m4 $(top_srcdir)/m4/malloc.m4 \
+	$(top_srcdir)/m4/mempcpy.m4 $(top_srcdir)/m4/printf.m4 \
+	$(top_srcdir)/m4/rawmemchr.m4 $(top_srcdir)/m4/size_max.m4 \
+	$(top_srcdir)/m4/sleep.m4 $(top_srcdir)/m4/stdbool.m4 \
+	$(top_srcdir)/m4/stdint.m4 $(top_srcdir)/m4/stdint_h.m4 \
+	$(top_srcdir)/m4/stdio_h.m4 $(top_srcdir)/m4/stdlib_h.m4 \
+	$(top_srcdir)/m4/strcase.m4 $(top_srcdir)/m4/strchrnul.m4 \
+	$(top_srcdir)/m4/strerror.m4 $(top_srcdir)/m4/string_h.m4 \
+	$(top_srcdir)/m4/strings_h.m4 $(top_srcdir)/m4/strndup.m4 \
+	$(top_srcdir)/m4/strnlen.m4 $(top_srcdir)/m4/sysexits.m4 \
+	$(top_srcdir)/m4/unistd_h.m4 $(top_srcdir)/m4/vasnprintf.m4 \
+	$(top_srcdir)/m4/vsnprintf.m4 $(top_srcdir)/m4/wchar.m4 \
+	$(top_srcdir)/m4/wchar_t.m4 $(top_srcdir)/m4/wint_t.m4 \
+	$(top_srcdir)/m4/xalloc.m4 $(top_srcdir)/m4/xsize.m4 \
+	$(top_srcdir)/m4/xstrndup.m4 $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = $(top_builddir)/config.h
 CONFIG_CLEAN_FILES =
+LIBRARIES = $(noinst_LIBRARIES)
+ARFLAGS = cru
+libasserts_a_AR = $(AR) $(ARFLAGS)
+libasserts_a_DEPENDENCIES = $(top_builddir)/cgreen/libcgreen.a \
+	$(top_builddir)/lib/libgnu.la
+am_libasserts_a_OBJECTS = asserts.$(OBJEXT)
+libasserts_a_OBJECTS = $(am_libasserts_a_OBJECTS)
 am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(bindir)"
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
-am_cache_OBJECTS = asserts.$(OBJEXT) cache.$(OBJEXT) debug.$(OBJEXT) \
+am_cache_OBJECTS = cache.$(OBJEXT) debug.$(OBJEXT) \
 	file_utils.$(OBJEXT) format_info.$(OBJEXT) \
 	runtime_config.$(OBJEXT) serve.$(OBJEXT) \
 	stdio_capture.$(OBJEXT) test_cache.$(OBJEXT)
 cache_OBJECTS = $(am_cache_OBJECTS)
-cache_DEPENDENCIES = $(top_builddir)/cgreen/libcgreen.a
-am_commandline_OBJECTS = asserts.$(OBJEXT) commandline.$(OBJEXT) \
-	debug.$(OBJEXT) file_utils.$(OBJEXT) format_info.$(OBJEXT) \
+cache_DEPENDENCIES = $(top_builddir)/cgreen/libcgreen.a \
+	$(top_builddir)/lib/libgnu.la libasserts.a
+am_commandline_OBJECTS = commandline.$(OBJEXT) debug.$(OBJEXT) \
+	file_utils.$(OBJEXT) format_info.$(OBJEXT) \
 	geometry_math.$(OBJEXT) runtime_config.$(OBJEXT) \
 	scaler.$(OBJEXT) test_commandline.$(OBJEXT)
 commandline_OBJECTS = $(am_commandline_OBJECTS)
-commandline_DEPENDENCIES = $(top_builddir)/cgreen/libcgreen.a
-am_file_utils_OBJECTS = asserts.$(OBJEXT) debug.$(OBJEXT) \
-	file_utils.$(OBJEXT) format_info.$(OBJEXT) \
-	runtime_config.$(OBJEXT) test_file_utils.$(OBJEXT)
+commandline_DEPENDENCIES = $(top_builddir)/cgreen/libcgreen.a \
+	$(top_builddir)/lib/libgnu.la libasserts.a
+am_file_utils_OBJECTS = debug.$(OBJEXT) file_utils.$(OBJEXT) \
+	format_info.$(OBJEXT) runtime_config.$(OBJEXT) \
+	test_file_utils.$(OBJEXT)
 file_utils_OBJECTS = $(am_file_utils_OBJECTS)
-file_utils_DEPENDENCIES = $(top_builddir)/cgreen/libcgreen.a
+file_utils_DEPENDENCIES = $(top_builddir)/cgreen/libcgreen.a \
+	$(top_builddir)/lib/libgnu.la libasserts.a
 am_format_info_OBJECTS = debug.$(OBJEXT) format_info.$(OBJEXT) \
 	runtime_config.$(OBJEXT) test_format_info.$(OBJEXT)
 format_info_OBJECTS = $(am_format_info_OBJECTS)
-format_info_DEPENDENCIES = $(top_builddir)/cgreen/libcgreen.a
-am_geometry_math_OBJECTS = asserts.$(OBJEXT) debug.$(OBJEXT) \
-	format_info.$(OBJEXT) geometry_math.$(OBJEXT) \
-	runtime_config.$(OBJEXT) test_geometry_math.$(OBJEXT)
+format_info_DEPENDENCIES = $(top_builddir)/cgreen/libcgreen.a \
+	$(top_builddir)/lib/libgnu.la
+am_geometry_math_OBJECTS = debug.$(OBJEXT) format_info.$(OBJEXT) \
+	geometry_math.$(OBJEXT) runtime_config.$(OBJEXT) \
+	test_geometry_math.$(OBJEXT)
 geometry_math_OBJECTS = $(am_geometry_math_OBJECTS)
-geometry_math_DEPENDENCIES = $(top_builddir)/cgreen/libcgreen.a
-geometry_math_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
-	$(geometry_math_LDFLAGS) $(LDFLAGS) -o $@
-am_main_OBJECTS = asserts.$(OBJEXT) cache.$(OBJEXT) \
-	cgiscaler.$(OBJEXT) commandline.$(OBJEXT) debug.$(OBJEXT) \
-	file_utils.$(OBJEXT) format_info.$(OBJEXT) \
-	geometry_math.$(OBJEXT) query_string.$(OBJEXT) \
-	runtime_config.$(OBJEXT) scaler.$(OBJEXT) serve.$(OBJEXT) \
-	stdio_capture.$(OBJEXT) test_main.$(OBJEXT)
+geometry_math_DEPENDENCIES = $(top_builddir)/cgreen/libcgreen.a \
+	$(top_builddir)/lib/libgnu.la libasserts.a
+am_main_OBJECTS = cache.$(OBJEXT) cgiscaler.$(OBJEXT) \
+	commandline.$(OBJEXT) debug.$(OBJEXT) file_utils.$(OBJEXT) \
+	format_info.$(OBJEXT) geometry_math.$(OBJEXT) \
+	query_string.$(OBJEXT) runtime_config.$(OBJEXT) \
+	scaler.$(OBJEXT) serve.$(OBJEXT) stdio_capture.$(OBJEXT) \
+	test_main.$(OBJEXT)
 main_OBJECTS = $(am_main_OBJECTS)
-main_DEPENDENCIES = $(top_builddir)/cgreen/libcgreen.a
+main_DEPENDENCIES = $(top_builddir)/cgreen/libcgreen.a \
+	$(top_builddir)/lib/libgnu.la libasserts.a
 am_query_string_OBJECTS = debug.$(OBJEXT) file_utils.$(OBJEXT) \
 	format_info.$(OBJEXT) query_string.$(OBJEXT) \
 	runtime_config.$(OBJEXT) test_query_string.$(OBJEXT)
@@ -96,19 +132,22 @@ query_string_DEPENDENCIES = $(top_builddir)/cgreen/libcgreen.a
 am_runtime_config_OBJECTS = debug.$(OBJEXT) format_info.$(OBJEXT) \
 	runtime_config.$(OBJEXT) test_runtime_config.$(OBJEXT)
 runtime_config_OBJECTS = $(am_runtime_config_OBJECTS)
-runtime_config_DEPENDENCIES = $(top_builddir)/cgreen/libcgreen.a
-am_scaler_OBJECTS = asserts.$(OBJEXT) debug.$(OBJEXT) \
-	file_utils.$(OBJEXT) format_info.$(OBJEXT) \
-	geometry_math.$(OBJEXT) runtime_config.$(OBJEXT) \
-	scaler.$(OBJEXT) test_scaler.$(OBJEXT)
+runtime_config_DEPENDENCIES = $(top_builddir)/cgreen/libcgreen.a \
+	$(top_builddir)/lib/libgnu.la
+am_scaler_OBJECTS = debug.$(OBJEXT) file_utils.$(OBJEXT) \
+	format_info.$(OBJEXT) geometry_math.$(OBJEXT) \
+	runtime_config.$(OBJEXT) scaler.$(OBJEXT) \
+	test_scaler.$(OBJEXT)
 scaler_OBJECTS = $(am_scaler_OBJECTS)
-scaler_DEPENDENCIES = $(top_builddir)/cgreen/libcgreen.a
-am_serve_OBJECTS = asserts.$(OBJEXT) cache.$(OBJEXT) debug.$(OBJEXT) \
+scaler_DEPENDENCIES = $(top_builddir)/cgreen/libcgreen.a \
+	$(top_builddir)/lib/libgnu.la libasserts.a
+am_serve_OBJECTS = cache.$(OBJEXT) debug.$(OBJEXT) \
 	file_utils.$(OBJEXT) format_info.$(OBJEXT) \
 	runtime_config.$(OBJEXT) serve.$(OBJEXT) \
 	stdio_capture.$(OBJEXT) test_serve.$(OBJEXT)
 serve_OBJECTS = $(am_serve_OBJECTS)
-serve_DEPENDENCIES = $(top_builddir)/cgreen/libcgreen.a
+serve_DEPENDENCIES = $(top_builddir)/cgreen/libcgreen.a \
+	$(top_builddir)/lib/libgnu.la libasserts.a
 binSCRIPT_INSTALL = $(INSTALL_SCRIPT)
 SCRIPTS = $(bin_SCRIPTS)
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
@@ -123,27 +162,34 @@ CCLD = $(CC)
 LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
-SOURCES = $(cache_SOURCES) $(commandline_SOURCES) \
-	$(file_utils_SOURCES) $(format_info_SOURCES) \
-	$(geometry_math_SOURCES) $(main_SOURCES) \
-	$(query_string_SOURCES) $(runtime_config_SOURCES) \
-	$(scaler_SOURCES) $(serve_SOURCES)
-DIST_SOURCES = $(cache_SOURCES) $(commandline_SOURCES) \
-	$(file_utils_SOURCES) $(format_info_SOURCES) \
-	$(geometry_math_SOURCES) $(main_SOURCES) \
-	$(query_string_SOURCES) $(runtime_config_SOURCES) \
-	$(scaler_SOURCES) $(serve_SOURCES)
+SOURCES = $(libasserts_a_SOURCES) $(cache_SOURCES) \
+	$(commandline_SOURCES) $(file_utils_SOURCES) \
+	$(format_info_SOURCES) $(geometry_math_SOURCES) \
+	$(main_SOURCES) $(query_string_SOURCES) \
+	$(runtime_config_SOURCES) $(scaler_SOURCES) $(serve_SOURCES)
+DIST_SOURCES = $(libasserts_a_SOURCES) $(cache_SOURCES) \
+	$(commandline_SOURCES) $(file_utils_SOURCES) \
+	$(format_info_SOURCES) $(geometry_math_SOURCES) \
+	$(main_SOURCES) $(query_string_SOURCES) \
+	$(runtime_config_SOURCES) $(scaler_SOURCES) $(serve_SOURCES)
 HEADERS = $(noinst_HEADERS)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 ACLOCAL = @ACLOCAL@
+ALLOCA = @ALLOCA@
+ALLOCA_H = @ALLOCA_H@
 AMTAR = @AMTAR@
 AR = @AR@
 AUTOCONF = @AUTOCONF@
 AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
 AWK = @AWK@
+BITSIZEOF_PTRDIFF_T = @BITSIZEOF_PTRDIFF_T@
+BITSIZEOF_SIG_ATOMIC_T = @BITSIZEOF_SIG_ATOMIC_T@
+BITSIZEOF_SIZE_T = @BITSIZEOF_SIZE_T@
+BITSIZEOF_WCHAR_T = @BITSIZEOF_WCHAR_T@
+BITSIZEOF_WINT_T = @BITSIZEOF_WINT_T@
 CC = @CC@
 CCDEPMODE = @CCDEPMODE@
 CFLAGS = @CFLAGS@
@@ -162,23 +208,175 @@ ECHO_C = @ECHO_C@
 ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
 EGREP = @EGREP@
+EOVERFLOW = @EOVERFLOW@
 EXEEXT = @EXEEXT@
 F77 = @F77@
 FFLAGS = @FFLAGS@
+FLOAT_H = @FLOAT_H@
+GETOPT_H = @GETOPT_H@
+GNULIB_CALLOC_POSIX = @GNULIB_CALLOC_POSIX@
+GNULIB_CHOWN = @GNULIB_CHOWN@
+GNULIB_DUP2 = @GNULIB_DUP2@
+GNULIB_ENVIRON = @GNULIB_ENVIRON@
+GNULIB_FCHDIR = @GNULIB_FCHDIR@
+GNULIB_FFLUSH = @GNULIB_FFLUSH@
+GNULIB_FOPEN = @GNULIB_FOPEN@
+GNULIB_FPRINTF_POSIX = @GNULIB_FPRINTF_POSIX@
+GNULIB_FREOPEN = @GNULIB_FREOPEN@
+GNULIB_FSEEK = @GNULIB_FSEEK@
+GNULIB_FSEEKO = @GNULIB_FSEEKO@
+GNULIB_FTELL = @GNULIB_FTELL@
+GNULIB_FTELLO = @GNULIB_FTELLO@
+GNULIB_FTRUNCATE = @GNULIB_FTRUNCATE@
+GNULIB_GETCWD = @GNULIB_GETCWD@
+GNULIB_GETDELIM = @GNULIB_GETDELIM@
+GNULIB_GETLINE = @GNULIB_GETLINE@
+GNULIB_GETLOGIN_R = @GNULIB_GETLOGIN_R@
+GNULIB_GETPAGESIZE = @GNULIB_GETPAGESIZE@
+GNULIB_GETSUBOPT = @GNULIB_GETSUBOPT@
+GNULIB_LCHOWN = @GNULIB_LCHOWN@
+GNULIB_LSEEK = @GNULIB_LSEEK@
+GNULIB_MALLOC_POSIX = @GNULIB_MALLOC_POSIX@
+GNULIB_MBSCASECMP = @GNULIB_MBSCASECMP@
+GNULIB_MBSCASESTR = @GNULIB_MBSCASESTR@
+GNULIB_MBSCHR = @GNULIB_MBSCHR@
+GNULIB_MBSCSPN = @GNULIB_MBSCSPN@
+GNULIB_MBSLEN = @GNULIB_MBSLEN@
+GNULIB_MBSNCASECMP = @GNULIB_MBSNCASECMP@
+GNULIB_MBSNLEN = @GNULIB_MBSNLEN@
+GNULIB_MBSPBRK = @GNULIB_MBSPBRK@
+GNULIB_MBSPCASECMP = @GNULIB_MBSPCASECMP@
+GNULIB_MBSRCHR = @GNULIB_MBSRCHR@
+GNULIB_MBSSEP = @GNULIB_MBSSEP@
+GNULIB_MBSSPN = @GNULIB_MBSSPN@
+GNULIB_MBSSTR = @GNULIB_MBSSTR@
+GNULIB_MBSTOK_R = @GNULIB_MBSTOK_R@
+GNULIB_MEMMEM = @GNULIB_MEMMEM@
+GNULIB_MEMPCPY = @GNULIB_MEMPCPY@
+GNULIB_MEMRCHR = @GNULIB_MEMRCHR@
+GNULIB_MKDTEMP = @GNULIB_MKDTEMP@
+GNULIB_MKSTEMP = @GNULIB_MKSTEMP@
+GNULIB_OBSTACK_PRINTF = @GNULIB_OBSTACK_PRINTF@
+GNULIB_OBSTACK_PRINTF_POSIX = @GNULIB_OBSTACK_PRINTF_POSIX@
+GNULIB_PRINTF_POSIX = @GNULIB_PRINTF_POSIX@
+GNULIB_PUTENV = @GNULIB_PUTENV@
+GNULIB_RAWMEMCHR = @GNULIB_RAWMEMCHR@
+GNULIB_READLINK = @GNULIB_READLINK@
+GNULIB_REALLOC_POSIX = @GNULIB_REALLOC_POSIX@
+GNULIB_RPMATCH = @GNULIB_RPMATCH@
+GNULIB_SETENV = @GNULIB_SETENV@
+GNULIB_SLEEP = @GNULIB_SLEEP@
+GNULIB_SNPRINTF = @GNULIB_SNPRINTF@
+GNULIB_SPRINTF_POSIX = @GNULIB_SPRINTF_POSIX@
+GNULIB_STPCPY = @GNULIB_STPCPY@
+GNULIB_STPNCPY = @GNULIB_STPNCPY@
+GNULIB_STRCASESTR = @GNULIB_STRCASESTR@
+GNULIB_STRCHRNUL = @GNULIB_STRCHRNUL@
+GNULIB_STRDUP = @GNULIB_STRDUP@
+GNULIB_STRERROR = @GNULIB_STRERROR@
+GNULIB_STRNDUP = @GNULIB_STRNDUP@
+GNULIB_STRNLEN = @GNULIB_STRNLEN@
+GNULIB_STRPBRK = @GNULIB_STRPBRK@
+GNULIB_STRSEP = @GNULIB_STRSEP@
+GNULIB_STRSIGNAL = @GNULIB_STRSIGNAL@
+GNULIB_STRSTR = @GNULIB_STRSTR@
+GNULIB_STRTOD = @GNULIB_STRTOD@
+GNULIB_STRTOK_R = @GNULIB_STRTOK_R@
+GNULIB_UNSETENV = @GNULIB_UNSETENV@
+GNULIB_VASPRINTF = @GNULIB_VASPRINTF@
+GNULIB_VFPRINTF_POSIX = @GNULIB_VFPRINTF_POSIX@
+GNULIB_VPRINTF_POSIX = @GNULIB_VPRINTF_POSIX@
+GNULIB_VSNPRINTF = @GNULIB_VSNPRINTF@
+GNULIB_VSPRINTF_POSIX = @GNULIB_VSPRINTF_POSIX@
+GNULIB_WCWIDTH = @GNULIB_WCWIDTH@
 GREP = @GREP@
+HAVE_CALLOC_POSIX = @HAVE_CALLOC_POSIX@
+HAVE_DECL_ENVIRON = @HAVE_DECL_ENVIRON@
+HAVE_DECL_GETDELIM = @HAVE_DECL_GETDELIM@
+HAVE_DECL_GETLINE = @HAVE_DECL_GETLINE@
+HAVE_DECL_GETLOGIN_R = @HAVE_DECL_GETLOGIN_R@
+HAVE_DECL_MEMMEM = @HAVE_DECL_MEMMEM@
+HAVE_DECL_MEMRCHR = @HAVE_DECL_MEMRCHR@
+HAVE_DECL_OBSTACK_PRINTF = @HAVE_DECL_OBSTACK_PRINTF@
+HAVE_DECL_SNPRINTF = @HAVE_DECL_SNPRINTF@
+HAVE_DECL_STRDUP = @HAVE_DECL_STRDUP@
+HAVE_DECL_STRERROR = @HAVE_DECL_STRERROR@
+HAVE_DECL_STRNCASECMP = @HAVE_DECL_STRNCASECMP@
+HAVE_DECL_STRNDUP = @HAVE_DECL_STRNDUP@
+HAVE_DECL_STRNLEN = @HAVE_DECL_STRNLEN@
+HAVE_DECL_STRSIGNAL = @HAVE_DECL_STRSIGNAL@
+HAVE_DECL_STRTOK_R = @HAVE_DECL_STRTOK_R@
+HAVE_DECL_VSNPRINTF = @HAVE_DECL_VSNPRINTF@
+HAVE_DECL_WCWIDTH = @HAVE_DECL_WCWIDTH@
+HAVE_DUP2 = @HAVE_DUP2@
+HAVE_FSEEKO = @HAVE_FSEEKO@
+HAVE_FTELLO = @HAVE_FTELLO@
+HAVE_FTRUNCATE = @HAVE_FTRUNCATE@
+HAVE_GETPAGESIZE = @HAVE_GETPAGESIZE@
+HAVE_GETSUBOPT = @HAVE_GETSUBOPT@
+HAVE_INTTYPES_H = @HAVE_INTTYPES_H@
+HAVE_LONG_LONG_INT = @HAVE_LONG_LONG_INT@
+HAVE_MALLOC_POSIX = @HAVE_MALLOC_POSIX@
+HAVE_MEMPCPY = @HAVE_MEMPCPY@
+HAVE_MKDTEMP = @HAVE_MKDTEMP@
+HAVE_OS_H = @HAVE_OS_H@
+HAVE_RAWMEMCHR = @HAVE_RAWMEMCHR@
+HAVE_READLINK = @HAVE_READLINK@
+HAVE_REALLOC_POSIX = @HAVE_REALLOC_POSIX@
+HAVE_RPMATCH = @HAVE_RPMATCH@
+HAVE_SETENV = @HAVE_SETENV@
+HAVE_SIGNED_SIG_ATOMIC_T = @HAVE_SIGNED_SIG_ATOMIC_T@
+HAVE_SIGNED_WCHAR_T = @HAVE_SIGNED_WCHAR_T@
+HAVE_SIGNED_WINT_T = @HAVE_SIGNED_WINT_T@
+HAVE_SLEEP = @HAVE_SLEEP@
+HAVE_STDINT_H = @HAVE_STDINT_H@
+HAVE_STPCPY = @HAVE_STPCPY@
+HAVE_STPNCPY = @HAVE_STPNCPY@
+HAVE_STRCASECMP = @HAVE_STRCASECMP@
+HAVE_STRCASESTR = @HAVE_STRCASESTR@
+HAVE_STRCHRNUL = @HAVE_STRCHRNUL@
+HAVE_STRNDUP = @HAVE_STRNDUP@
+HAVE_STRPBRK = @HAVE_STRPBRK@
+HAVE_STRSEP = @HAVE_STRSEP@
+HAVE_STRTOD = @HAVE_STRTOD@
+HAVE_SYSEXITS_H = @HAVE_SYSEXITS_H@
+HAVE_SYS_BITYPES_H = @HAVE_SYS_BITYPES_H@
+HAVE_SYS_INTTYPES_H = @HAVE_SYS_INTTYPES_H@
+HAVE_SYS_PARAM_H = @HAVE_SYS_PARAM_H@
+HAVE_SYS_TYPES_H = @HAVE_SYS_TYPES_H@
+HAVE_UNISTD_H = @HAVE_UNISTD_H@
+HAVE_UNSETENV = @HAVE_UNSETENV@
+HAVE_UNSIGNED_LONG_LONG_INT = @HAVE_UNSIGNED_LONG_LONG_INT@
+HAVE_VASPRINTF = @HAVE_VASPRINTF@
+HAVE_WCHAR_H = @HAVE_WCHAR_H@
+HAVE__BOOL = @HAVE__BOOL@
+INCLUDE_NEXT = @INCLUDE_NEXT@
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
 LDFLAGS = @LDFLAGS@
+LIBINTL = @LIBINTL@
 LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
 LIBTOOL = @LIBTOOL@
+LIBTOOL_DEPS = @LIBTOOL_DEPS@
 LN_S = @LN_S@
+LTALLOCA = @LTALLOCA@
+LTLIBINTL = @LTLIBINTL@
 LTLIBOBJS = @LTLIBOBJS@
 MAKEINFO = @MAKEINFO@
 MKDIR_P = @MKDIR_P@
+NEXT_FLOAT_H = @NEXT_FLOAT_H@
+NEXT_STDINT_H = @NEXT_STDINT_H@
+NEXT_STDIO_H = @NEXT_STDIO_H@
+NEXT_STDLIB_H = @NEXT_STDLIB_H@
+NEXT_STRINGS_H = @NEXT_STRINGS_H@
+NEXT_STRING_H = @NEXT_STRING_H@
+NEXT_SYSEXITS_H = @NEXT_SYSEXITS_H@
+NEXT_UNISTD_H = @NEXT_UNISTD_H@
+NEXT_WCHAR_H = @NEXT_WCHAR_H@
 NMEDIT = @NMEDIT@
 OBJEXT = @OBJEXT@
 PACKAGE = @PACKAGE@
@@ -188,12 +386,56 @@ PACKAGE_STRING = @PACKAGE_STRING@
 PACKAGE_TARNAME = @PACKAGE_TARNAME@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
+POW_LIB = @POW_LIB@
+PTRDIFF_T_SUFFIX = @PTRDIFF_T_SUFFIX@
 RANLIB = @RANLIB@
+REPLACE_CHOWN = @REPLACE_CHOWN@
+REPLACE_FCHDIR = @REPLACE_FCHDIR@
+REPLACE_FFLUSH = @REPLACE_FFLUSH@
+REPLACE_FOPEN = @REPLACE_FOPEN@
+REPLACE_FPRINTF = @REPLACE_FPRINTF@
+REPLACE_FREOPEN = @REPLACE_FREOPEN@
+REPLACE_FSEEK = @REPLACE_FSEEK@
+REPLACE_FSEEKO = @REPLACE_FSEEKO@
+REPLACE_FTELL = @REPLACE_FTELL@
+REPLACE_FTELLO = @REPLACE_FTELLO@
+REPLACE_GETCWD = @REPLACE_GETCWD@
+REPLACE_GETLINE = @REPLACE_GETLINE@
+REPLACE_GETPAGESIZE = @REPLACE_GETPAGESIZE@
+REPLACE_LCHOWN = @REPLACE_LCHOWN@
+REPLACE_LSEEK = @REPLACE_LSEEK@
+REPLACE_MEMMEM = @REPLACE_MEMMEM@
+REPLACE_MKSTEMP = @REPLACE_MKSTEMP@
+REPLACE_OBSTACK_PRINTF = @REPLACE_OBSTACK_PRINTF@
+REPLACE_PRINTF = @REPLACE_PRINTF@
+REPLACE_PUTENV = @REPLACE_PUTENV@
+REPLACE_SNPRINTF = @REPLACE_SNPRINTF@
+REPLACE_SPRINTF = @REPLACE_SPRINTF@
+REPLACE_STRCASESTR = @REPLACE_STRCASESTR@
+REPLACE_STRERROR = @REPLACE_STRERROR@
+REPLACE_STRSIGNAL = @REPLACE_STRSIGNAL@
+REPLACE_STRSTR = @REPLACE_STRSTR@
+REPLACE_STRTOD = @REPLACE_STRTOD@
+REPLACE_VASPRINTF = @REPLACE_VASPRINTF@
+REPLACE_VFPRINTF = @REPLACE_VFPRINTF@
+REPLACE_VPRINTF = @REPLACE_VPRINTF@
+REPLACE_VSNPRINTF = @REPLACE_VSNPRINTF@
+REPLACE_VSPRINTF = @REPLACE_VSPRINTF@
+REPLACE_WCWIDTH = @REPLACE_WCWIDTH@
 SED = @SED@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
+SIG_ATOMIC_T_SUFFIX = @SIG_ATOMIC_T_SUFFIX@
+SIZE_T_SUFFIX = @SIZE_T_SUFFIX@
+STDBOOL_H = @STDBOOL_H@
+STDINT_H = @STDINT_H@
 STRIP = @STRIP@
+SYSEXITS_H = @SYSEXITS_H@
 VERSION = @VERSION@
+VOID_UNSETENV = @VOID_UNSETENV@
+WCHAR_H = @WCHAR_H@
+WCHAR_T_SUFFIX = @WCHAR_T_SUFFIX@
+WINT_T_SUFFIX = @WINT_T_SUFFIX@
 abs_builddir = @abs_builddir@
 abs_srcdir = @abs_srcdir@
 abs_top_builddir = @abs_top_builddir@
@@ -218,6 +460,10 @@ datarootdir = @datarootdir@
 docdir = @docdir@
 dvidir = @dvidir@
 exec_prefix = @exec_prefix@
+gl_LIBOBJS = @gl_LIBOBJS@
+gl_LTLIBOBJS = @gl_LTLIBOBJS@
+gltests_LIBOBJS = @gltests_LIBOBJS@
+gltests_LTLIBOBJS = @gltests_LTLIBOBJS@
 host = @host@
 host_alias = @host_alias@
 host_cpu = @host_cpu@
@@ -231,6 +477,7 @@ libdir = @libdir@
 libexecdir = @libexecdir@
 localedir = @localedir@
 localstatedir = @localstatedir@
+magickconfig = @magickconfig@
 mandir = @mandir@
 mkdir_p = @mkdir_p@
 oldincludedir = @oldincludedir@
@@ -243,56 +490,59 @@ sharedstatedir = @sharedstatedir@
 srcdir = @srcdir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
+top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 METASOURCES = AUTO
-file_utils_LDADD = $(top_builddir)/cgreen/libcgreen.a
-file_utils_SOURCES = asserts.c debug.c file_utils.c format_info.c \
-	runtime_config.c test_file_utils.c
-
 noinst_HEADERS = asserts.h cache.h cgiscaler.h commandline.h debug.h defaults.h \
-	file_utils.h format_info.h geometry_math.h query_string.h runtime_config.h scaler.h \
-	serve.h stdio_capture.h test_config.h test_defaults.h
+								         file_utils.h format_info.h geometry_math.h query_string.h runtime_config.h scaler.h \
+												         serve.h stdio_capture.h test_config.h test_defaults.h
 
-serve_LDADD = $(top_builddir)/cgreen/libcgreen.a
-serve_SOURCES = asserts.c cache.c debug.c file_utils.c format_info.c \
-	runtime_config.c serve.c stdio_capture.c test_serve.c
+noinst_LIBRARIES = libasserts.a
+libasserts_a_SOURCES = asserts.c
+libasserts_a_LIBADD = $(top_builddir)/cgreen/libcgreen.a $(top_builddir)/lib/libgnu.la
+file_utils_SOURCES = debug.c file_utils.c format_info.c \
+										         runtime_config.c test_file_utils.c
 
-cache_LDADD = $(top_builddir)/cgreen/libcgreen.a
-cache_SOURCES = asserts.c cache.c debug.c file_utils.c format_info.c \
-	runtime_config.c serve.c stdio_capture.c test_cache.c
+file_utils_LDADD = $(top_builddir)/cgreen/libcgreen.a $(top_builddir)/lib/libgnu.la libasserts.a
+serve_SOURCES = cache.c debug.c file_utils.c format_info.c \
+								        runtime_config.c serve.c stdio_capture.c test_serve.c
 
-geometry_math_SOURCES = asserts.c debug.c format_info.c geometry_math.c \
-	runtime_config.c test_geometry_math.c
+serve_LDADD = $(top_builddir)/cgreen/libcgreen.a $(top_builddir)/lib/libgnu.la libasserts.a
+cache_SOURCES = cache.c debug.c file_utils.c format_info.c \
+								        runtime_config.c serve.c stdio_capture.c test_cache.c
 
-geometry_math_LDADD = $(top_builddir)/cgreen/libcgreen.a
-geometry_math_LDFLAGS = -lm
+cache_LDADD = $(top_builddir)/cgreen/libcgreen.a $(top_builddir)/lib/libgnu.la libasserts.a
+geometry_math_SOURCES = debug.c format_info.c geometry_math.c \
+												        runtime_config.c test_geometry_math.c
+
+geometry_math_LDADD = $(top_builddir)/cgreen/libcgreen.a $(top_builddir)/lib/libgnu.la libasserts.a
 runtime_config_SOURCES = debug.c format_info.c runtime_config.c \
-	test_runtime_config.c
+												         test_runtime_config.c
 
-runtime_config_LDADD = $(top_builddir)/cgreen/libcgreen.a
-commandline_SOURCES = asserts.c commandline.c debug.c file_utils.c \
-	format_info.c geometry_math.c runtime_config.c scaler.c test_commandline.c
+runtime_config_LDADD = $(top_builddir)/cgreen/libcgreen.a $(top_builddir)/lib/libgnu.la
+commandline_SOURCES = commandline.c debug.c file_utils.c \
+											        format_info.c geometry_math.c runtime_config.c scaler.c test_commandline.c
 
-commandline_LDADD = $(top_builddir)/cgreen/libcgreen.a
-scaler_SOURCES = asserts.c debug.c file_utils.c format_info.c geometry_math.c \
-	runtime_config.c scaler.c test_scaler.c
+commandline_LDADD = $(top_builddir)/cgreen/libcgreen.a $(top_builddir)/lib/libgnu.la libasserts.a
+scaler_SOURCES = debug.c file_utils.c format_info.c geometry_math.c \
+								         runtime_config.c scaler.c test_scaler.c
 
-AM_CFLAGS = -Wall `Wand-config --libs`
-scaler_LDADD = $(top_builddir)/cgreen/libcgreen.a
+scaler_LDADD = $(top_builddir)/cgreen/libcgreen.a $(top_builddir)/lib/libgnu.la libasserts.a
 query_string_SOURCES = debug.c file_utils.c format_info.c query_string.c \
-	runtime_config.c test_query_string.c
+											         runtime_config.c test_query_string.c
 
 query_string_LDADD = $(top_builddir)/cgreen/libcgreen.a
-main_LDADD = $(top_builddir)/cgreen/libcgreen.a
-main_SOURCES = asserts.c cache.c cgiscaler.c commandline.c debug.c file_utils.c \
-	format_info.c geometry_math.c query_string.c runtime_config.c scaler.c serve.c \
-	stdio_capture.c test_main.c
+main_SOURCES = cache.c cgiscaler.c commandline.c debug.c file_utils.c \
+							         format_info.c geometry_math.c query_string.c runtime_config.c scaler.c serve.c \
+											         stdio_capture.c test_main.c
 
-bin_SCRIPTS = memory_test unit_test
+main_LDADD = $(top_builddir)/cgreen/libcgreen.a $(top_builddir)/lib/libgnu.la libasserts.a
 format_info_SOURCES = debug.c format_info.c runtime_config.c test_format_info.c
-format_info_LDADD = $(top_builddir)/cgreen/libcgreen.a
-INCLUDES = `Wand-config --cflags`
+format_info_LDADD = $(top_builddir)/cgreen/libcgreen.a $(top_builddir)/lib/libgnu.la
+bin_SCRIPTS = memory_test unit_test
+INCLUDES = -I/usr/local/include -I$(top_builddir)/lib
+AM_CFLAGS = -Wall -I$(top_srcdir)/lib
 all: all-am
 
 .SUFFIXES:
@@ -306,9 +556,9 @@ $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu  test/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign  test/Makefile'; \
 	cd $(top_srcdir) && \
-	  $(AUTOMAKE) --gnu  test/Makefile
+	  $(AUTOMAKE) --foreign  test/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
@@ -326,6 +576,13 @@ $(top_srcdir)/configure:  $(am__configure_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 $(ACLOCAL_M4):  $(am__aclocal_m4_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
+
+clean-noinstLIBRARIES:
+	-test -z "$(noinst_LIBRARIES)" || rm -f $(noinst_LIBRARIES)
+libasserts.a: $(libasserts_a_OBJECTS) $(libasserts_a_DEPENDENCIES) 
+	-rm -f libasserts.a
+	$(libasserts_a_AR) libasserts.a $(libasserts_a_OBJECTS) $(libasserts_a_LIBADD)
+	$(RANLIB) libasserts.a
 install-binPROGRAMS: $(bin_PROGRAMS)
 	@$(NORMAL_INSTALL)
 	test -z "$(bindir)" || $(MKDIR_P) "$(DESTDIR)$(bindir)"
@@ -368,7 +625,7 @@ format_info$(EXEEXT): $(format_info_OBJECTS) $(format_info_DEPENDENCIES)
 	$(LINK) $(format_info_OBJECTS) $(format_info_LDADD) $(LIBS)
 geometry_math$(EXEEXT): $(geometry_math_OBJECTS) $(geometry_math_DEPENDENCIES) 
 	@rm -f geometry_math$(EXEEXT)
-	$(geometry_math_LINK) $(geometry_math_OBJECTS) $(geometry_math_LDADD) $(LIBS)
+	$(LINK) $(geometry_math_OBJECTS) $(geometry_math_LDADD) $(LIBS)
 main$(EXEEXT): $(main_OBJECTS) $(main_DEPENDENCIES) 
 	@rm -f main$(EXEEXT)
 	$(LINK) $(main_OBJECTS) $(main_LDADD) $(LIBS)
@@ -536,7 +793,7 @@ distdir: $(DISTFILES)
 	done
 check-am: all-am
 check: check-am
-all-am: Makefile $(PROGRAMS) $(SCRIPTS) $(HEADERS)
+all-am: Makefile $(LIBRARIES) $(PROGRAMS) $(SCRIPTS) $(HEADERS)
 installdirs:
 	for dir in "$(DESTDIR)$(bindir)" "$(DESTDIR)$(bindir)"; do \
 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
@@ -567,7 +824,8 @@ maintainer-clean-generic:
 	@echo "it deletes files that may require special tools to rebuild."
 clean: clean-am
 
-clean-am: clean-binPROGRAMS clean-generic clean-libtool mostlyclean-am
+clean-am: clean-binPROGRAMS clean-generic clean-libtool \
+	clean-noinstLIBRARIES mostlyclean-am
 
 distclean: distclean-am
 	-rm -rf ./$(DEPDIR)
@@ -626,19 +884,19 @@ uninstall-am: uninstall-binPROGRAMS uninstall-binSCRIPTS
 .MAKE: install-am install-strip
 
 .PHONY: CTAGS GTAGS all all-am check check-am clean clean-binPROGRAMS \
-	clean-generic clean-libtool ctags distclean distclean-compile \
-	distclean-generic distclean-libtool distclean-tags distdir dvi \
-	dvi-am html html-am info info-am install install-am \
-	install-binPROGRAMS install-binSCRIPTS install-data \
-	install-data-am install-dvi install-dvi-am install-exec \
-	install-exec-am install-html install-html-am install-info \
-	install-info-am install-man install-pdf install-pdf-am \
-	install-ps install-ps-am install-strip installcheck \
-	installcheck-am installdirs maintainer-clean \
-	maintainer-clean-generic mostlyclean mostlyclean-compile \
-	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
-	tags uninstall uninstall-am uninstall-binPROGRAMS \
-	uninstall-binSCRIPTS
+	clean-generic clean-libtool clean-noinstLIBRARIES ctags \
+	distclean distclean-compile distclean-generic \
+	distclean-libtool distclean-tags distdir dvi dvi-am html \
+	html-am info info-am install install-am install-binPROGRAMS \
+	install-binSCRIPTS install-data install-data-am install-dvi \
+	install-dvi-am install-exec install-exec-am install-html \
+	install-html-am install-info install-info-am install-man \
+	install-pdf install-pdf-am install-ps install-ps-am \
+	install-strip installcheck installcheck-am installdirs \
+	maintainer-clean maintainer-clean-generic mostlyclean \
+	mostlyclean-compile mostlyclean-generic mostlyclean-libtool \
+	pdf pdf-am ps ps-am tags uninstall uninstall-am \
+	uninstall-binPROGRAMS uninstall-binSCRIPTS
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
