@@ -18,6 +18,8 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include "config.h"
+
 #include "../cgreen/cgreen.h"
 #include "test_config.h"
 #include "debug.h"
@@ -70,7 +72,7 @@ static void test_teardown() {
 	debug_stop();
 }
 
-int main(int argc, char **argv) {
+int main() {
 	TestSuite *output_config_suite = create_named_test_suite(__FILE__);
 
 	add_test(output_config_suite, test_alloc_default_output_config);

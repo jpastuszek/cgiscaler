@@ -17,6 +17,9 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
+
+#include "config.h"
+
 #include "../cgreen/cgreen.h"
 #include "asserts.h"
 #include "test_config.h"
@@ -115,7 +118,7 @@ static void test_resize_field_limiting() {
 	a.h = IMAGE_TEST_FILE_HEIGHT - 10;
 
 	/* resource_limit_config->max_pixel_no is set to lower then a.w * a.h */
-	if (a.w * a.h > resource_limit_config->max_pixel_no)
+	if (a.w * a.h > (int) resource_limit_config->max_pixel_no)
 		assert_true(1);
 	else
 		assert_true(0);
@@ -311,7 +314,7 @@ static void test_teardown() {
 	debug_stop();
 }
 
-int main(int argc, char **argv) {
+int main() {
 	TestSuite *cgiscaler_suite = create_named_test_suite(__FILE__);
 
 	add_test(cgiscaler_suite, test_load_image);

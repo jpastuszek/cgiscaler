@@ -14,5 +14,5 @@ asciidoc PERFORMANCE
 
 cd ..
 
-tar cvjf $NAME.tar.bz2 --exclude="doc" --exclude="CMakeCache.txt" --exclude=".git" --exclude=".svn" --exclude="CMakeFiles" --exclude="*~" --exclude="autom4te.cache" --exclude="debug" $NAME
+tar cvjf $NAME.tar.bz2 --exclude="doc" --exclude="CMakeCache.txt" --exclude=".git" --exclude=".svn" --exclude="CMakeFiles" --exclude="*~" --exclude="autom4te.cache" --exclude="debug" --exclude="config.guess" --exclude="config.sub" --exclude="ltmain.sh" $NAME
 

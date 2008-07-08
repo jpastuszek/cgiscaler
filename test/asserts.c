@@ -18,6 +18,8 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include "config.h"
+
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <sys/types.h>
@@ -136,7 +138,7 @@ unsigned int test_read_contains(int fd, char *str) {
 	char *data;
 	unsigned int len;
 	unsigned int str_len;
-	int i;
+	unsigned int i;
 
 	data = (char *) data_read_all(fd, &len);
 	if (!data)

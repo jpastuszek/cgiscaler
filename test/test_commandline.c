@@ -18,6 +18,8 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include "config.h"
+
 #include "../cgreen/cgreen.h"
 #include "runtime_config.h"
 #include "defaults.h"
@@ -297,7 +299,7 @@ static void test_teardown() {
 //	debug_stop();
 }
 
-int main(int argc, char **argv) {
+int main() {
 	TestSuite *commandline_suite = create_named_test_suite(__FILE__);
 
 	add_test(commandline_suite, test_apply_commandline_config);

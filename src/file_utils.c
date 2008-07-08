@@ -18,11 +18,14 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include "config.h"
+
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #include <stdio.h>
 #include <string.h>
+#include <strings.h>
 #include <stdlib.h>
 #include <fcntl.h>
 #include <errno.h>
@@ -253,8 +256,8 @@ fpath *sanitize_file_path(fpath *file_path) {
 */
 int write_blob_to_file(unsigned char *blob, int blob_len,abs_fpath *absolute_file_path) {
 	int out_file;
-	size_t bytes_written;
-	size_t total_blob_written;
+	ssize_t bytes_written;
+	ssize_t total_blob_written;
 
 	debug(DEB, "Writing BLOB to file: '%s'", absolute_file_path);
 
@@ -269,7 +272,7 @@ int write_blob_to_file(unsigned char *blob, int blob_len,abs_fpath *absolute_fil
 		debug(DEB, "Writing %d bytes to '%s'", blob_len - total_blob_written, absolute_file_path);
 
 		bytes_written = write(out_file, blob + total_blob_written, blob_len - total_blob_written);
-		debug(DEB, "%d bytes written", bytes_written);
+		debug(DEB, "%u bytes written", bytes_written);
 		if (bytes_written == -1) {
 			debug(ERR, "Error writing to '%s': %s", absolute_file_path, strerror(errno));
 			close(out_file);

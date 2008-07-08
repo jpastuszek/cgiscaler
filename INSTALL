@@ -27,6 +27,29 @@ ccmake . -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX:PATH=/usr
 
 Make sure that ImageMagick include directory and libraries are correct (us arrow key to navigate, enter to change field - there are some tips at the bottom of the window).
 
+
+Configure with GNU Autotolls
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+You will need libtool and also may need autoconf and automake if compilation fails.
+
+-----------
+libtoolize
+export CFLAGS="-DNDEBUG"; ./configure
+-----------
+
+If this fails try:
+
+-------------------------
+libtoolize --ltdl --force
+aclocal -I m4 -I libltdl
+autoconf
+automake
+export CFLAGS="-DNDEBUG"; ./configure
+make
+-------------------------
+
+
 Build & Install
 ~~~~~~~~~~~~~~~
 -----------------
@@ -38,6 +61,7 @@ The binary will be installed in */usr/libexec* and will be named *cgiscaler*.
 
 Create new shell script in your www/cgi-bin directory
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 Replace *<switches>* with your options (see *\-\-help* all switch first).
 ---------------------------------
 #!/bin/sh
@@ -45,14 +69,15 @@ Replace *<switches>* with your options (see *\-\-help* all switch first).
 /usr/libexec/cgiscaler <switches>
 ---------------------------------
 
+
+Apache Configuration
+--------------------
+
 You can optionally *prelink* your executable (it will load faster)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 --------------------------------------------
 sudo prelink --random /usr/libexec/cgiscaler
 --------------------------------------------
-
-Apache Configuration
---------------------
 
 Update your vhost/httpd.conf
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~

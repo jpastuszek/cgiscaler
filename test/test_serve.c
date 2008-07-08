@@ -18,6 +18,8 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include "config.h"
+
 #include <strings.h>
 #include <sys/types.h>
 #include <stdlib.h>
@@ -188,7 +190,7 @@ static void test_teardown() {
 	debug_stop();
 }
 
-int main(int argc, char **argv) {
+int main() {
 	TestSuite *serve_suite = create_named_test_suite(__FILE__);
 
 	add_test(serve_suite, test_serve_from_file);

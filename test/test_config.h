@@ -24,6 +24,10 @@
 
 //#define DEBUG_SYNC
 
+#ifdef HAVE_CONFIG_H
+#include "../config.h"
+#endif
+
 #define IMAGE_TEST_FILE "quick_gimp_pattern_test.png"
 #define IMAGE_TEST_FILE_WIDTH 450
 #define IMAGE_TEST_FILE_HEIGHT 300

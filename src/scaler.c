@@ -18,6 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include "config.h"
 
 #include <string.h>
 
@@ -102,7 +103,7 @@ MagickWand *load_image(media_fpath *media_file_path, struct dimensions to_size) 
 		size = malloc(24); /* this will get removed on DestroyImageInfo */
 		snprintf(size, 24, "%ux%u", to_size.w, to_size.h);
 		image_info->size = size;
-		debug(DEB, "Trying image size: %ux%u", to_size.w, to_size.h);
+		debug(DEB, "Trying to load sub image of size: %ux%u", to_size.w, to_size.h);
 	}
 
 	debug(DEB,"Loading image: '%s'", image_info->filename);

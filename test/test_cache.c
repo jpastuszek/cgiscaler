@@ -17,6 +17,9 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
+
+#include "config.h"
+
 #include <utime.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -249,7 +252,7 @@ static void test_teardown() {
 	debug_stop();
 }
 
-int main(int argc, char **argv) {
+int main() {
 	TestSuite *cache_suite = create_named_test_suite(__FILE__);
 
 	add_test(cache_suite, test_if_cached);
