@@ -48,74 +48,74 @@ static char doc[] = "CGIScaler is an image thumbnailer. It communicates with a w
 
 static struct argp_option options[] = {
         {0, 0, 0, 0, "Output geometry:\n"},
-        {"width",                                       'w',    "INTEGER",      0, "Width of output image" DEFAULT(WIDTH) },
-        {"height",                              'h',    "INTEGER",      0, "Height of output image" DEFAULT(HEIGHT) },
+	{"width",				'w',"INTEGER",		0, "Width of output image" DEFAULT(WIDTH) },
+        {"height",				'h',	"INTEGER",	0, "Height of output image" DEFAULT(HEIGHT) },
 
         {0, 0, 0, 0, "Output format:\n"},
-        {"out-format",                  'O',    "STRING",       0, "Resulting thumbnail format (ex. JPG, GIF, PNG) " DEFAULT(OUT_FORMAT)},
-        {"failback-mime-type",          'b',    "STRING",       0, "Mime-type that will be send in HTTP headers if one corresponding to format/extension could not be determined" DEFAULT(FAIL_BACK_MIME_TYPE)},
+        {"out-format",				'O',	"STRING",	0, "Resulting thumbnail format (ex. JPG, GIF, PNG) " DEFAULT(OUT_FORMAT)},
+        {"failback-mime-type",			'b',	"STRING",	0, "Mime-type that will be send in HTTP headers if one corresponding to format/extension could not be determined" DEFAULT(FAIL_BACK_MIME_TYPE)},
 
         {0, 0, 0, 0, "Simple CGI query parameter names:\n"},
-        {"cgi-width",                           'W',    "STRING",       0, "String to match width parameter in CGI query string" DEFAULT(CGI_WIDTH)},
-        {"cgi-height",                          'E',    "STRING",       0, "String to match height parameter in CGI query string" DEFAULT(CGI_HEIGHT)},
-        {"cgi-strict",                          'R',    "STRING",       0, "String to match strict enable parameter in CGI query string" DEFAULT(CGI_STRICT)},
-        {"cgi-low-quality",                     'L',    "STRING",       0, "String to mach low quality enable parameter in CGI query string" DEFAULT(CGI_LOW_QUALITY)},
+        {"cgi-width",				'W',	"STRING",	0, "String to match width parameter in CGI query string" DEFAULT(CGI_WIDTH)},
+        {"cgi-height",				'E',	"STRING",	0, "String to match height parameter in CGI query string" DEFAULT(CGI_HEIGHT)},
+        {"cgi-strict",				'R',	"STRING",	0, "String to match strict enable parameter in CGI query string" DEFAULT(CGI_STRICT)},
+        {"cgi-low-quality",			'L',	"STRING",	0, "String to mach low quality enable parameter in CGI query string" DEFAULT(CGI_LOW_QUALITY)},
 
         {0, 0, 0, 0, "Simple CGI query parameter values:\n"},
-        {"cgi-true",                            'T',    "STRING",       0, "String to mach true value in CGI query string" DEFAULT(CGI_TRUE)},
-        {"cgi-false",                           'F',    "STRING",       0, "String to mach false value in CGI query string" DEFAULT(CGI_FALSE)},
+        {"cgi-true",				'T',	"STRING",	0, "String to mach true value in CGI query string" DEFAULT(CGI_TRUE)},
+        {"cgi-false",				'F',	"STRING",	0, "String to mach false value in CGI query string" DEFAULT(CGI_FALSE)},
 
         {0, 0, 0, 0, "Simple CGI query defaults:\n"},
 #if SCALE_METHOD == SM_FIT
-        {"strict-resize",                       's',    0,                      0, "Do strict scaling (overwrites fit scaling)" DEFAULT(fit)},
+        {"strict-resize",			's',	0,		0, "Do strict scaling (overwrites fit scaling)" DEFAULT(fit)},
 #else
-        {"fit-resize",                          'f',    0,                      0, "Do fit scaling (overwrites strict scaling)" DEFAULT(strict)},
+        {"fit-resize",				'f',	0,		0, "Do fit scaling (overwrites strict scaling)" DEFAULT(strict)},
 #endif
-        {"low-quality",                 'l',    0,                      0, "Produce more compressed output" DEFAULT(unset)},
-        {"file-name",                           'i',    "FILE",         0, "Use this file name if no file name passed in CGI query" DEFAULT(show error)},
+        {"low-quality",				'l',	0,		0, "Produce more compressed output" DEFAULT(unset)},
+        {"file-name",				'i',	"FILE",		0, "Use this file name if no file name passed in CGI query" DEFAULT(show error)},
 
-        {"low-quality-value",           'Q',    "INTEGER",      0, "Image quality (1-100) to use when low-quality is enabled" DEFAULT(LOW_QUALITY_VALUE)},
-        {"normal-quality-value",        'N',    "INTEGER",      0, "Image quality (1-100) to use when low-quality is disabled" DEFAULT(NORMAL_QUALITY_VALUE)},
+        {"low-quality-value",			'Q',	"INTEGER",	0, "Image quality (1-100) to use when low-quality is enabled" DEFAULT(LOW_QUALITY_VALUE)},
+        {"normal-quality-value",		'N',	"INTEGER",	0, "Image quality (1-100) to use when low-quality is disabled" DEFAULT(NORMAL_QUALITY_VALUE)},
 
         {0, 0, 0, 0, "Storage\n"},
-        {"media-dir",                           'm',    "DIRECTORY",    0, "Root directory of media store - all file paths are relative to this directory" DEFAULT(MEDIA_DIR)},
-        {"cache-dir",                           'c',    "DIRECTORY",    0, "Root directory of cache store - all cached thumbnails will go there" DEFAULT(CACHE_DIR)},
+        {"media-dir",				'm',	"DIRECTORY",	0, "Root directory of media store - all file paths are relative to this directory" DEFAULT(MEDIA_DIR)},
+        {"cache-dir",				'c',	"DIRECTORY",	0, "Root directory of cache store - all cached thumbnails will go there" DEFAULT(CACHE_DIR)},
         //{"outfile",   'o', "FILE",    0, "Output to file instead of stdout"},
 
         {0, 0, 0, 0, "Resize filtering:\n"},
-        {"scaling-filter",                      'G',    "STRING",       0, "Smoothing filter to use when resizing" DEFAULT(SCALING_FILTER)},
-        {"list-scaling-filter",         'Y',    0,                      0, "List all possible smoothing filters"},
-        {"blur-factor",                 'B',    "REAL",         0, "Blur factor where > 1 is blurry, < 1 is sharp" DEFAULT(BLUR_FACTOR)},
+        {"scaling-filter",			'G',	"STRING",	0, "Smoothing filter to use when resizing" DEFAULT(SCALING_FILTER)},
+        {"list-scaling-filter",			'Y',	0,		0, "List all possible smoothing filters"},
+        {"blur-factor",				'B',	"REAL",		0, "Blur factor where > 1 is blurry, < 1 is sharp" DEFAULT(BLUR_FACTOR)},
 
         {0, 0, 0, 0, "Transparent image handling:\n"},
 #ifdef REMOVE_TRANSPARENCY
-        {"no-remove-transparency",      'n',    0,                      0, "Do not replace transparent image area" DEFAULT(set)},
+        {"no-remove-transparency",		'n',	0,		0, "Do not replace transparent image area" DEFAULT(set)},
 #else
-        {"remove-transparency", 't',    0,                      0, "Replace transparent image area with configured colour" DEFAULT(unset)},
+        {"remove-transparency",			't',	0,		0, "Replace transparent image area with configured colour" DEFAULT(unset)},
 #endif
-        {"transparency-colour",         'u',    "STRING",       0, "Transparency replacement colour" DEFAULT(TRANSPARENCY_COLOUR)},
+        {"transparency-colour",			'u',	"STRING",       0, "Transparency replacement colour" DEFAULT(TRANSPARENCY_COLOUR)},
 
         {0, 0, 0, 0, "General operation:\n"},
-        {"no-serve",                            'S',    0,                      0, "Do not serve the resulting image" DEFAULT(unset)},
-        {"no-headers",                  'H',    0,                      0, "Do not serve HTTP headers" DEFAULT(unset)},
-        {"no-cache",                            'C',    0,                      0, "Do disable cache" DEFAULT(unset)},
+        {"no-serve",				'S',	0,		0, "Do not serve the resulting image" DEFAULT(unset)},
+        {"no-headers",				'H',	0,		0, "Do not serve HTTP headers" DEFAULT(unset)},
+        {"no-cache",				'C',	0,		0, "Do disable cache" DEFAULT(unset)},
 
         {0, 0, 0, 0, "Error handling:\n"},
-        {"error-file",                          'e', "FILE",            0, "Serve this file in case of an error" DEFAULT(ERROR_FILE)},
-        {"error-message",                       'M', "STRING",  0, "Error message to serve in case error file cannot be served" DEFAULT(ERROR_MESSAGE)},
+        {"error-file",				'e',	"FILE",		0, "Serve this file in case of an error" DEFAULT(ERROR_FILE)},
+        {"error-message",			'M',	"STRING",	0, "Error message to serve in case error file cannot be served" DEFAULT(ERROR_MESSAGE)},
 
 #ifdef DEBUG
         {0, 0, 0, 0, "Logging:\n"},
-        {"log-file",                            'g', "STRING",          0, "Messages will be logged to this file" DEFAULT(LOG_FILE)},
+        {"log-file",				'g',	"STRING",	0, "Messages will be logged to this file" DEFAULT(LOG_FILE)},
 #endif
 
         {0, 0, 0, 0, "Limits (units may vary between IM versions):\n"},
-        {"max-out-pixels",                      'P',    "INTEGER",      0, "If image area (in pixels) will be grater than this limit it's size will be reduced proportionally" DEFAULT(MAX_OUT_PIXELS)},
-        {"limit-files",                         'U',    "INTEGER",      0, "Maximum number of open pixel cache files" DEFAULT(LIMIT_FILES)},
-        {"limit-disk",                          'D',    "INTEGER",      0, "Maximum amount of disk space permitted for use by the pixel cache in bytes" DEFAULT(LIMIT_DISK)},
-        {"limit-map",                           'A',    "INTEGER",      0, "Maximum amount of memory map to allocate for the pixel cache in bytes - when this limit is exceeded, the image pixels are cached to disk" DEFAULT(LIMIT_MAP)},
-        {"limit-memory",                        'K',    "INTEGER",      0, "Maximum amount of memory to allocate for the pixel cache from the heap in bytes - when this limit is exceeded, the image pixels are cached to memory-mapped disk" DEFAULT(LIMIT_MEMORY)},
-        {"limit-area",                          'J',    "INTEGER",      0, "Maximum amount of memory to allocate for image from in bytes - images that exceed the area limit are cached to disk" DEFAULT(LIMIT_AREA)},
+        {"max-out-pixels",			'P',	"INTEGER",	0, "If image area (in pixels) will be grater than this limit it's size will be reduced proportionally" DEFAULT(MAX_OUT_PIXELS)},
+        {"limit-files",				'U',	"INTEGER",	0, "Maximum number of open pixel cache files" DEFAULT(LIMIT_FILES)},
+        {"limit-disk",				'D',	"INTEGER",	0, "Maximum amount of disk space permitted for use by the pixel cache in bytes" DEFAULT(LIMIT_DISK)},
+        {"limit-map",				'A',	"INTEGER",	0, "Maximum amount of memory map to allocate for the pixel cache in bytes - when this limit is exceeded, the image pixels are cached to disk" DEFAULT(LIMIT_MAP)},
+        {"limit-memory",			'K',	"INTEGER",	0, "Maximum amount of memory to allocate for the pixel cache from the heap in bytes - when this limit is exceeded, the image pixels are cached to memory-mapped disk" DEFAULT(LIMIT_MEMORY)},
+        {"limit-area",				'J',	"INTEGER",	0, "Maximum amount of memory to allocate for image from in bytes - images that exceed the area limit are cached to disk" DEFAULT(LIMIT_AREA)},
 
         {0, 0, 0, 0, "Other options:"},
         { 0 }
@@ -311,6 +311,8 @@ static error_t parse_opt (int key, char *arg, struct argp_state *state) {
 			// non taged arg
 			break;
 		case ARGP_KEY_END:
+			//TODO: Fix argp library to free this up at exit...
+			free(state->name);
 			// done
 			break;
 		default:
