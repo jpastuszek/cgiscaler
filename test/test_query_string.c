@@ -159,7 +159,7 @@ static void test_teardown() {
 	debug_stop();
 }
 
-int main(int argc, char **argv) {
+int main() {
 
 	TestSuite *query_string_suite = create_named_test_suite(__FILE__);;
 
