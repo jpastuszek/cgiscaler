@@ -22,6 +22,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <strings.h>
 
 #include "query_string.h"
 #include "runtime_config.h"
@@ -50,17 +51,25 @@ void apply_simple_query_string_config(char *file_name, char *query_string) {
 	if (!output_config || !file_name)
 		return;
 
+	//TODO: Split this into two functions
 	debug(DEB, "Processing query file name: '%s'", file_name);
 
-	/* this will allocat the file name */
-	file_name = sanitize_file_path(file_name);
-	if (file_name) {
-		if (output_config->file_name)
-			free(output_config->file_name);
-		output_config->file_name = file_name;
+	/* we have non empty path */
+	if (file_name[0] != 0) {
+		/* this will allocat the file name */
+		file_name = sanitize_file_path(file_name);
+		if (!file_name) {
+			debug(WARN, "File path not secure! Using default: '%s'", output_config->file_name ? output_config->file_name : "<null>");
+		} else {
+			debug(INFO, "Using fle name: '%s'", file_name);
+			if (output_config->file_name)
+				free(output_config->file_name);
+			output_config->file_name = file_name;
+		}
 	}
 
-	debug(DEB, "Processing query string: '%s' target name: '%s'", query_string, file_name);
+
+	debug(DEB, "Processing query string: '%s'", query_string);
 
 	w = get_query_string_param(query_string, simple_query_string_config->query_width_param);
 	h = get_query_string_param(query_string, simple_query_string_config->query_height_param);
