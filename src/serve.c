@@ -63,7 +63,7 @@ int serve_from_file(abs_fpath *absolute_file_path, char *mime_type) {
 	unsigned char *buffer;
 	char *ext;
 	int file;
-	size_t bytes_read, bytes_written, total_bytes_read, total_bytes_written;
+	ssize_t bytes_read, bytes_written, total_bytes_read, total_bytes_written;
 	off_t file_size;
 	struct format_info *fi;
 
@@ -182,8 +182,8 @@ int serve_from_file(abs_fpath *absolute_file_path, char *mime_type) {
 * @see serve_from_file()
 */
 int serve_from_blob(unsigned char *blob, size_t blob_len, char *mime_type) {
-	size_t bytes_written;
-	size_t total_blob_written;
+	ssize_t bytes_written;
+	ssize_t total_blob_written;
 
 	debug(DEB,"Serving from BLOB: size: %d", blob_len);
 

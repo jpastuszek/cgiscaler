@@ -138,7 +138,7 @@ unsigned int test_read_contains(int fd, char *str) {
 	char *data;
 	unsigned int len;
 	unsigned int str_len;
-	int i;
+	unsigned int i;
 
 	data = (char *) data_read_all(fd, &len);
 	if (!data)
