@@ -72,7 +72,7 @@ static void test_teardown() {
 	debug_stop();
 }
 
-int main(int argc, char **argv) {
+int main() {
 	TestSuite *output_config_suite = create_named_test_suite(__FILE__);
 
 	add_test(output_config_suite, test_alloc_default_output_config);

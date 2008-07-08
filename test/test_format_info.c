@@ -158,7 +158,7 @@ static void test_teardown() {
 	debug_stop();
 }
 
-int main(int argc, char **argv) {
+int main() {
 	TestSuite *file_format_info_suite = create_named_test_suite(__FILE__);
 
 	add_test(file_format_info_suite, test_file_extension_to_format_info_from_builtin);

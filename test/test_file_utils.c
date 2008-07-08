@@ -215,7 +215,7 @@ static void test_teardown() {
 	debug_stop();
 }
 
-int main(int argc, char **argv) {
+int main() {
 	TestSuite *file_utils_suite = create_named_test_suite(__FILE__);
 
 	add_test(file_utils_suite, test_create_cache_file_path);

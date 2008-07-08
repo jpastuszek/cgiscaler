@@ -299,7 +299,7 @@ static void test_teardown() {
 //	debug_stop();
 }
 
-int main(int argc, char **argv) {
+int main() {
 	TestSuite *commandline_suite = create_named_test_suite(__FILE__);
 
 	add_test(commandline_suite, test_apply_commandline_config);

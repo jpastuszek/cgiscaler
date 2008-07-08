@@ -377,7 +377,7 @@ static void test_teardown() {
 	//debug_stop();
 }
 
-int main(int argc, char **argv) {
+int main() {
 	TestSuite *main_suite = create_named_test_suite(__FILE__);
 
 	add_test(main_suite, test_error);

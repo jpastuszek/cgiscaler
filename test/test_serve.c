@@ -190,7 +190,7 @@ static void test_teardown() {
 	debug_stop();
 }
 
-int main(int argc, char **argv) {
+int main() {
 	TestSuite *serve_suite = create_named_test_suite(__FILE__);
 
 	add_test(serve_suite, test_serve_from_file);
