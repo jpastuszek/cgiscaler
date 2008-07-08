@@ -23,7 +23,10 @@
 /* sync every line written to debug file... slow */
 //#define DEBUG_SYNC
 
+#ifdef HAVE_CONFIG_H
 #include "../config.h"
+#endif
+
 #include "build_config.h"
 
 /** Disk/cache file serving buffer */

@@ -1,5 +1,11 @@
 CGIScaler release notes:
 
+- Final Release v2.1
+	Additions/Improvements:
+		- support for GNU Autotools chain
+		- support for Solaris 5.10
+		- 0 height or width will be considered as infinity
+
 - Bugfix Release v2.0.1
 	Bug Fixes:
 		- suppressed some compiler warnings
