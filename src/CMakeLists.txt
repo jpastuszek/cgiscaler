@@ -3,7 +3,7 @@ set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 find_package(Magick REQUIRED)
 find_package(Wand REQUIRED)
 
-option(DEBUG_SYNC FALSE CACHE BOOL "If set every log line will be flushed to disk (very slow)")
+option(DEBUG_SYNC "If set every log line will be flushed to disk (very slow)" FALSE)
 if(DEBUG_SYNC STREQUAL "ON")
   set(DEBUG_SYNC 1)
 else(DEBUG_SYNC STREQUAL "ON")
@@ -28,4 +28,4 @@ if(Doxygen_FOUND)
 endif(Doxygen_FOUND)
 
 
-INSTALL(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/cgiscaler DESTINATION libexec)
+install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/cgiscaler DESTINATION libexec)
