@@ -17,7 +17,7 @@ add_executable(cache
   serve.c
   format_info.c
   )
-target_link_libraries(cache ${Magick_LIBRARY} ${Wand_LIBRARY} cgreen)
+target_link_libraries(cache ${Magick_LIBRARY} ${Wand_LIBRARY} cgreen m)
 
 add_executable(commandline
   test_commandline.c

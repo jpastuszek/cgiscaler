@@ -15,9 +15,7 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/build_config.h.tpl ${CMAKE_CURRENT_SO
 add_executable(cgiscaler cache.c  commandline.c  debug.c  file_utils.c
   geometry_math.c  main.c cgiscaler.c format_info.c  query_string.c  runtime_config.c  scaler.c
   serve.c)
-target_link_libraries(cgiscaler ${Magick_LIBRARY})
-target_link_libraries(cgiscaler ${Wand_LIBRARY})
-
+target_link_libraries(cgiscaler ${Magick_LIBRARY} ${Wand_LIBRARY} m)
   
 find_package(Doxygen)
 if(Doxygen_FOUND)
