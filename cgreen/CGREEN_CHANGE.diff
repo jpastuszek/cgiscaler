@@ -1,0 +1,77 @@
+Index: CMakeLists.txt
+===================================================================
+--- CMakeLists.txt	(revision 0)
++++ CMakeLists.txt	(revision 149)
+@@ -0,0 +1,2 @@
++add_library (cgreen assertions.c  breadcrumb.c  constraint.c  messaging.c
++  mocks.c  parameters.c  reporter.c  text_reporter.c  unit.c  vector.c)
+Index: messaging.c
+===================================================================
+--- messaging.c	(revision 32)
++++ messaging.c	(working copy)
+@@ -1,6 +1,8 @@
+ #include "messaging.h"
+ #include <sys/msg.h>
+ #include <stdlib.h>
++#include <sys/types.h>
++#include <unistd.h>
+ 
+ static MessageQueue *queues = NULL;
+ static int queue_count = 0;
+@@ -22,13 +24,13 @@
+     Message *message = (Message *)malloc(sizeof(Message));
+     message->type = queues[messaging].tag;
+     message->result = result;
+-    msgsnd(queues[messaging].queue, message, sizeof(Message), 0);
++    msgsnd(queues[messaging].queue, message, sizeof(message->result), 0);
+     free(message);
+ }
+ 
+ int receive_message(int messaging) {
+     Message *message = (Message *)malloc(sizeof(Message));
+-    ssize_t received = msgrcv(queues[messaging].queue, message, sizeof(Message), queues[messaging].tag, IPC_NOWAIT);
++    ssize_t received = msgrcv(queues[messaging].queue, message, sizeof(message->result), queues[messaging].tag, IPC_NOWAIT);
+     int result = (received > 0 ? message->result : 0);
+     free(message);
+     return result;
+Index: unit.c
+===================================================================
+--- unit.c	(revision 32)
++++ unit.c	(working copy)
+@@ -40,7 +40,7 @@
+ static void allow_ctrl_c();
+ static void stop();
+ static void run_the_test_code(TestSuite *suite, UnitTest *test, TestReporter *reporter);
+-static void tally_counter(const char *file, int line, int expected, int actual, void *abstract_reporter);
++/* static void tally_counter(const char *file, int line, int expected, int actual, void *abstract_reporter); */
+ static void die(char *message, ...);
+ static void do_nothing();
+ 
+@@ -209,6 +209,7 @@
+ 	tally_mocks(reporter);
+ }
+ 
++/*
+ static void tally_counter(const char *file, int line, int expected, int actual, void *abstract_reporter) {
+     TestReporter *reporter = (TestReporter *)abstract_reporter;
+     (*reporter->assert_true)(
+@@ -220,6 +221,7 @@
+             expected,
+             actual);
+ }
++*/
+ 
+ static void die(char *message, ...) {
+ 	va_list arguments;
+Index: assertions.c
+===================================================================
+--- assertions.c	(revision 32)
++++ assertions.c	(working copy)
+@@ -1,6 +1,7 @@
+ #include "assertions.h"
+ #include "reporter.h"
+ #include <stdlib.h>
++#include <string.h>
+ 
+ void _assert_equal(const char *file, int line, intptr_t tried, intptr_t expected) {
+     (*get_test_reporter()->assert_true)(

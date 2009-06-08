@@ -48,3 +48,10 @@ yours Marcus Baker
 -- 
 marcus@lastcraft.com
 marcus@wordtracker.com
+
+Following changes were made to this distribution by Jakub Pastuszek <jpastuszek@gmail.com>:
+ - fixed memory access problem in messaging.c
+ - adapted for CGIScaler's build system (CMake)
+
+See CGREEN_CHANGE.diff.
+
