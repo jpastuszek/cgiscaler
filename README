@@ -25,7 +25,7 @@ For configuration parameters see ./cgiscaler --help or see installation INSTALL.
 
 == Performance ==
 
-Performance tests shows that CGIScaler is capable of delivering 39.7 thumbanils per second with empty cache and 126.2 per second when all thumbnails are cached on virtual server with only one VCPU (Xen).
+Performance tests show that CGIScaler is capable of delivering 39.7 thumbanils per second with empty cache and 126.2 per second when all thumbnails are cached on virtual server with only one VCPU (Xen).
 
 For more details see PERFORMANCE.html file.
 
