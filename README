@@ -19,6 +19,21 @@ To further improve timing CGIScaler will sent scaled down image to the client be
 After image was sent to client it is saved in cache directory by replicating sub directory structure and with use of file name in format: '<original_file_name_with_extension>-<width>-<height>-<strict>-<quality>.<output_extension>'.
 In case of any error that would happen before thumbnail was sent to the client error image will be sent instead.
 
+== Scaling modes ==
+
+Currently two modes are supported:
+
+=== Fit ===
+Image will be scaled to fit to required dimensions without loosing aspect ratio.
+In this mode one of the resulting image dimension may be smaller then requested.
+
+image:doc/fit.jpg[Fit example image]
+
+=== Strict ===
+In strict mode image will be cropped and scaled to fill required dimensions.
+
+image:doc/strict.jpg[Strict example image]
+
 == Configuration ==
 
 For configuration parameters see ./cgiscaler --help or see installation INSTALL.html file.

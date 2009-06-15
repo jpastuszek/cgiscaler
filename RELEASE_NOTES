@@ -1,5 +1,12 @@
 CGIScaler release notes:
 
+- Build Fix Release v2.1-r1
+    Build System:
+        - now links with m library (for sqrt function on some systems)
+        - CMake 2.6 compatibility
+    Documentation:
+        - updated README file with more information about CGIScaler
+
 - Final Release v2.1
 	Additions/Improvements:
 		- support for GNU Autotools chain
