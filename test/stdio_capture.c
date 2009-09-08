@@ -71,17 +71,20 @@ void restore_fd(int fd_to_restore, int orginal_fd) {
 * @see restore_stdout()
 **/
 int capture_stdout() {
-	/* saving original stdout */
-	orginal_stdout = dup(1);
+    /* flush all remaining data */
+    fflush(stdout);
 
-	return capture_fd(1);
+	/* saving original stdout */
+	orginal_stdout = dup(STDOUT_FILENO);
+
+	return capture_fd(STDOUT_FILENO);
 }
 
 /** Restores original stdout stream after capture_stdout() call.
 * @see capture_stdout()
 **/
 void restore_stdout() {
-	restore_fd(1, orginal_stdout);
+	restore_fd(STDOUT_FILENO, orginal_stdout);
 }
 
 /** Intercepts stderr stream to file descriptor.
@@ -90,17 +93,20 @@ void restore_stdout() {
 * @see restore_stderr()
 **/
 int capture_stderr() {
-	/* saving original stdout */
-	orginal_stderr = dup(2);
+    /* flush all remaining data */
+    fflush(stderr);
 
-	return capture_fd(2);
+	/* saving original stdout */
+	orginal_stderr = dup(STDERR_FILENO);
+
+	return capture_fd(STDERR_FILENO);
 }
 
 /** Restores original stderr stream after capture_stderr() call.
 * @see capture_stderr()
 **/
 void restore_stderr() {
-	restore_fd(2, orginal_stderr);
+	restore_fd(STDERR_FILENO, orginal_stderr);
 }
 
 /** This function will fork and redirect child's stdout to stdout_fd pipe end.
@@ -111,8 +117,9 @@ void restore_stderr() {
 **/
 int fork_with_stdout_capture(int *stdout_fd) {
 	*stdout_fd = capture_stdout();
-	if(!fork())
+	if(!fork()) {
 		return 0;
+    }
 
 	/* We restore our local stdout */
 	restore_stdout();
