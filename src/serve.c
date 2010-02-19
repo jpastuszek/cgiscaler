@@ -240,7 +240,7 @@ void serve_error_message() {
 		printf("\n");
 	}
 
-	printf(error_handling_config->error_message);
+	printf("%s", error_handling_config->error_message);
 	fflush(stdout);
 }
 

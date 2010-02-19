@@ -11,6 +11,7 @@ svn st | egrep '^\?' | grep -v .git | awk '{print $2}' | xargs rm -R
 echo "Generating AsciiDoc..."
 asciidoc INSTALL
 asciidoc PERFORMANCE
+asciidoc README
 
 cd ..
 

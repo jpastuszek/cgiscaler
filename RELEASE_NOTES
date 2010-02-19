@@ -1,5 +1,16 @@
 CGIScaler release notes:
 
+- Build Fix Release v2.1-r3
+    Other:
+        - AsciiDoc documentation will be generated and installed if AsciiDoc is available
+        - fixed missing COPYRIGHT file during 'make install'
+
+- Build Fix Release v2.1-r2
+    Unit Tests:
+        - fixed problem with failing unit tests if make output was piped to a file
+    Other:
+        - fixed misuse of printf
+
 - Build Fix Release v2.1-r1
     Build System:
         - now links with m library (for sqrt function on some systems)

@@ -1,11 +1,13 @@
 CGIScaler
 =========
+Jakub Pastuszek <jpastuszek@gmail.com>
+v2.1, Feb 2010
 
 Fast, small, ImageMagick® based CGI image scaler for any web based application requiring intensive thumbnailing.
 
-For installation instructions and setup examples see INSTALL.html.
+For installation instructions and setup examples see link:INSTALL.html[INSTALL].
 
-== Theory of operation ==
+== Theory of operation
 
 This program utilises ImageMagick for image access and manipulation.
 For each request CGI process is spawned.
@@ -19,32 +21,32 @@ To further improve timing CGIScaler will sent scaled down image to the client be
 After image was sent to client it is saved in cache directory by replicating sub directory structure and with use of file name in format: '<original_file_name_with_extension>-<width>-<height>-<strict>-<quality>.<output_extension>'.
 In case of any error that would happen before thumbnail was sent to the client error image will be sent instead.
 
-== Scaling modes ==
+== Scaling modes
 
 Currently two modes are supported:
 
-=== Fit ===
+=== Fit
 Image will be scaled to fit to required dimensions without loosing aspect ratio.
 In this mode one of the resulting image dimension may be smaller then requested.
 
 image:doc/fit.jpg[Fit example image]
 
-=== Strict ===
+=== Strict
 In strict mode image will be cropped and scaled to fill required dimensions.
 
 image:doc/strict.jpg[Strict example image]
 
-== Configuration ==
+== Configuration
 
-For configuration parameters see ./cgiscaler --help or see installation INSTALL.html file.
+For configuration parameters see ./cgiscaler --help or see installation link:INSTALL.html[INSTALL] file.
 
-== Performance ==
+== Performance
 
 Performance tests show that CGIScaler is capable of delivering 39.7 thumbanils per second with empty cache and 126.2 per second when all thumbnails are cached on virtual server with only one VCPU (Xen).
 
-For more details see PERFORMANCE.html file.
+For more details see link:PERFORMANCE.html[PERFORMANCE] file.
 
-== End Note ==
+== End Note
 
 I hope that this program will be useful.
 Any suggestions and ideas are welcome.
