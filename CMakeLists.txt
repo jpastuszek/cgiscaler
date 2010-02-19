@@ -16,11 +16,15 @@ if(AsciiDoc_FOUND)
     add_custom_command(OUTPUT PERFORMANCE.html
         COMMAND asciidoc PERFORMANCE
         WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
+    add_custom_command(OUTPUT README.html
+        COMMAND asciidoc README
+        WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
 
     add_custom_target(doc ALL 
-        DEPENDS INSTALL.html PERFORMANCE.html)
+        DEPENDS INSTALL.html PERFORMANCE.html README.html)
 
-    install(FILES INSTALL.html PERFORMANCE.html DESTINATION share/doc/CGIScaler-${CGISCALER_VERSION})
+    install(FILES INSTALL.html PERFORMANCE.html README.html DESTINATION share/doc/CGIScaler-${CGISCALER_VERSION})
+    install(FILES doc/strict.jpg doc/fit.jpg DESTINATION share/doc/CGIScaler-${CGISCALER_VERSION}/doc)
 endif(AsciiDoc_FOUND)
 
 install(FILES RELEASE_NOTES LICENSE README TODO DESTINATION share/doc/CGIScaler-${CGISCALER_VERSION})
